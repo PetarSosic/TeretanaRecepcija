@@ -1,11 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   CircleAlert,
   CreditCard,
   Pencil,
+  LogIn,
+  LogOut,
   Plus,
   ShieldOff,
   UserX,
@@ -16,6 +19,9 @@ import { Table, TableWrapper, Td, Th } from "@/components/ui/table";
 import type { SaleCatalog } from "@/features/memberships/catalog";
 import type { TrainerDefaults } from "@/features/memberships/components/membership-fields";
 import { SellDialog } from "@/features/memberships/components/sell-dialog";
+import { beginCheckIn, checkOut } from "@/features/reception/actions";
+import { useCheckInFlow } from "@/features/reception/components/check-in-flow";
+import { useToast } from "@/components/common/toast";
 import { formatDate, formatMoney, formatTime } from "@/lib/format";
 import { me } from "@/lib/i18n/me";
 import { cn } from "@/lib/utils";
@@ -145,6 +151,7 @@ export function MemberProfile({
   member,
   cardCode,
   unpaidCount,
+  openVisitId,
   memberships,
   payments,
   visits,
@@ -157,6 +164,8 @@ export function MemberProfile({
   member: Member;
   cardCode: string | null;
   unpaidCount: number;
+  /** BR-071: the member's open visit, if they are in the gym. */
+  openVisitId: string | null;
   memberships: ProfileMembership[];
   payments: ProfilePayment[];
   visits: ProfileVisit[];
@@ -171,6 +180,20 @@ export function MemberProfile({
     "edit" | "anonymize" | "lostCard" | null
   >(null);
   const readOnly = member.is_anonymized;
+  const router = useRouter();
+  const toast = useToast();
+  const [checking, startChecking] = useTransition();
+  const flow = useCheckInFlow({ catalog, onChanged: () => router.refresh() });
+
+  // BR-080: [Ručna prijava] runs the S-03 flow with is_manual; [Ručna odjava] is the
+  // deliberate check-out of "U teretani".
+  function manual(work: ReturnType<typeof beginCheckIn>) {
+    startChecking(async () => {
+      const answer = await work;
+      if (answer.ok) flow.handle(answer.data);
+      else toast({ tone: "error", message: answer.error });
+    });
+  }
   const fullName = `${member.first_name} ${member.last_name}`;
   const trainerDefaults = trainerDefaultsOf(memberships);
   const visitPages = Math.max(1, Math.ceil(visitTotal / visitsPerPage));
@@ -247,6 +270,27 @@ export function MemberProfile({
             >
               {me.members.lostCard}
             </MoneyButton>
+            {openVisitId ? (
+              <Button
+                type="button"
+                variant="outline"
+                disabled={checking}
+                onClick={() => manual(checkOut(openVisitId, true))}
+              >
+                <LogOut aria-hidden="true" />
+                {me.reception.manualCheckOut}
+              </Button>
+            ) : (
+              <Button
+                type="button"
+                variant="outline"
+                disabled={checking}
+                onClick={() => manual(beginCheckIn(member.id))}
+              >
+                <LogIn aria-hidden="true" />
+                {me.reception.manualCheckIn}
+              </Button>
+            )}
             <Button
               type="button"
               variant="outline"
@@ -525,6 +569,7 @@ export function MemberProfile({
         </>
       ) : null}
 
+      {flow.element}
       <SellDialog
         open={selling !== null}
         onOpenChange={(open) => !open && setSelling(null)}

@@ -271,9 +271,9 @@ select throws_ok(
       '66666666-0000-0000-0000-00000000f001', null, null, null, 'cash')$$,
   'P0001', 'E_VALIDATION', 'AS-2: a date of birth after today is rejected');
 select throws_ok(
-  $$select register_member('6600000001', 'Ana', 'Anić', '067 111 222', 'ana@pgtap.invalid',
-      '1995-05-05', '66666666-0000-0000-0000-00000000f001', null, null, null, 'cash', true)$$,
-  'P0001', 'E_VALIDATION', 'M-07: "Prijavi odmah" is refused until check-in exists');
+  $$select register_member('6600000001', 'Ana', 'Anić', '067 111 222', 'ana@pgtap',
+      '1995-05-05', '66666666-0000-0000-0000-00000000f001', null, null, null, 'cash')$$,
+  'P0001', 'E_VALIDATION', 'BR-040: an email without a domain is rejected');
 
 select is(
   (register_member('6600000001', ' Ana ', 'Ćosić', '067 111 222', 'ANA@pgtap.invalid',

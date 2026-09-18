@@ -230,8 +230,12 @@ test("US-06.1: a receptionist registers a member with an empty card", async ({
     ),
   ).toBeVisible();
   await dialog.getByRole("button", { name: "Zatvori" }).first().click();
+  // "Prijavi odmah" is on by default (D-31): the green check-in result follows.
+  await expect(page.locator("[data-result=covered]")).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(page.getByRole("dialog")).toBeHidden();
 
-  // AC2: member, card, membership and payment, all saved together.
+  // AC2: member, card, membership, payment and the visit, all saved together.
   const admin = adminClient();
   const { data: member } = await admin
     .from("members")
@@ -262,6 +266,20 @@ test("US-06.1: a receptionist registers a member with an empty card", async ({
     .returns<{ kind: string; amount: string; method: string }[]>();
   expect(payments).toEqual([
     { kind: "membership", amount: "79.00", method: "cash" },
+  ]);
+  const { data: visits } = await admin
+    .from("visits")
+    .select("visit_type, is_unpaid, checked_out_at")
+    .eq("member_id", memberId)
+    .returns<
+      {
+        visit_type: string;
+        is_unpaid: boolean;
+        checked_out_at: string | null;
+      }[]
+    >();
+  expect(visits).toEqual([
+    { visit_type: "gym", is_unpaid: false, checked_out_at: null },
   ]);
 
   // BR-044: the list finds her without the diacritics.

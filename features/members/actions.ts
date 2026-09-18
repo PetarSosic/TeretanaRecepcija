@@ -8,6 +8,7 @@ import { fieldErrorsOf, rpcCode, rpcFailure } from "@/lib/rpc";
 import { parseCardCode } from "@/lib/scan";
 import { createClient } from "@/lib/supabase/server";
 import type { ActionState } from "@/lib/action-state";
+import type { CheckInResult } from "@/features/reception/types";
 import {
   personalMinimumText,
   saleArguments,
@@ -77,11 +78,13 @@ export type RegisteredMember = {
   memberId: string;
   memberNumber: number;
   fullName: string;
+  /** "Prijavi odmah": the BR-079 result S-03b/c/d shows next. */
+  checkIn: CheckInResult | null;
 };
 
 /**
- * F-06: the member, the card, the membership and its payment in one transaction
- * (US-06.1 AC2). "Prijavi odmah" arrives with the check-in of M-07.
+ * F-06: the member, the card, the membership, its payment and, with "Prijavi odmah"
+ * (on by default, D-31), the check-in, all in one transaction (US-06.1 AC2).
  */
 export async function registerMember(
   _state: ActionState<RegisteredMember>,
@@ -106,7 +109,7 @@ export async function registerMember(
     p_email: value.email,
     p_dob: value.dateOfBirth,
     ...saleArguments(value),
-    p_check_in: false,
+    p_check_in: formData.get("checkInNow") === "on",
   });
   if (error) {
     const code = rpcCode(error);
@@ -123,14 +126,17 @@ export async function registerMember(
     member_number: number;
     first_name: string;
     last_name: string;
+    check_in: CheckInResult | null;
   };
   revalidatePath("/members");
+  revalidatePath("/reception");
   return {
     success: me.memberships.saved,
     data: {
       memberId: member.member_id,
       memberNumber: member.member_number,
       fullName: `${member.first_name} ${member.last_name}`,
+      checkIn: member.check_in,
     },
   };
 }

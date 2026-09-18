@@ -16,6 +16,7 @@
     "test:watch": "vitest",
     "test:db": "node scripts/test-db.mjs",
     "test:e2e": "playwright test",
+    "perf:scan": "node scripts/perf-scan.mjs",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "db:link": "supabase link",

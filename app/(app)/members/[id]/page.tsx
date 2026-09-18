@@ -58,7 +58,7 @@ export default async function MemberPage({
   if (!member) notFound();
 
   const from = (visitPage - 1) * VISITS_PER_PAGE;
-  const [card, memberships, payments, visits, unpaid, catalog] =
+  const [card, memberships, payments, visits, unpaid, openVisit, catalog] =
     await Promise.all([
       supabase
         .from("cards")
@@ -103,6 +103,13 @@ export default async function MemberPage({
         .eq("member_id", id)
         .eq("is_unpaid", true)
         .is("membership_id", null),
+      // BR-071: the open visit, if any, decides [Ručna prijava] or [Ručna odjava].
+      supabase
+        .from("visits")
+        .select("id")
+        .eq("member_id", id)
+        .is("checked_out_at", null)
+        .maybeSingle<{ id: string }>(),
       loadSaleCatalog(staff),
     ]);
   if (memberships.error)
@@ -125,6 +132,7 @@ export default async function MemberPage({
       member={member}
       cardCode={card.data?.code ?? null}
       unpaidCount={unpaid.count ?? 0}
+      openVisitId={openVisit.data?.id ?? null}
       memberships={(memberships.data ?? []) as ProfileMembership[]}
       payments={(payments.data ?? []).map(
         ({ plans, created_by, ...payment }) => ({

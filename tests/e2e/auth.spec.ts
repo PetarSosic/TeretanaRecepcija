@@ -121,8 +121,9 @@ test("US-01.3: the owner creates a manager and a receptionist", async ({
   await signIn(receptionistPage, receptionistName, TEMPORARY);
   await expect(receptionistPage).toHaveURL(/\/change-password/);
   await setNewPassword(receptionistPage, CHOSEN);
-  // Doc 06 §2: a receptionist lands on Recepcija.
-  await expect(receptionistPage).toHaveURL(/\/reception/);
+  // Doc 06 §2: a receptionist lands on Recepcija. The password change and the S-03
+  // render (panel and sale catalogue, M-07) share one response, so allow for a slow run.
+  await expect(receptionistPage).toHaveURL(/\/reception/, { timeout: 15_000 });
   await second.close();
 });
 

@@ -19,23 +19,33 @@ import {
 import type { SaleCatalog } from "@/features/memberships/catalog";
 import { MembershipFields } from "@/features/memberships/components/membership-fields";
 import { me } from "@/lib/i18n/me";
-import { findDuplicates, registerMember, type Duplicate } from "../actions";
+import {
+  findDuplicates,
+  registerMember,
+  type Duplicate,
+  type RegisteredMember,
+} from "../actions";
 import { CardScanField } from "./card-scan-field";
 import { MemberFields } from "./member-fields";
 
 /**
- * S-05, opened from [Novi član] on S-06 (US-06.1 AC4): scan an empty card, enter the
- * member, sell the first membership, and save everything in one transaction (AC2).
- * Opening it from a scan on S-03 arrives with M-07.
+ * S-05, opened by scanning an empty card on S-03 (BR-070) or from [Novi član]
+ * (US-06.1 AC4): the card, the member, the first membership and "Prijavi odmah", saved
+ * in one transaction (AC2). When the success notice is closed, `onRegistered` receives
+ * the result so the check-in dialog (S-03b/c/d) can follow.
  */
 export function RegisterDialog({
   open,
   onOpenChange,
   catalog,
+  initialCard,
+  onRegistered,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   catalog: SaleCatalog;
+  initialCard?: string;
+  onRegistered?: (member: RegisteredMember) => void;
 }) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -44,7 +54,14 @@ export function RegisterDialog({
         className="max-h-[92svh] overflow-y-auto sm:max-w-2xl"
       >
         {open ? (
-          <RegisterForm catalog={catalog} onDone={() => onOpenChange(false)} />
+          <RegisterForm
+            catalog={catalog}
+            initialCard={initialCard}
+            onDone={(member) => {
+              onOpenChange(false);
+              if (member) onRegistered?.(member);
+            }}
+          />
         ) : null}
       </DialogContent>
     </Dialog>
@@ -53,13 +70,15 @@ export function RegisterDialog({
 
 function RegisterForm({
   catalog,
+  initialCard,
   onDone,
 }: {
   catalog: SaleCatalog;
-  onDone: () => void;
+  initialCard?: string;
+  onDone: (member: RegisteredMember | null) => void;
 }) {
   const [state, onSubmit, pending] = useFormAction(registerMember);
-  const [cardCode, setCardCode] = useState<string | null>(null);
+  const [cardCode, setCardCode] = useState<string | null>(initialCard ?? null);
   const [duplicates, setDuplicates] = useState<Duplicate[]>([]);
   const [, startChecking] = useTransition();
   const form = useRef<HTMLFormElement>(null);
@@ -87,7 +106,11 @@ function RegisterForm({
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
-          <Button type="button" onClick={onDone}>
+          <Button
+            type="button"
+            autoFocus
+            onClick={() => onDone(state.data ?? null)}
+          >
             {me.common.close}
           </Button>
         </DialogFooter>
@@ -111,7 +134,8 @@ function RegisterForm({
           <CardScanField
             id="register-card"
             label={me.members.scanCard}
-            autoFocus
+            autoFocus={!initialCard}
+            initialCode={initialCard}
             onChange={setCardCode}
             serverError={state.fieldErrors?.cardCode}
           />
@@ -182,6 +206,17 @@ function RegisterForm({
             fieldErrors={state.fieldErrors}
           />
         </section>
+
+        {/* S-05 item 4 and D-31: "Prijavi odmah", on by default. */}
+        <label className="flex items-center gap-2 text-sm font-medium">
+          <input
+            type="checkbox"
+            name="checkInNow"
+            defaultChecked
+            className="size-4 accent-primary"
+          />
+          {me.reception.checkInNow}
+        </label>
 
         <DialogFooter>
           <DialogClose asChild>

@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
 import { Table, TableWrapper, Td, Th } from "@/components/ui/table";
 import type { SaleCatalog } from "@/features/memberships/catalog";
+import { useCheckInFlow } from "@/features/reception/components/check-in-flow";
 import { formatDate } from "@/lib/format";
 import { me } from "@/lib/i18n/me";
 import { RegisterDialog } from "./register-dialog";
@@ -67,6 +68,7 @@ export function MembersScreen({
   const [text, setText] = useState(query);
   const [registering, setRegistering] = useState(false);
   const [navigating, startNavigation] = useTransition();
+  const flow = useCheckInFlow({ catalog, onChanged: () => router.refresh() });
 
   function go(next: { q?: string; status?: MemberFilter; page?: number }) {
     const params = new URLSearchParams();
@@ -234,7 +236,13 @@ export function MembersScreen({
         open={registering}
         onOpenChange={setRegistering}
         catalog={catalog}
+        onRegistered={(member) => {
+          // S-05: with "Prijavi odmah", the check-in result follows (S-03b/c/d).
+          if (member.checkIn)
+            flow.handle({ result: "checked_in", check_in: member.checkIn });
+        }}
       />
+      {flow.element}
     </>
   );
 }

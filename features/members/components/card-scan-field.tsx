@@ -20,12 +20,15 @@ export function CardScanField({
   onChange,
   serverError,
   autoFocus,
+  initialCode,
 }: {
   id: string;
   label: string;
   onChange: (code: string | null) => void;
   serverError?: string;
   autoFocus?: boolean;
+  /** S-05 opened by a scan on S-03: the card is already known and read-only. */
+  initialCode?: string;
 }) {
   const [text, setText] = useState("");
   const [confirmed, setConfirmed] = useState<string | null>(null);
@@ -34,6 +37,18 @@ export function CardScanField({
   // Two scans in quick succession can be answered out of order; only the answer to the
   // latest one may change the field.
   const latest = useRef(0);
+
+  if (initialCode)
+    return (
+      <div className="grid gap-2">
+        <span className="text-sm font-medium">{me.members.cardCode}</span>
+        <output className="flex h-10 items-center rounded-lg border bg-muted px-3 font-mono text-sm tabular-nums">
+          {initialCode}
+        </output>
+        <input type="hidden" name="cardCode" value={initialCode} />
+        <FieldError id={`${id}-error`}>{serverError}</FieldError>
+      </div>
+    );
 
   function check() {
     const value = text.trim();
