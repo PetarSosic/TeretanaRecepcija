@@ -52,6 +52,7 @@ const ITEMS: readonly NavItem[] = [
 // Routes that exist today. Later milestones add their route here when the screen lands.
 const IMPLEMENTED = new Set([
   "/reception",
+  "/members",
   "/finance",
   "/settings/users",
   "/settings/trainers",

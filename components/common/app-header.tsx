@@ -80,13 +80,20 @@ export function AppHeader({
           </ul>
         </nav>
 
-        <div className="ml-auto flex items-center gap-2">
+        {/* Doc 08 §9: at 375 px the badge and the name give way (truncate) rather
+            than push the page sideways; min-w-0 is what lets flex items shrink. */}
+        <div className="ml-auto flex min-w-0 items-center justify-end gap-2">
           <ShiftBadge openShift={openShift} />
           <MobileNav navigation={navigation} isCurrent={isCurrent} />
           <DropdownMenu.Root>
             <DropdownMenu.Trigger asChild>
-              <Button variant="outline" size="sm" aria-label={me.nav.account}>
-                <span className="max-w-32 truncate">{fullName}</span>
+              <Button
+                variant="outline"
+                size="sm"
+                aria-label={me.nav.account}
+                className="min-w-0 shrink"
+              >
+                <span className="max-w-32 min-w-0 truncate">{fullName}</span>
                 <ChevronDown aria-hidden="true" />
               </Button>
             </DropdownMenu.Trigger>
@@ -173,12 +180,12 @@ function ShiftBadge({
 }) {
   if (!openShift)
     return (
-      <span className="max-w-28 truncate text-xs text-muted-foreground sm:max-w-none sm:text-sm">
+      <span className="max-w-28 min-w-0 truncate text-xs text-muted-foreground sm:max-w-none sm:text-sm">
         {me.shift.none}
       </span>
     );
   return (
-    <span className="max-w-36 truncate rounded-lg bg-muted px-2 py-1 text-xs sm:max-w-none sm:px-3 sm:py-1.5 sm:text-sm">
+    <span className="max-w-36 min-w-0 truncate rounded-lg bg-muted px-2 py-1 text-xs sm:max-w-none sm:px-3 sm:py-1.5 sm:text-sm">
       {me.shift.badge
         .replace("{name}", openShift.staffName)
         .replace("{time}", formatTime(openShift.startedAt))}

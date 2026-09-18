@@ -120,11 +120,17 @@ export async function deleteTestGym(gymId: string): Promise<void> {
     .returns<{ user_id: string }[]>();
 
   await admin.from("audit_log").delete().eq("gym_id", gymId);
+  // M-06: visits and payments reference memberships, which reference shifts and plans.
+  await admin.from("visits").delete().eq("gym_id", gymId);
+  await admin.from("payments").delete().eq("gym_id", gymId);
+  await admin.from("membership_finance").delete().eq("gym_id", gymId);
+  await admin.from("memberships").delete().eq("gym_id", gymId);
   // M-05: shifts reference staff, so they go before it.
   await admin.from("shifts").delete().eq("gym_id", gymId);
-  // M-04: cards before their batches.
+  // M-04: cards before their batches; M-06: cards before the members they point to.
   await admin.from("cards").delete().eq("gym_id", gymId);
   await admin.from("card_batches").delete().eq("gym_id", gymId);
+  await admin.from("members").delete().eq("gym_id", gymId);
   // Catalogue first, in foreign-key order (M-03).
   await admin.from("class_slots").delete().eq("gym_id", gymId);
   await admin.from("trainer_programs").delete().eq("gym_id", gymId);

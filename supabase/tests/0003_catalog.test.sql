@@ -177,28 +177,34 @@ select throws_ok(
 );
 
 -- D-62: the trainer group share overrides the plan percentage ------------------
+-- M-06 (0012) made resolve_group_share internal: staff never receive a percentage
+-- (doc 04 §2), and the sale reads it with definer rights. So it is read here as the
+-- database owner, and only set_trainer_fee runs as the signed-in owner.
 reset role;
 set local request.jwt.claims = '{"sub": "33333333-0000-0000-0000-00000000a001"}';
-set local role authenticated;
 
 select is(
   resolve_group_share('33333333-0000-0000-0000-00000000d001', '33333333-0000-0000-0000-00000000f002'),
   70::numeric,
   'D-62: with no trainer share, the plan percentage applies'
 );
+set local role authenticated;
 select lives_ok(
   $$select set_trainer_fee('33333333-0000-0000-0000-00000000d001', 80::numeric, 60::numeric)$$,
   'D-62: the owner sets a trainer group share'
 );
+reset role;
 select is(
   resolve_group_share('33333333-0000-0000-0000-00000000d001', '33333333-0000-0000-0000-00000000f002'),
   60::numeric,
   'D-62: the trainer share overrides the plan percentage'
 );
+set local role authenticated;
 select lives_ok(
   $$select set_trainer_fee('33333333-0000-0000-0000-00000000d001', 80::numeric, null::numeric)$$,
   'D-62: clearing it is allowed'
 );
+reset role;
 select is(
   resolve_group_share('33333333-0000-0000-0000-00000000d001', '33333333-0000-0000-0000-00000000f002'),
   70::numeric,

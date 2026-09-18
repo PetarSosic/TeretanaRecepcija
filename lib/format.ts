@@ -80,6 +80,29 @@ export function formatDateTime(value: Date | string): string {
   return `${formatDate(instant(value))} ${formatTime(value)}`;
 }
 
+/**
+ * S-05: a date is typed as dd.mm.yyyy (BR-002) or comes from the date picker as
+ * yyyy-mm-dd. Returns the database form yyyy-mm-dd, or null for anything that is not a
+ * real calendar date (31.02 included).
+ */
+export function parseDateInput(value: string): string | null {
+  const text = value.trim();
+  const local = /^(\d{1,2})\.(\d{1,2})\.(\d{4})\.?$/.exec(text);
+  const iso = /^(\d{4})-(\d{2})-(\d{2})$/.exec(text);
+  const [year, month, day] = local
+    ? [local[3], local[2], local[1]]
+    : iso
+      ? [iso[1], iso[2], iso[3]]
+      : [];
+  if (!year || !month || !day) return null;
+  const result = `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
+  const date = new Date(`${result}T12:00:00Z`);
+  return !Number.isNaN(date.getTime()) &&
+    date.toISOString().slice(0, 10) === result
+    ? result
+    : null;
+}
+
 export function formatDuration(seconds: number): string {
   if (!Number.isFinite(seconds) || seconds < 0)
     throw new RangeError("Invalid duration");

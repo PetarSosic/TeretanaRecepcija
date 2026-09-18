@@ -2,6 +2,8 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 
 // Doc 08 §9: tables scroll inside their own container so pages never scroll sideways.
+// `relative` matters: an absolutely positioned child (a visually hidden sr-only header)
+// would otherwise escape the scroll container and widen the whole page.
 export function TableWrapper({
   className,
   ...props
@@ -9,7 +11,7 @@ export function TableWrapper({
   return (
     <div
       data-slot="table-wrapper"
-      className={cn("w-full overflow-x-auto", className)}
+      className={cn("relative w-full overflow-x-auto", className)}
       {...props}
     />
   );
