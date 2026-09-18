@@ -1,0 +1,12 @@
+import { connect } from "./pg-client.mjs";
+const c = await connect();
+const q = async (l, s) => { const r = await c.query(s); console.log(`## ${l} (${r.rows.length})`); r.rows.forEach(x=>console.log(JSON.stringify(x))); };
+await q("plans", `select p.sort_order, p.name, p.kind, p.duration_value, p.duration_unit, p.price, p.covers_gym as g, p.covers_group as gr, p.covers_personal as pe, p.gym_visit_limit as gvl, p.group_session_limit as gsl, p.requires_trainer as rt, f.gym_fixed_amount as fixed, f.trainer_share_pct as pct from plans p join plan_finance f on f.plan_id = p.id order by p.sort_order`);
+await q("trainers", `select t.full_name, f.personal_gym_fee from trainers t join trainer_finance f on f.trainer_id = t.id order by t.full_name`);
+await q("programs", `select name, kind from programs order by name`);
+await q("assignments", `select t.full_name, p.name from trainer_programs tp join trainers t on t.id=tp.trainer_id join programs p on p.id=tp.program_id order by p.name, t.full_name`);
+await q("slots", `select t.full_name, cs.weekday, cs.starts_at from class_slots cs join trainers t on t.id=cs.trainer_id order by t.full_name, cs.starts_at, cs.weekday`);
+await q("categories", `select name, is_salary, is_system from expense_categories order by name`);
+await q("products", `select name, current_purchase_price, sale_price from products`);
+await q("counters", `select last_number from member_counters`);
+await c.end();

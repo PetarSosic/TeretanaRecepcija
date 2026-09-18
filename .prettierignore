@@ -1,0 +1,12 @@
+node_modules
+.next
+package-lock.json
+next-env.d.ts
+playwright-report
+test-results
+supabase/.temp
+.playwright
+.npm-cache
+docs
+README.md
+CLAUDE.md

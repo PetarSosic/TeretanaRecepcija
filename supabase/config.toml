@@ -1,0 +1,9 @@
+﻿# D-56: CLI metadata for hosted Supabase migrations. No local stack is used.
+# Linking is separate: npm run db:link -- --project-ref paakuxiufzmdobpooqdi
+project_id = "kp-fitness"
+
+[db.migrations]
+enabled = true
+
+[db.seed]
+enabled = false

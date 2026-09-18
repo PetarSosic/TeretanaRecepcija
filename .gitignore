@@ -1,0 +1,17 @@
+node_modules/
+.next/
+out/
+coverage/
+playwright-report/
+test-results/
+*.tsbuildinfo
+.env*
+!.env.example
+*.xlsx
+*.xls
+.vercel/
+supabase/.temp/
+supabase/.branches/
+.npm-cache/
+.playwright/
+*.log
