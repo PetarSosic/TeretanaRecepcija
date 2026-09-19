@@ -273,7 +273,8 @@ export async function saveExpenseCategory(
         p_name: value.name,
         p_is_active: value.isActive,
       }),
-    [GYM_PATH],
+    // M-12: the same dialog is reachable from S-17, whose filter lists the categories.
+    [GYM_PATH, "/finance/expenses"],
   );
 }
 

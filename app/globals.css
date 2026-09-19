@@ -15,6 +15,12 @@
   --danger: #9b1c1c;
   --success: #1a6b4c;
   --radius: 0.75rem;
+  /* Chart series (M-12). Two categorical slots, validated together for colour-vision
+     deficiency and for contrast against the card surface; identity never rests on the
+     colour alone, because every chart here also carries a legend and direct labels. */
+  --chart-1: #2a78d6;
+  --chart-2: #eb6834;
+  --chart-grid: #d9e0d9;
 }
 
 @theme inline {
@@ -30,6 +36,9 @@
   --color-ring: var(--ring);
   --color-danger: var(--danger);
   --color-success: var(--success);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-grid: var(--chart-grid);
   --radius-lg: var(--radius);
   --font-sans: Arial, Helvetica, sans-serif;
 }
