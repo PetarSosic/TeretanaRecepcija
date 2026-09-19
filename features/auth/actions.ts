@@ -142,6 +142,14 @@ export async function changeOwnPassword(
       .update({ must_change_password: false })
       .eq("id", staff.id);
     if (flagError) return { error: me.errors.unexpected };
+
+    // BR-111: a first login is sent to S-01b before the shift logic runs, so it runs
+    // here instead. Without it a new receptionist would reach the reception screen with
+    // no shift of their own, which BR-116 treats as a shift that has ended.
+    if (staff.role === "receptionist") {
+      const state = await resolveLoginShift();
+      redirect(state === "gate" ? "/shift/gate" : homeRoute(staff.role));
+    }
     redirect(homeRoute(staff.role));
   }
 

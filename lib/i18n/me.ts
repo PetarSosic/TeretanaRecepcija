@@ -795,6 +795,26 @@ export const me = {
     descriptionInvalid: "Unesite opis (2–200 znakova).",
     quantityInvalid: "Unesite broj između 1 i 20.",
   },
+  // S-15 Statistika dolazaka (F-20).
+  stats: {
+    title: "Statistika dolazaka",
+    total: "Ukupno dolazaka",
+    averageDuration: "Prosječno trajanje",
+    averageHint: "Bez automatskih odjava ({count} mjerenih dolazaka).",
+    perDay: "Dolasci po danima",
+    perHour: "Dolasci po satima (06–23)",
+    byType: "Dolasci po vrsti",
+    topMembers: "Najčešći članovi",
+    member: "Član",
+    visits: "dolazaka",
+    visitsColumn: "Dolazaka",
+    typeGym: "Teretana",
+    typeGroup: "Grupni",
+    typePersonal: "Personalni",
+    chartHint: "Pređite mišem preko stupca za broj dolazaka.",
+    empty: "Nema dolazaka u izabranom periodu.",
+    noAverage: "Nema izmjerenih dolazaka.",
+  },
   // F-25 expiry reminder to the member (BR-160, doc 08 §7).
   expiry: {
     emailSubject: "Vaša članarina ističe {date}",
@@ -819,6 +839,8 @@ export const me = {
     cancel: "Otkaži",
     close: "Zatvori",
     loading: "Učitavanje…",
+    retry: "Pokušaj ponovo",
+    errorCode: "Šifra greške",
     comingSoon: "Ovaj dio aplikacije je u pripremi.",
   },
   errors: {

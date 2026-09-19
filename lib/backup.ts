@@ -11,6 +11,8 @@ import { createAdminClient } from "@/lib/supabase/admin";
 export const BACKUP_KEEP = 8;
 /** BR-163 and AS-23: bigger than this and the email carries a note instead of the ZIP. */
 export const BACKUP_ATTACHMENT_LIMIT = 35 * 1024 * 1024;
+/** Doc 08 §9: tables are exported one at a time, in pages of this many rows. */
+export const BACKUP_PAGE = 5000;
 
 export type BackupManifest = {
   gym_id: string;
@@ -153,12 +155,18 @@ export async function createBackup(
   let total = 0;
 
   for (const { table_name: table } of tableNames) {
-    const { data: rows, error } = await admin.rpc("backup_table_rows", {
-      p_gym: gymId,
-      p_table: table,
-    });
-    if (error) throw new Error(`backup_table_rows ${table}: ${error.message}`);
-    const list = (rows ?? []) as Record<string, unknown>[];
+    // Doc 08 §9: one table at a time, in pages, so a gym with a year of visits never
+    // has its whole history in memory at once inside a serverless function.
+    const list: Record<string, unknown>[] = [];
+    for (let offset = 0; ; offset += BACKUP_PAGE) {
+      const { data: rows, error } = await admin
+        .rpc("backup_table_rows", { p_gym: gymId, p_table: table })
+        .range(offset, offset + BACKUP_PAGE - 1);
+      if (error) throw new Error(`backup_table_rows ${table}: ${error.message}`);
+      const page = (rows ?? []) as Record<string, unknown>[];
+      list.push(...page);
+      if (page.length < BACKUP_PAGE) break;
+    }
 
     // An empty table still gets its header, so a restore knows the shape of the file.
     let columns = list.length ? Object.keys(list[0]) : [];

@@ -164,7 +164,10 @@ test("US-01.3 AC5: a deactivated user is signed out on the next request", async 
   });
 
   await signIn(page, doomed.identifier, doomed.password);
-  await expect(page).toHaveURL(/\/reception/);
+  // BR-111: the receptionist of the earlier test still holds this gym's open shift, so
+  // this one meets the S-02 gate rather than the reception screen. Either is a signed-in
+  // session, which is all this test needs before the account is deactivated.
+  await expect(page).toHaveURL(/\/reception|\/shift\/gate/);
 
   const admin = adminClient();
   await admin.from("staff").update({ is_active: false }).eq("id", doomed.id);

@@ -2,10 +2,12 @@ import { NextResponse, type NextRequest } from "next/server";
 import { isJobName, runJob } from "@/lib/jobs";
 
 // Doc 08 §8: pg_cron posts here every five minutes with the shared secret; each handler
-// decides for itself whether its job is due. The work can outlast the default budget of
-// a serverless function, so the route is dynamic and given room.
+// decides for itself whether its job is due. The work outlasts the default budget of a
+// serverless function, so the route is dynamic and asks for the whole of it — 60 s is
+// the ceiling on Vercel's Hobby plan (doc 08 §9), and a backup that would need longer
+// fails and is reported rather than producing half a copy.
 export const dynamic = "force-dynamic";
-export const maxDuration = 300;
+export const maxDuration = 60;
 
 /**
  * Doc 08 §8 and doc 04: the secret is the only credential, so it is compared in constant

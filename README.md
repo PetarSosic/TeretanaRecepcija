@@ -78,3 +78,93 @@ Migrations live in `supabase/migrations/NNNN_description.sql` and are applied to
 `npm run db:link` still exists for the authenticated CLI workflow (`npx supabase login` first), but it is not required.
 
 Technical references: [Next.js CSP](https://nextjs.org/docs/app/guides/content-security-policy), [Supabase server-side clients](https://supabase.com/docs/guides/auth/server-side/creating-a-client), [Supabase pgTAP testing](https://supabase.com/docs/guides/database/testing).
+
+## Jobs and backups (M-11)
+
+The four scheduled jobs of doc 08 §8 run behind `POST /api/jobs/<name>` with the header
+`x-cron-secret`, and `pg_cron` posts to them every five minutes. The schedule is created
+by migration `0019` and reads `APP_URL` and `CRON_SECRET` from Supabase Vault at each run,
+so neither value is ever committed. Until both secrets exist the schedule does nothing,
+which is what makes it harmless in development.
+
+- `npm run jobs:secrets` writes `APP_URL` and `CRON_SECRET` from `.env.local` into the
+  Vault of the hosted project. It refuses a localhost address, because Supabase cannot
+  reach this machine.
+- `npm run jobs:run -- nightly | morning | weekly-backup | email-retry` calls one handler
+  by hand. **In development this sends real email**, because `.env.local` holds a working
+  Resend key: the morning job mails real members. The automated tests never can — the
+  browser tests run with a key Resend rejects, and the backup test runs with `EMAIL_FROM`
+  unset.
+- `npm run restore:test -- --file <backup.zip>` restores a weekly backup into the
+  **separate, empty** project named by `RESTORE_TEST_DATABASE_URL`. It refuses to run when
+  that host matches `DATABASE_URL`, so it can never be pointed at the gym (D-56). Without
+  `--file` it downloads the newest backup from Storage.
+
+## Production deployment
+
+Everything below is done once, in this order. Nothing here is automated: each step needs
+an account only the owner has.
+
+### 1. Supabase
+
+1. `npm run db:push` applies every pending migration to the production project.
+2. `npm run seed` creates the gym row and the BR-012 settings; `npm run seed:owner` and
+   `npm run seed:admin` create the two accounts of D-58. All three are idempotent.
+3. In **Authentication → SMTP Settings**, enter the Resend SMTP credentials, so the
+   password-reset mail of US-01.2 leaves from the verified domain rather than from
+   Supabase's shared sender, which is rate-limited and often filtered.
+4. Confirm that the extensions `pg_cron` and `pg_net` are enabled (migration `0019` does
+   this) and that `cron.job` holds one row named `kp-fitness-jobs` on `*/5 * * * *`.
+
+### 2. Resend
+
+1. Add the domain `stamenkovicc.com` and create the DNS records Resend asks for (SPF and
+   DKIM, and the return-path record).
+2. Wait until the domain shows **Verified**. Until it does, every send fails and the shift
+   reports are recorded as `failed` (BR-118).
+3. Create an API key with send permission for that domain; it becomes `RESEND_API_KEY`.
+
+### 3. Vercel
+
+1. Import the repository and set the environment variables of doc 08 §11 for the
+   Production environment:
+   `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`,
+   `SUPABASE_SERVICE_ROLE_KEY`, `RESEND_API_KEY`, `EMAIL_FROM`
+   (`noreply@stamenkovicc.com`), `BACKUP_ZIP_PASSWORD` (at least 20 random characters),
+   `CRON_SECRET` (at least 32 random characters), `APP_URL` (the deployed address),
+   `STAFF_EMAIL_DOMAIN`. `DATABASE_URL` and the seed passwords belong to the developer's
+   machine and must **not** be set on Vercel.
+2. Deploy, and check that `https://<app>/login` answers.
+3. Store `BACKUP_ZIP_PASSWORD` in a password manager. It is never sent by email and there
+   is no way to recover a backup without it (doc 08 §9).
+
+### 4. Turn the jobs on
+
+1. Set `APP_URL` in `.env.local` to the deployed address and run `npm run jobs:secrets`.
+2. Within five minutes, `select * from cron.job_run_details order by start_time desc` on
+   the production project shows `succeeded`, and the Vercel logs show four `POST
+   /api/jobs/...` requests answering 200.
+3. `POST https://<app>/api/jobs/nightly` without the header must answer **401**.
+
+### 5. Smoke test
+
+Sign in as the owner, scan or search one member, and close a shift. The shift report must
+arrive by email, and S-19 must show its status as `poslato`.
+
+### 6. Restoring a backup
+
+The weekly backup is an AES-256 ZIP in the private `backups` bucket, also emailed to
+`backup_emails`. To restore it into an empty project — **never into the working project**
+(D-56):
+
+1. Create a new Supabase project and put its connection URI and keys in `.env.local` as
+   `RESTORE_TEST_DATABASE_URL`, `RESTORE_TEST_SUPABASE_URL` and
+   `RESTORE_TEST_SERVICE_ROLE_KEY`.
+2. Run `npm run restore:test -- --file <backup.zip>`. The script applies every migration,
+   decrypts the ZIP with `BACKUP_ZIP_PASSWORD`, empties the target, loads each CSV with
+   the triggers disabled and the parents before the children, resets the identity
+   counters, and prints a row-count comparison against `manifest.json`. It exits non-zero
+   on any mismatch.
+3. Supabase Auth is not part of the backup, so the script creates a placeholder
+   `auth.users` row for every staff member. Their passwords must be set again from S-23
+   before anyone can sign in to the restored project.
