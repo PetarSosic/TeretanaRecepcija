@@ -14,9 +14,26 @@ export const metadata: Metadata = {
 export default async function ReceptionPage() {
   const staff = await requireStaff();
   const supabase = await createClient();
-  const [panel, catalog] = await Promise.all([
+  const [panel, catalog, dayPass, categories] = await Promise.all([
     supabase.rpc("reception_panel"),
     loadSaleCatalog(staff),
+    // S-10 and BR-100: the current day-pass price (the RPC charges its own reading).
+    supabase
+      .from("plans")
+      .select("price::text")
+      .eq("kind", "day_pass")
+      .eq("is_active", true)
+      .order("sort_order")
+      .limit(1)
+      .maybeSingle<{ price: string }>(),
+    // S-11 and BR-132: active categories that are not salary categories (D-37).
+    supabase
+      .from("expense_categories")
+      .select("id, name")
+      .eq("is_active", true)
+      .eq("is_salary", false)
+      .order("name")
+      .returns<{ id: string; name: string }[]>(),
   ]);
   if (panel.error) console.error(`reception_panel: ${panel.error.message}`);
 
@@ -26,6 +43,8 @@ export default async function ReceptionPage() {
         (panel.data as ReceptionPanel | null) ?? { in_gym: [], today_count: 0 }
       }
       catalog={catalog}
+      dayPassPrice={dayPass.data?.price ?? null}
+      expenseCategories={categories.data ?? []}
     />
   );
 }

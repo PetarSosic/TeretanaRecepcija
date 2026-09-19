@@ -5,11 +5,14 @@ import Link from "next/link";
 import {
   CircleAlert,
   Loader2,
+  Receipt,
   ScanLine,
   Search,
+  Ticket,
   UserPlus,
   Volume2,
 } from "lucide-react";
+import { MoneyButton } from "@/components/common/money-button";
 import { useAppState } from "@/components/common/app-state";
 import { useToast } from "@/components/common/toast";
 import { Button } from "@/components/ui/button";
@@ -17,6 +20,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RegisterDialog } from "@/features/members/components/register-dialog";
 import type { SaleCatalog } from "@/features/memberships/catalog";
+import {
+  DayPassDialog,
+  DeskExpenseDialog,
+  type ExpenseCategory,
+} from "@/features/payments/components/desk-dialogs";
 import { formatDuration, formatTime } from "@/lib/format";
 import { getErrorMessage } from "@/lib/errors";
 import { me } from "@/lib/i18n/me";
@@ -42,14 +50,23 @@ const CARD_MESSAGES: Record<string, string> = {
 export function ReceptionScreen({
   initialPanel,
   catalog,
+  dayPassPrice,
+  expenseCategories,
 }: {
   initialPanel: ReceptionPanel;
   catalog: SaleCatalog;
+  /** BR-100: the current day-pass price, for S-10's live total. */
+  dayPassPrice: string | null;
+  /** BR-132: active, non-salary categories for S-11. */
+  expenseCategories: ExpenseCategory[];
 }) {
   const [panel, setPanel] = useState(initialPanel);
   const [status, setStatus] = useState<string | null>(null);
   const [registerCard, setRegisterCard] = useState<string | null>(null);
   const [registering, setRegistering] = useState(false);
+  const [deskDialog, setDeskDialog] = useState<"dayPass" | "expense" | null>(
+    null,
+  );
   const [audioReady, setAudioReady] = useState(true);
   const [scanning, startScan] = useTransition();
   const { reportNetworkFailure, reportNetworkSuccess } = useAppState();
@@ -114,7 +131,11 @@ export function ReceptionScreen({
   // scan. A result dialog does not stop it (the next scan replaces it); S-03a, S-03e and
   // the form dialogs do, and a field with focus keeps its own typing.
   const buffer = useRef("");
-  const blocked = flow.scanBlocked || registerCard !== null || registering;
+  const blocked =
+    flow.scanBlocked ||
+    registerCard !== null ||
+    registering ||
+    deskDialog !== null;
   useEffect(() => {
     function onKey(event: KeyboardEvent) {
       if (blocked || event.ctrlKey || event.altKey || event.metaKey) return;
@@ -184,7 +205,24 @@ export function ReceptionScreen({
 
         <MemberSearch onPick={(id) => run(() => beginCheckIn(id))} />
 
+        {/* S-03: [Dnevna karta] [Trošak] [Novi član]; the first two record money (BR-092). */}
         <div className="flex flex-wrap gap-2">
+          <MoneyButton
+            type="button"
+            variant="outline"
+            onClick={() => setDeskDialog("dayPass")}
+          >
+            <Ticket aria-hidden="true" />
+            {me.dayPass.title}
+          </MoneyButton>
+          <MoneyButton
+            type="button"
+            variant="outline"
+            onClick={() => setDeskDialog("expense")}
+          >
+            <Receipt aria-hidden="true" />
+            {me.deskExpense.title}
+          </MoneyButton>
           <Button
             type="button"
             variant="outline"
@@ -202,6 +240,17 @@ export function ReceptionScreen({
       />
 
       {flow.element}
+
+      <DayPassDialog
+        open={deskDialog === "dayPass"}
+        onOpenChange={(open) => !open && setDeskDialog(null)}
+        price={dayPassPrice}
+      />
+      <DeskExpenseDialog
+        open={deskDialog === "expense"}
+        onOpenChange={(open) => !open && setDeskDialog(null)}
+        categories={expenseCategories}
+      />
 
       <RegisterDialog
         open={registerCard !== null || registering}

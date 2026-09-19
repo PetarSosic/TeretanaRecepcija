@@ -53,6 +53,7 @@ const ITEMS: readonly NavItem[] = [
 const IMPLEMENTED = new Set([
   "/reception",
   "/members",
+  "/payments/today",
   "/finance",
   "/settings/users",
   "/settings/trainers",
