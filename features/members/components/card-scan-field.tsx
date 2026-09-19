@@ -87,6 +87,8 @@ export function CardScanField({
           onChange={(event) => {
             setText(event.target.value);
             latest.current++;
+            // A new code is not judged by the previous code's answer.
+            setError(undefined);
             if (confirmed) {
               setConfirmed(null);
               onChange(null);

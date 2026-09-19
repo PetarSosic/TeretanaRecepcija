@@ -228,7 +228,11 @@ test("US-06.1: a receptionist registers a member with an empty card", async ({
     dialog.getByText(
       "Član #1 je kreiran. Upišite ime olovkom na karticu: E2E Ana Ćosić.",
     ),
-  ).toBeVisible();
+  ).toBeVisible({
+    // Registration writes member, card, membership, payment and visit in one
+    // transaction, after the preview; allow for a slow network.
+    timeout: 15_000,
+  });
   await dialog.getByRole("button", { name: "Zatvori" }).first().click();
   // "Prijavi odmah" is on by default (D-31): the green check-in result follows.
   await expect(page.locator("[data-result=covered]")).toBeVisible();

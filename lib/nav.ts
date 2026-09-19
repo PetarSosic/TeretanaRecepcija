@@ -54,6 +54,7 @@ const IMPLEMENTED = new Set([
   "/reception",
   "/members",
   "/payments/today",
+  "/storage",
   "/finance",
   "/settings/users",
   "/settings/trainers",

@@ -373,7 +373,11 @@ test("Flow 2: an empty card registers, checks in, and the next scan checks out",
   await expect(dialog.getByLabel("Prijavi odmah")).toBeChecked();
   await dialog.getByText("Gotovina", { exact: true }).click();
   await dialog.getByRole("button", { name: "Sačuvaj" }).click();
-  await expect(dialog.getByText(/^Član #103 je kreiran\./)).toBeVisible();
+  await expect(dialog.getByText(/^Član #103 je kreiran\./)).toBeVisible({
+    // Registration writes member, card, membership, payment and visit in one
+    // transaction, after the preview; allow for a slow network.
+    timeout: 15_000,
+  });
   await dialog.getByRole("button", { name: "Zatvori" }).first().click();
 
   // S-03b: covered, green, with the membership.

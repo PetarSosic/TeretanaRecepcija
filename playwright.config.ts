@@ -13,6 +13,9 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   reporter: "list",
+  // D-56: every page talks to the hosted database, whose round trip varies from about
+  // 100 ms to over 300 ms; 10 s leaves room for a slow network without hiding a real hang.
+  expect: { timeout: 10_000 },
   use: {
     baseURL,
     channel: "chrome",

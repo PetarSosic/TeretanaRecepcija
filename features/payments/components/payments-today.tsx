@@ -25,6 +25,7 @@ import { Table, TableWrapper, Td, Th } from "@/components/ui/table";
 import { formatMoney, formatTime } from "@/lib/format";
 import { me } from "@/lib/i18n/me";
 import { cn } from "@/lib/utils";
+import { correctSale, voidSale } from "@/features/storage/actions";
 import { correctPayment, voidExpense, voidPayment } from "../actions";
 
 export type TodayPayment = {
@@ -54,6 +55,23 @@ export type TodayExpense = {
   created_by: string;
   voided_at: string | null;
   void_reason: string | null;
+  /** BR-141: set on a stock-in's automatic expense, which is voided with the stock-in. */
+  stock_movement_id: string | null;
+  entered_by: string;
+};
+
+/** S-12 "Prodaja iz magacina" (BR-142). */
+export type TodaySale = {
+  id: string;
+  created_at: string;
+  product: string;
+  quantity: number;
+  /** quantity × unit price, as decimal text. */
+  amount: string;
+  method: "cash" | "card";
+  shift_id: string | null;
+  voided_at: string | null;
+  void_reason: string | null;
   entered_by: string;
 };
 
@@ -74,6 +92,11 @@ function describe(payment: TodayPayment): string {
   }
 }
 
+const saleLabel = (sale: TodaySale) =>
+  me.storage.saleDescription
+    .replace("{product}", sale.product)
+    .replace("{qty}", String(sale.quantity));
+
 const methodLabel = (method: TodayPayment["method"] | null) =>
   method === "cash"
     ? me.memberships.cash
@@ -85,6 +108,8 @@ type Editing =
   | { kind: "correct"; payment: TodayPayment }
   | { kind: "voidPayment"; payment: TodayPayment }
   | { kind: "voidExpense"; expense: TodayExpense }
+  | { kind: "correctSale"; sale: TodaySale }
+  | { kind: "voidSale"; sale: TodaySale }
   | null;
 
 /**
@@ -94,12 +119,14 @@ type Editing =
  */
 export function PaymentsToday({
   payments,
+  sales,
   expenses,
   openShiftId,
   isOwner,
   staffId,
 }: {
   payments: TodayPayment[];
+  sales: TodaySale[];
   expenses: TodayExpense[];
   openShiftId: string | null;
   isOwner: boolean;
@@ -192,6 +219,79 @@ export function PaymentsToday({
         </TableWrapper>
       </section>
 
+      <section className="mb-8" aria-labelledby="sales-title">
+        <h2 id="sales-title" className="mb-3 text-lg font-semibold">
+          {me.storage.sectionSales}
+        </h2>
+        <TableWrapper className="rounded-2xl border bg-card">
+          <Table>
+            <thead>
+              <tr>
+                <Th>{me.payments.columnTime}</Th>
+                <Th>{me.payments.columnDescription}</Th>
+                <Th>{me.payments.columnMethod}</Th>
+                <Th className="text-right">{me.payments.columnAmount}</Th>
+                <Th>{me.payments.columnEnteredBy}</Th>
+                <Th>
+                  <span className="sr-only">{me.users.actions}</span>
+                </Th>
+              </tr>
+            </thead>
+            <tbody>
+              {sales.length === 0 ? (
+                <tr>
+                  <Td colSpan={6} className="text-muted-foreground">
+                    {me.storage.noSales}
+                  </Td>
+                </tr>
+              ) : (
+                sales.map((sale) => {
+                  const label = saleLabel(sale);
+                  return (
+                    <tr
+                      key={sale.id}
+                      data-voided={sale.voided_at ? "true" : undefined}
+                      title={sale.void_reason ?? undefined}
+                      className={cn(
+                        sale.voided_at && "text-muted-foreground line-through",
+                      )}
+                    >
+                      <Td className="tabular-nums">
+                        {formatTime(sale.created_at)}
+                      </Td>
+                      <Td>
+                        {label}
+                        {sale.voided_at ? (
+                          <span className="ml-2 text-xs no-underline">
+                            ({me.payments.voided})
+                          </span>
+                        ) : null}
+                      </Td>
+                      <Td>{methodLabel(sale.method)}</Td>
+                      <Td className="text-right whitespace-nowrap tabular-nums">
+                        {formatMoney(sale.amount)}
+                      </Td>
+                      <Td>{sale.entered_by}</Td>
+                      <Td className="text-right whitespace-nowrap">
+                        <RowActions
+                          label={label}
+                          canEdit={editable(sale.shift_id, sale.voided_at)}
+                          voided={Boolean(sale.voided_at)}
+                          onCorrect={() =>
+                            setEditing({ kind: "correctSale", sale })
+                          }
+                          onVoid={() => setEditing({ kind: "voidSale", sale })}
+                        />
+                      </Td>
+                    </tr>
+                  );
+                })
+              )}
+            </tbody>
+          </Table>
+        </TableWrapper>
+      </section>
+
       <section aria-labelledby="expenses-title">
         <h2 id="expenses-title" className="mb-3 text-lg font-semibold">
           {isOwner
@@ -222,7 +322,9 @@ export function PaymentsToday({
               ) : (
                 expenses.map((expense) => {
                   // BR-135: only the owner voids someone else's expense.
+                  const fromStockIn = expense.stock_movement_id !== null;
                   const canVoid =
+                    !fromStockIn &&
                     editable(expense.shift_id, expense.voided_at) &&
                     (isOwner || expense.created_by === staffId);
                   const label = `${expense.category}: ${expense.description}`;
@@ -259,7 +361,13 @@ export function PaymentsToday({
                             size="sm"
                             variant="outline"
                             disabled={!canVoid}
-                            title={canVoid ? undefined : me.payments.readOnly}
+                            title={
+                              canVoid
+                                ? undefined
+                                : fromStockIn
+                                  ? me.storage.stockInExpense
+                                  : me.payments.readOnly
+                            }
                             aria-label={`${me.payments.void} ${label}`}
                             onClick={() =>
                               setEditing({ kind: "voidExpense", expense })
@@ -295,6 +403,18 @@ export function PaymentsToday({
               : null
           }
           action={voidPayment}
+          onClose={close}
+        />
+      ) : null}
+      {editing?.kind === "correctSale" ? (
+        <CorrectSaleDialog sale={editing.sale} onClose={close} />
+      ) : null}
+      {editing?.kind === "voidSale" ? (
+        <VoidDialog
+          id={editing.sale.id}
+          subject={saleLabel(editing.sale)}
+          warning={null}
+          action={voidSale}
           onClose={close}
         />
       ) : null}
@@ -413,6 +533,55 @@ function CorrectDialog({
               <FieldError id="correct-amount-error">{errors.amount}</FieldError>
             </div>
           ) : null}
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button type="button" variant="outline">
+                {me.common.cancel}
+              </Button>
+            </DialogClose>
+            <Button type="submit" disabled={pending}>
+              {pending ? (
+                <Loader2 aria-hidden="true" className="animate-spin" />
+              ) : null}
+              {me.common.save}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+/** BR-094: a bar sale's method is the only thing that can be corrected. */
+function CorrectSaleDialog({
+  sale,
+  onClose,
+}: {
+  sale: TodaySale;
+  onClose: () => void;
+}) {
+  const [state, onSubmit, pending] = useFormAction(correctSale);
+  const [method, setMethod] = useState<PaymentMethod | null>(sale.method);
+  useActionToast(state, onClose);
+
+  return (
+    <Dialog open onOpenChange={(open) => !open && onClose()}>
+      <DialogContent aria-describedby="correct-sale-subject">
+        <DialogHeader>
+          <DialogTitle>{me.storage.correctSaleTitle}</DialogTitle>
+          <DialogDescription id="correct-sale-subject">
+            {saleLabel(sale)} · {formatMoney(sale.amount)}
+          </DialogDescription>
+        </DialogHeader>
+        <form onSubmit={onSubmit} className="grid gap-4" noValidate>
+          <input type="hidden" name="movementId" value={sale.id} />
+          <FormError>{state.error}</FormError>
+          <MethodButtons
+            idPrefix="correct-sale"
+            value={method}
+            onChange={setMethod}
+            error={state.fieldErrors?.method}
+          />
           <DialogFooter>
             <DialogClose asChild>
               <Button type="button" variant="outline">
