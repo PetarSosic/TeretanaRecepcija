@@ -130,8 +130,19 @@ export async function deleteTestGym(gymId: string): Promise<void> {
       .from("shift-reports")
       .remove(reports.data.map((file) => `${gymId}/${file.name}`));
 
+  // M-11: the stored backups of this gym (backups/<gym_id>/…).
+  const backups = await admin.storage.from("backups").list(gymId);
+  if (backups.data?.length)
+    await admin.storage
+      .from("backups")
+      .remove(backups.data.map((file) => `${gymId}/${file.name}`));
+
   const steps: [string, string][] = [
     ["audit_log", "gym_id"],
+    // M-11: the job records, and the reminders that point at memberships.
+    ["job_runs", "gym_id"],
+    ["backup_runs", "gym_id"],
+    ["expiry_notifications", "gym_id"],
     // M-08 and M-09: expenses point at stock movements, and both at shifts and staff.
     ["expenses", "gym_id"],
     ["stock_movements", "gym_id"],

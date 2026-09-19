@@ -2,7 +2,9 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
 // Routes reachable without a session. Everything else requires active staff.
-const PUBLIC_ROUTES = ["/login", "/auth/callback"];
+// Doc 08 §8: pg_cron posts to /api/jobs/* with no cookies at all, so the session check
+// must not stand in front of it; the handler authorises those calls with CRON_SECRET.
+const PUBLIC_ROUTES = ["/login", "/auth/callback", "/api/jobs"];
 const PASSWORD_ROUTE = "/change-password";
 
 function securityHeaders(request: NextRequest) {

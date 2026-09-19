@@ -29,6 +29,15 @@ export default async function AppLayout({
     getOpenShift(),
   ]);
 
+  // BR-116 and BR-119: the nightly job closes the shift while the receptionist is still
+  // signed in, and an owner may close it from S-19. Their next request ends the session
+  // and lands on S-01 with the notice. A receptionist who reaches the S-02 gate always
+  // has an open shift to take over, so the gate is not caught by this.
+  if (staff.role === "receptionist" && !shift) {
+    await supabase.auth.signOut();
+    redirect("/login?auto=1");
+  }
+
   const openShift = shift
     ? { staffName: shift.staff_name, startedAt: shift.started_at }
     : null;

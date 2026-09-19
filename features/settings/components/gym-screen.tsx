@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Table, TableWrapper, Td, Th } from "@/components/ui/table";
 import { idleState } from "@/lib/action-state";
+import { formatDateTime } from "@/lib/format";
 import { me } from "@/lib/i18n/me";
 import {
   saveExpenseCategory,
@@ -29,6 +30,15 @@ export type GymSettings = {
   logo_path: string | null;
 };
 
+/** BR-163: the newest attempt of the weekly backup, shown read-only on S-27. */
+export type BackupStatus = {
+  run_date: string;
+  status: "running" | "success" | "failed";
+  error: string | null;
+  finished_at: string | null;
+  started_at: string;
+};
+
 export type Category = {
   id: string;
   name: string;
@@ -42,10 +52,12 @@ export function GymScreen({
   settings,
   categories,
   logoUrl,
+  backup,
 }: {
   settings: GymSettings;
   categories: Category[];
   logoUrl: string | null;
+  backup: BackupStatus | null;
 }) {
   return (
     <div className="grid gap-10">
@@ -53,9 +65,41 @@ export function GymScreen({
         {me.settings.gymTitle}
       </h1>
       <SettingsForm settings={settings} />
+      <BackupLine backup={backup} />
       <LogoSection logoUrl={logoUrl} />
       <CategoriesSection categories={categories} />
     </div>
+  );
+}
+
+/** S-27 read-only info (BR-163): when the last backup ran and how it went. */
+function BackupLine({ backup }: { backup: BackupStatus | null }) {
+  if (!backup)
+    return (
+      <p className="text-sm text-muted-foreground">
+        {me.settings.lastBackupNever}
+      </p>
+    );
+
+  const status =
+    backup.status === "success"
+      ? me.settings.backupSuccess
+      : backup.status === "running"
+        ? me.settings.backupRunning
+        : me.settings.backupFailed.replace(
+            "{error}",
+            backup.error ?? me.settings.backupUnknownError,
+          );
+
+  return (
+    <p className="text-sm text-muted-foreground">
+      {me.settings.lastBackup
+        .replace(
+          "{date}",
+          formatDateTime(backup.finished_at ?? backup.started_at),
+        )
+        .replace("{status}", status)}
+    </p>
   );
 }
 

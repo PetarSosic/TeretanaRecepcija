@@ -207,6 +207,13 @@ export const me = {
     logoMissing: "Logo nije postavljen.",
     logoSaved: "Logo je sačuvan.",
     logoInvalid: "Dozvoljeni su PNG i JPG do 1 MB.",
+    // S-27 read-only backup status (BR-163).
+    lastBackup: "Posljednja rezervna kopija: {date} – {status}",
+    lastBackupNever: "Posljednja rezervna kopija: Još nije napravljena",
+    backupSuccess: "uspješno",
+    backupFailed: "neuspješno: {error}",
+    backupRunning: "u toku",
+    backupUnknownError: "nepoznata greška",
     // Categories (BR-131), managed from S-27.
     categories: "Kategorije troškova",
     addCategory: "Dodaj kategoriju",
@@ -604,6 +611,20 @@ export const me = {
       expired: "Istekla",
       voided: "Poništena",
     },
+  },
+  // F-25 expiry reminder to the member (BR-160, doc 08 §7).
+  expiry: {
+    emailSubject: "Vaša članarina ističe {date}",
+    emailBody:
+      'Poštovani/a {name},\n\nVaša članarina "{plan}" u teretani {gym} važi do {date}.\nProdužite je na recepciji kako biste nastavili bez prekida.\n\nVidimo se!\n{gym}\n',
+  },
+  // F-28 weekly backup (BR-163, doc 08 §7).
+  backup: {
+    emailSubject: "Sedmična rezervna kopija – {gym} – {date}",
+    emailBody:
+      "U prilogu je sedmična rezervna kopija ({tables} tabela, {rows} redova). Lozinka nije u ovom emailu.",
+    tooLarge:
+      "Kopija je prevelika za email i sačuvana je u Supabase Storage (backups/{file}).",
   },
   // F-27 offline banner.
   offline: {

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import {
   GymScreen,
+  type BackupStatus,
   type Category,
   type GymSettings,
 } from "@/features/settings/components/gym-screen";
@@ -20,7 +21,7 @@ export default async function GymPage() {
   if (staff.role !== "owner" && staff.role !== "admin") notFound();
 
   const supabase = await createClient();
-  const [settings, categories] = await Promise.all([
+  const [settings, categories, backup] = await Promise.all([
     supabase
       .from("gym_settings")
       .select(
@@ -34,6 +35,14 @@ export default async function GymPage() {
       .select("id, name, is_salary, is_system, is_active")
       .order("name")
       .returns<Category[]>(),
+    // BR-163: the newest attempt, whatever came of it. RLS keeps this to the gym.
+    supabase
+      .from("backup_runs")
+      .select("run_date, status, error, started_at, finished_at")
+      .order("run_date", { ascending: false })
+      .order("attempt", { ascending: false })
+      .limit(1)
+      .maybeSingle<BackupStatus>(),
   ]);
 
   if (!settings.data) notFound();
@@ -53,6 +62,7 @@ export default async function GymPage() {
       settings={settings.data}
       categories={categories.data ?? []}
       logoUrl={logoUrl}
+      backup={backup.data ?? null}
     />
   );
 }
