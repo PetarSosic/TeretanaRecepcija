@@ -6,6 +6,7 @@ import { z } from "zod";
 import { requireStaff } from "@/lib/auth";
 import { getErrorMessage } from "@/lib/errors";
 import { me } from "@/lib/i18n/me";
+import { deliverShiftReport } from "@/lib/shift-report";
 import { createClient } from "@/lib/supabase/server";
 import type { ActionState } from "@/lib/action-state";
 
@@ -51,7 +52,7 @@ export async function takeOverShift(
     return { fieldErrors: { countedCash: me.shift.cashInvalid } };
 
   const supabase = await createClient();
-  const { error } = await supabase.rpc("take_over_shift", {
+  const { data, error } = await supabase.rpc("take_over_shift", {
     p_counted_cash: parsed.data.countedCash,
   });
   if (error) {
@@ -60,8 +61,59 @@ export async function takeOverShift(
     return { error: getErrorMessage(code) };
   }
 
+  // BR-111 and M-10: the shift that was taken over gets its report and email (BR-117).
+  const closed = (data as { closed_shift?: { id: string } | null })
+    .closed_shift;
+  if (closed?.id) await deliverShiftReport(closed.id);
+
   // The header badge lives in the app layout, so it must be re-rendered with the
   // shift that was just opened.
   revalidatePath("/", "layout");
   redirect("/reception");
+}
+
+// BR-114: the counted cash is required when a receptionist closes her shift.
+const closeSchema = z.object({
+  shiftId: z.string().uuid(),
+  countedCash: z
+    .string()
+    .trim()
+    .transform((value) => value.replace(",", "."))
+    .refine((value) => /^\d{1,8}(\.\d{1,2})?$/.test(value), {
+      message: me.closeShift.countedInvalid,
+    }),
+});
+
+/**
+ * Doc 08 §6 closeShiftAndReport (BR-114): close the shift with the caller's session, then
+ * build, store and email the report (BR-117; a failed email never undoes the close,
+ * BR-118), sign out, and land on the login page with `Smjena je zaključena.`
+ */
+export async function closeShiftAndReport(
+  _state: ActionState,
+  formData: FormData,
+): Promise<ActionState> {
+  await requireStaff();
+  const parsed = closeSchema.safeParse({
+    shiftId: formData.get("shiftId"),
+    countedCash: formData.get("countedCash") ?? "",
+  });
+  if (!parsed.success)
+    return { fieldErrors: { countedCash: me.closeShift.countedInvalid } };
+
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("close_shift", {
+    p_shift: parsed.data.shiftId,
+    p_counted_cash: parsed.data.countedCash,
+  });
+  if (error) {
+    const code = error.message.trim();
+    if (!code.startsWith("E_")) console.error(`close_shift: ${code}`);
+    return { error: getErrorMessage(code) };
+  }
+
+  await deliverShiftReport(parsed.data.shiftId);
+  await supabase.auth.signOut();
+  revalidatePath("/", "layout");
+  redirect("/login?closed=1");
 }

@@ -41,6 +41,12 @@ export default defineConfig({
     command: `node node_modules/next/dist/bin/next ${process.env.E2E_PRODUCTION ? "start" : "dev"} --hostname 127.0.0.1 --port ${port}`,
     url: baseURL,
     reuseExistingServer: !process.env.CI,
+    // BR-118 and BR-161: tests exercise the email path with a key Resend rejects, so no
+    // real email ever leaves a test run, and a failed send is what the tests expect.
+    env: {
+      EMAIL_FROM: "noreply@stamenkovicc.com",
+      RESEND_API_KEY: "re_e2e_invalid_key",
+    },
     timeout: 120_000,
   },
 });

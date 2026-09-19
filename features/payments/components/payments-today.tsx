@@ -25,6 +25,7 @@ import { Table, TableWrapper, Td, Th } from "@/components/ui/table";
 import { formatMoney, formatTime } from "@/lib/format";
 import { me } from "@/lib/i18n/me";
 import { cn } from "@/lib/utils";
+import { money, type ShiftTotalsOnly } from "@/features/shifts/types";
 import { correctSale, voidSale } from "@/features/storage/actions";
 import { correctPayment, voidExpense, voidPayment } from "../actions";
 
@@ -122,6 +123,7 @@ export function PaymentsToday({
   sales,
   expenses,
   openShiftId,
+  shiftTotals,
   isOwner,
   staffId,
 }: {
@@ -129,6 +131,8 @@ export function PaymentsToday({
   sales: TodaySale[];
   expenses: TodayExpense[];
   openShiftId: string | null;
+  /** P-14: the open shift's totals, when this person may see them. */
+  shiftTotals: ShiftTotalsOnly | null;
   isOwner: boolean;
   staffId: string;
 }) {
@@ -385,6 +389,35 @@ export function PaymentsToday({
           </Table>
         </TableWrapper>
       </section>
+
+      {/* S-12 footer (BR-115, D-54): aggregate totals only, never expense details. */}
+      {shiftTotals ? (
+        <section
+          aria-labelledby="shift-totals-title"
+          className="mt-8 rounded-2xl border bg-card p-4"
+        >
+          <h2 id="shift-totals-title" className="mb-3 font-semibold">
+            {me.closeShift.footer}
+          </h2>
+          <dl className="grid grid-cols-2 gap-3 text-sm sm:grid-cols-4">
+            {(
+              [
+                [me.closeShift.cashIncome, shiftTotals.cash_income],
+                [me.closeShift.cardIncome, shiftTotals.card_income],
+                [me.closeShift.tillExpenses, shiftTotals.till_expenses],
+                [me.closeShift.expectedCash, shiftTotals.expected_cash],
+              ] as const
+            ).map(([label, value]) => (
+              <div key={label}>
+                <dt className="text-muted-foreground">{label}</dt>
+                <dd className="text-base font-semibold tabular-nums">
+                  {formatMoney(money(value))}
+                </dd>
+              </div>
+            ))}
+          </dl>
+        </section>
+      ) : null}
 
       {editing?.kind === "correct" ? (
         <CorrectDialog

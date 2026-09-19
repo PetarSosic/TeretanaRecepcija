@@ -132,6 +132,15 @@ test("US-02.2 and E19: the second receptionist meets S-02 and takes over", async
   expect(closed[0].close_type).toBe("takeover");
   expect(Number(closed[0].counted_cash)).toBe(120.5);
 
+  // M-10: the taken-over shift gets its report; the test key makes the email fail (BR-118).
+  const { data: report } = await adminClient()
+    .from("shifts")
+    .select("report_path, email_status")
+    .eq("id", closed[0].id)
+    .single<{ report_path: string | null; email_status: string }>();
+  expect(report?.report_path).toBe(`${gymId}/${closed[0].id}.pdf`);
+  expect(report?.email_status).toBe("failed");
+
   await expect(
     page.getByText(/^Smjena: E2E Bojana od \d{2}:\d{2}$/),
   ).toBeVisible();

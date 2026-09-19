@@ -5,6 +5,7 @@ import {
   type TodayPayment,
   type TodaySale,
 } from "@/features/payments/components/payments-today";
+import type { ShiftTotalsOnly } from "@/features/shifts/types";
 import { formatDate } from "@/lib/format";
 import { requireStaff } from "@/lib/auth";
 import { me } from "@/lib/i18n/me";
@@ -102,6 +103,16 @@ export default async function PaymentsTodayPage() {
       >(),
   ]);
 
+  // P-14 and D-54: the open shift's four totals, for the owner, a manager and the
+  // shift's own receptionist; shift_summary itself enforces who may ask.
+  let shiftTotals: ShiftTotalsOnly | null = null;
+  if (shift && (staff.role !== "receptionist" || shift.is_mine)) {
+    const { data } = await supabase.rpc("shift_summary", { p_shift: shift.id });
+    const summary = data as
+      (ShiftTotalsOnly & { totals?: ShiftTotalsOnly }) | null;
+    shiftTotals = summary ? (summary.totals ?? summary) : null;
+  }
+
   // Doc 07 §6 hides colleagues' staff rows; staff_names gives only the names needed.
   const ids = [
     ...new Set([
@@ -145,6 +156,7 @@ export default async function PaymentsTodayPage() {
         entered_by: names.get(row.created_by) ?? "—",
       }))}
       openShiftId={shift?.id ?? null}
+      shiftTotals={shiftTotals}
       isOwner={isOwner}
       staffId={staff.id}
     />

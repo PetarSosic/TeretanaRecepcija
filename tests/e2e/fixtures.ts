@@ -110,7 +110,11 @@ export async function createTestStaff(
   };
 }
 
-/** Removes everything the test created, in foreign-key order. */
+/**
+ * Removes everything the test created, in foreign-key order. Every step is checked: a
+ * delete that fails (a table added later and forgotten here) stops with an error instead
+ * of leaving test gyms behind in the hosted database.
+ */
 export async function deleteTestGym(gymId: string): Promise<void> {
   const admin = adminClient();
   const { data: staff } = await admin
@@ -119,34 +123,53 @@ export async function deleteTestGym(gymId: string): Promise<void> {
     .eq("gym_id", gymId)
     .returns<{ user_id: string }[]>();
 
-  await admin.from("audit_log").delete().eq("gym_id", gymId);
-  // M-06: visits and payments reference memberships, which reference shifts and plans.
-  await admin.from("visits").delete().eq("gym_id", gymId);
-  await admin.from("payments").delete().eq("gym_id", gymId);
-  await admin.from("membership_finance").delete().eq("gym_id", gymId);
-  await admin.from("memberships").delete().eq("gym_id", gymId);
-  // M-05: shifts reference staff, so they go before it.
-  await admin.from("shifts").delete().eq("gym_id", gymId);
-  // M-04: cards before their batches; M-06: cards before the members they point to.
-  await admin.from("cards").delete().eq("gym_id", gymId);
-  await admin.from("card_batches").delete().eq("gym_id", gymId);
-  await admin.from("members").delete().eq("gym_id", gymId);
-  // Catalogue first, in foreign-key order (M-03).
-  await admin.from("class_slots").delete().eq("gym_id", gymId);
-  await admin.from("trainer_programs").delete().eq("gym_id", gymId);
-  await admin.from("trainer_finance").delete().eq("gym_id", gymId);
-  await admin.from("trainers").delete().eq("gym_id", gymId);
-  await admin.from("programs").delete().eq("gym_id", gymId);
-  await admin.from("plan_finance").delete().eq("gym_id", gymId);
-  await admin.from("plans").delete().eq("gym_id", gymId);
-  await admin.from("products").delete().eq("gym_id", gymId);
-  await admin.from("expense_categories").delete().eq("gym_id", gymId);
-  await admin.from("member_counters").delete().eq("gym_id", gymId);
-  await admin.from("staff_credentials").delete().eq("gym_id", gymId);
-  await admin.from("staff").delete().eq("gym_id", gymId);
-  for (const row of staff ?? []) await admin.auth.admin.deleteUser(row.user_id);
-  await admin.from("gym_settings").delete().eq("gym_id", gymId);
-  await admin.from("gyms").delete().eq("id", gymId);
+  // M-10: the stored shift reports of this gym (shift-reports/<gym_id>/…).
+  const reports = await admin.storage.from("shift-reports").list(gymId);
+  if (reports.data?.length)
+    await admin.storage
+      .from("shift-reports")
+      .remove(reports.data.map((file) => `${gymId}/${file.name}`));
+
+  const steps: [string, string][] = [
+    ["audit_log", "gym_id"],
+    // M-08 and M-09: expenses point at stock movements, and both at shifts and staff.
+    ["expenses", "gym_id"],
+    ["stock_movements", "gym_id"],
+    // M-06: visits and payments reference memberships, which reference shifts and plans.
+    ["visits", "gym_id"],
+    ["payments", "gym_id"],
+    ["membership_finance", "gym_id"],
+    ["memberships", "gym_id"],
+    // M-05: shifts reference staff, so they go before it.
+    ["shifts", "gym_id"],
+    // M-04: cards before their batches; M-06: cards before the members they point to.
+    ["cards", "gym_id"],
+    ["card_batches", "gym_id"],
+    ["members", "gym_id"],
+    // The catalogue, in foreign-key order (M-03).
+    ["class_slots", "gym_id"],
+    ["trainer_programs", "gym_id"],
+    ["trainer_finance", "gym_id"],
+    ["trainers", "gym_id"],
+    ["programs", "gym_id"],
+    ["plan_finance", "gym_id"],
+    ["plans", "gym_id"],
+    ["products", "gym_id"],
+    ["expense_categories", "gym_id"],
+    ["member_counters", "gym_id"],
+    ["staff_credentials", "gym_id"],
+    ["staff", "gym_id"],
+    ["gym_settings", "gym_id"],
+    ["gyms", "id"],
+  ];
+  for (const [table, column] of steps) {
+    const { error } = await admin.from(table).delete().eq(column, gymId);
+    if (error)
+      throw new Error(`Test cleanup of ${table} failed: ${error.message}`);
+    if (table === "staff")
+      for (const row of staff ?? [])
+        await admin.auth.admin.deleteUser(row.user_id);
+  }
 }
 
 /**
