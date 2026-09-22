@@ -1,7 +1,7 @@
 -- M-06: members and memberships. The worked examples E1, E2, E4, E13 and E14, BR-052
 -- with unpaid visits from fixtures (E3 and E5, date logic only), the sale, registration,
 -- editing, anonymization and card replacement RPCs, and the doc 07 §6 visibility.
-select plan(78);
+select plan(82);
 
 -- Fixtures ------------------------------------------------------------------------
 insert into auth.users (id, email) values
@@ -322,6 +322,20 @@ select is(
 select is(
   (select member_number from member_search('2') where member_number = 2),
   2, 'BR-044: the member number matches exactly');
+
+-- N-02: the characters LIKE treats as wildcards are searched for literally.
+select is(
+  (select count(*)::int from member_search('%')),
+  0, 'BR-044 and N-02: "%" is a character to look for, not a wildcard');
+select is(
+  (select count(*)::int from member_search('_')),
+  0, 'BR-044 and N-02: "_" is a character to look for, not a wildcard');
+select is(
+  (select count(*)::int from member_search('\')),
+  0, 'N-02: the escape character itself does not break the search');
+select is(
+  (select count(*)::int from member_search('osi')),
+  1, 'BR-044: a partial name still matches once the wildcards are escaped');
 
 -- BR-059 and BR-058: amounts and trainers --------------------------------------------------
 select throws_ok(

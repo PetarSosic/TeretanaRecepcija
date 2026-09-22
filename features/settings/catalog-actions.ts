@@ -14,6 +14,7 @@ import {
   categorySchema,
   classSlotSchema,
   gymSettingsSchema,
+  LOGO_MAX_BYTES,
   planSchema,
   productSchema,
   programSchema,
@@ -336,7 +337,10 @@ export async function uploadLogo(
   const file = formData.get("logo");
   if (!(file instanceof File) || file.size === 0)
     return { fieldErrors: { logo: me.settings.logoInvalid } };
-  if (file.size > 1_048_576 || !["image/png", "image/jpeg"].includes(file.type))
+  if (
+    file.size > LOGO_MAX_BYTES ||
+    !["image/png", "image/jpeg"].includes(file.type)
+  )
     return { fieldErrors: { logo: me.settings.logoInvalid } };
 
   const extension = await imageKind(file);

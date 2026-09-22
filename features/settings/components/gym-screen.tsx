@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { Loader2 } from "lucide-react";
 import { FieldError, FormError } from "@/components/common/form-message";
 import { useActionToast } from "@/components/common/use-action-toast";
@@ -12,6 +12,7 @@ import { idleState } from "@/lib/action-state";
 import { formatDateTime } from "@/lib/format";
 import { me } from "@/lib/i18n/me";
 import { saveGymSettings, uploadLogo } from "../catalog-actions";
+import { LOGO_MAX_BYTES } from "../catalog-schemas";
 import { CategoriesSection, type Category } from "./categories-section";
 
 export type { Category };
@@ -220,6 +221,9 @@ function EmailField({
 /** US-21.1: PNG or JPG of at most 1 MB. */
 function LogoSection({ logoUrl }: { logoUrl: string | null }) {
   const [state, action, pending] = useActionState(uploadLogo, idleState);
+  // N-01: a body larger than the server action limit never reaches uploadLogo, so the
+  // size is checked here too and the owner gets the same sentence as from the server.
+  const [tooLarge, setTooLarge] = useState(false);
   useActionToast(state);
 
   return (
@@ -248,11 +252,21 @@ function LogoSection({ logoUrl }: { logoUrl: string | null }) {
           accept="image/png,image/jpeg"
           required
           className="text-sm"
+          onChange={(event) => {
+            const file = event.currentTarget.files?.[0];
+            setTooLarge(!!file && file.size > LOGO_MAX_BYTES);
+          }}
         />
         <p className="text-xs text-muted-foreground">{me.settings.logoHint}</p>
-        <FieldError id="logo-error">{state.fieldErrors?.logo}</FieldError>
+        <FieldError id="logo-error">
+          {tooLarge ? me.settings.logoInvalid : state.fieldErrors?.logo}
+        </FieldError>
         <div>
-          <Button type="submit" variant="outline" disabled={pending}>
+          <Button
+            type="submit"
+            variant="outline"
+            disabled={pending || tooLarge}
+          >
             {pending ? (
               <Loader2 aria-hidden="true" className="animate-spin" />
             ) : null}

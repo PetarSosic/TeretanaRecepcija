@@ -15,6 +15,12 @@ sekciju **7. Otvorena pitanja**.
 
 ---
 
+> **Izvršavanje 22.09.2026:** rezultati ovog prolaza upisani su uz svih 217 slučajeva u §3–4.
+> **48 prošlo · 2 palo · 148 djelimično · 19 nije izvršeno.**
+> Djelimična provjera nije kompletan prolaz: napomena navodi dokaz i preostale korake.
+> Tehničke provjere, novi nalazi i ograničenja su u **§9**. Stariji nalazi/popravke iz §6
+> ostavljeni su kao istorija i ne znače da je svaki njihov UI korak ponovljen danas.
+
 ## 1. Priprema okruženja
 
 ### 1.1 Preduslovi
@@ -202,7 +208,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   „Vlasnik“. U navigaciji: Recepcija, Članovi, Uplate danas, Magacin, Statistika dolazaka,
   Finansije, Podešavanja. Nema stavke „Zaključi smjenu“.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E admin.spec.ts: vlasnik sa korisničkim imenom dolazi na /finance; foundation.spec.ts: odjavljeni / ide na /login. Seed vlasnik sa emailom i kompletan meni nisu provjereni ovim testom.
 
 ### [AUTH-02] Prijava recepcionera korisničkim imenom otvara smjenu
 - **Prioritet:** Kritično
@@ -216,7 +222,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   „Smjena: <ime> od HH:MM“. U navigaciji postoji „Zaključi smjenu“, a nema „Finansije“ ni
   „Statistika dolazaka“.
 - **Gdje provjeriti:** UI; baza: novi red u `shifts` sa `closed_at = null`
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E shifts.spec.ts: prijava korisničkim imenom, /reception, značka i tačno jedna otvorena smjena provjereni. Kompletna navigacija nije posebno upoređena.
 
 ### [AUTH-03] Pogrešna lozinka
 - **Prioritet:** Kritično
@@ -226,7 +232,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** crvena poruka „Pogrešno korisničko ime/email ili lozinka.“ Ostajete na
   `/login`, polje lozinke se ne pamti.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [x] Prošlo  [ ] Palo  Napomena: **22.09.2026 — PROŠLO.** E2E auth.spec.ts + dodatna UI provjera: neutralna poruka, ostaje /login, polje lozinke se prazni.
 
 ### [AUTH-04] Nepostojeći nalog daje istu poruku (bez otkrivanja naloga)
 - **Prioritet:** Kritično
@@ -237,7 +243,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** ista poruka kao u AUTH-03, riječ u riječ. Ništa ne smije da nagovijesti
   da nalog ne postoji, ni vrijeme odgovora ne smije biti bitno različito.
 - **Gdje provjeriti:** UI; Network tab (status i tijelo odgovora isti kao kod pogrešne lozinke)
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** UI: nepostojeće korisničko ime i email daju istu neutralnu poruku. Nisu mjerena vremena odgovora radi detekcije naloga.
 
 ### [AUTH-05] Prazna polja
 - **Prioritet:** Visoko
@@ -248,7 +254,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** u sva tri slučaja „Pogrešno korisničko ime/email ili lozinka.“
   Aplikacija ne puca i ne šalje zahtjev u nedogled.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [x] Prošlo  [ ] Palo  Napomena: **22.09.2026 — PROŠLO.** Dodatne UI provjere u Chromeu, na odvojenim test nalozima; izvršeni unosi, preusmjerenja i očekivane poruke iz ovog slučaja. AUTH-09: testiran vlasnik.
 
 ### [AUTH-06] Prva prijava traži novu lozinku i ne pušta dalje
 - **Prioritet:** Kritično
@@ -263,7 +269,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   lozinkom. Postavite novu lozinku da nastavite.“ Svaki pokušaj druge rute vraća na
   `/change-password`. Polje „Trenutna lozinka“ se **ne** traži.
 - **Gdje provjeriti:** UI, adresna linija
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [x] Prošlo  [ ] Palo  Napomena: **22.09.2026 — PROŠLO.** Dodatne UI provjere u Chromeu, na odvojenim test nalozima; izvršeni unosi, preusmjerenja i očekivane poruke iz ovog slučaja. AUTH-09: testiran vlasnik.
 
 ### [AUTH-07] Lozinka kraća od 8 znakova
 - **Prioritet:** Visoko
@@ -273,7 +279,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** poruka ispod polja „Lozinka mora imati najmanje 8 znakova.“ Ništa nije
   sačuvano.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [x] Prošlo  [ ] Palo  Napomena: **22.09.2026 — PROŠLO.** Dodatne UI provjere u Chromeu, na odvojenim test nalozima; izvršeni unosi, preusmjerenja i očekivane poruke iz ovog slučaja. AUTH-09: testiran vlasnik.
 
 ### [AUTH-08] Lozinke se ne poklapaju
 - **Prioritet:** Visoko
@@ -282,7 +288,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Test podaci:** kao gore
 - **Očekivani rezultat:** poruka uz polje za ponavljanje: „Lozinke se ne poklapaju.“
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [x] Prošlo  [ ] Palo  Napomena: **22.09.2026 — PROŠLO.** Dodatne UI provjere u Chromeu, na odvojenim test nalozima; izvršeni unosi, preusmjerenja i očekivane poruke iz ovog slučaja. AUTH-09: testiran vlasnik.
 
 ### [AUTH-09] Granica dužine lozinke: tačno 8 znakova prolazi
 - **Prioritet:** Srednje
@@ -292,7 +298,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** lozinka je prihvaćena; recepcioner nastavlja na `/reception` (ili na
   S-02 ako je tuđa smjena otvorena), vlasnik/menadžer na svoj početni ekran.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [x] Prošlo  [ ] Palo  Napomena: **22.09.2026 — PROŠLO.** Dodatne UI provjere u Chromeu, na odvojenim test nalozima; izvršeni unosi, preusmjerenja i očekivane poruke iz ovog slučaja. AUTH-09: testiran vlasnik.
 
 ### [AUTH-10] Promjena lozinke kasnije traži trenutnu lozinku
 - **Prioritet:** Visoko
@@ -305,7 +311,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** prvi pokušaj: „Trenutna lozinka nije tačna.“ Drugi: „Lozinka je
   promijenjena.“ i možete se odjaviti pa prijaviti novom lozinkom.
 - **Gdje provjeriti:** UI; nova prijava
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [x] Prošlo  [ ] Palo  Napomena: **22.09.2026 — PROŠLO.** Dodatne UI provjere u Chromeu, na odvojenim test nalozima; izvršeni unosi, preusmjerenja i očekivane poruke iz ovog slučaja. AUTH-09: testiran vlasnik.
 
 ### [AUTH-11] Admin vidi novu lozinku zaposlenog (D-59)
 - **Prioritet:** Visoko
@@ -316,7 +322,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** prikazuje se **nova** lozinka u čitljivom obliku (ne stara). Dugme se
   mijenja u [Sakrij].
 - **Gdje provjeriti:** UI; baza: `staff_credentials.password`
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [x] Prošlo  [ ] Palo  Napomena: **22.09.2026 — PROŠLO.** Dodatne UI provjere u Chromeu, na odvojenim test nalozima; izvršeni unosi, preusmjerenja i očekivane poruke iz ovog slučaja. AUTH-09: testiran vlasnik.
 
 ### [AUTH-12] Zaboravljena lozinka za nalog sa korisničkim imenom
 - **Prioritet:** Srednje
@@ -326,7 +332,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** poruka „Lozinku vam postavlja administrator, vlasnik ili menadžer.“
   Nikakav email se ne šalje.
 - **Gdje provjeriti:** UI; Network tab
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [x] Prošlo  [ ] Palo  Napomena: **22.09.2026 — PROŠLO.** E2E foundation.spec.ts, desktop i 375 px: korisničko ime dobija poruku da lozinku postavlja administrator/vlasnik/menadžer.
 
 ### [AUTH-13] Zaboravljena lozinka za nepostojeći email ne otkriva naloge
 - **Prioritet:** Kritično
@@ -337,7 +343,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** **obje** radnje daju istu poruku: „Ako nalog postoji, poslali smo link za
   promjenu lozinke na taj email.“ Email stiže samo u drugom slučaju.
 - **Gdje provjeriti:** UI; sanduče administratora
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** Dodatna UI provjera nepostojećeg emaila vraća očekivanu neutralnu poruku. Reset postojećeg email naloga i prijem reset linka nisu potvrđeni; testovi poslovnog emaila ne dokazuju Supabase Auth/SMTP.
 
 ### [AUTH-14] Link iz emaila vodi na promjenu lozinke
 - **Prioritet:** Visoko
@@ -347,7 +353,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** link vodi na `/auth/callback?...next=/change-password`, pa na ekran
   promjene lozinke. Nakon čuvanja, prijava novom lozinkom uspijeva.
 - **Gdje provjeriti:** UI, adresna linija, email
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — NIJE IZVRŠENO.** Nije dostupan stvarni recovery link iz sandučeta testnog Auth naloga. Slanje poslovnih emailova kroz Resend nije ovaj tok.
 
 ### [AUTH-15] Neispravan ili istekao kod u callbacku
 - **Prioritet:** Srednje
@@ -357,7 +363,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Test podaci:** `code=neispravan`
 - **Očekivani rezultat:** oba puta preusmjerenje na `/login`, bez poruke o grešci i bez sesije.
 - **Gdje provjeriti:** UI, adresna linija
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [x] Prošlo  [ ] Palo  Napomena: **22.09.2026 — PROŠLO.** Dodatne UI provjere u Chromeu, na odvojenim test nalozima; izvršeni unosi, preusmjerenja i očekivane poruke iz ovog slučaja. AUTH-09: testiran vlasnik.
 
 ### [AUTH-16] Callback ne smije da vodi van aplikacije (otvoreno preusmjerenje)
 - **Prioritet:** Kritično (bezbjednost)
@@ -367,7 +373,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** nikada ne odlazite na `example.com`. Završavate na `/change-password`
   ili `/login`.
 - **Gdje provjeriti:** adresna linija, Network tab
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [x] Prošlo  [ ] Palo  Napomena: **22.09.2026 — PROŠLO poslije popravke.** Nalaz N-03 je potvrđen: `/\example.org` je prolazio filter i `new URL` ga je razrješavao na `https://example.org/`. Odredište sada bira `inAppRedirect` u `features/auth/schemas.ts`, koje poredi razriješeni origin sa origin-om aplikacije; `app/auth/callback/route.ts` ga koristi. Pokriveno sa 5 jediničnih testova u `tests/unit/auth-schemas.test.ts` (obrnuta kosa crta, `//`, strani apsolutni URL, `javascript:`, prazno). Kompletan napad sa važećim recovery kodom i dalje nije izveden.
 
 ### [AUTH-17] Odjava recepcionera traži potvrdu dok je smjena otvorena
 - **Prioritet:** Visoko
@@ -377,7 +383,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** dijalog „Odjava“ sa tekstom „Smjena ostaje otvorena. Odjaviti se?“.
   Nakon potvrde ste na `/login`, a smjena u bazi **ostaje otvorena**.
 - **Gdje provjeriti:** UI; baza: `shifts.closed_at` i dalje `null`
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [x] Prošlo  [ ] Palo  Napomena: **22.09.2026 — PROŠLO.** E2E shifts.spec.ts: potvrda odjave, prelazak na /login i otvorena smjena ostaje u bazi; oba viewporta.
 
 ### [AUTH-18] Vlasnik i menadžer se odjavljuju bez potvrde
 - **Prioritet:** Srednje
@@ -397,7 +403,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** odmah vas vraća na početni ekran uloge (`/finance` za vlasnika i
   administratora, `/reception` za menadžera i recepcionera).
 - **Gdje provjeriti:** adresna linija
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [x] Prošlo  [ ] Palo  Napomena: **22.09.2026 — PROŠLO.** Dodatne UI provjere u Chromeu, na odvojenim test nalozima; izvršeni unosi, preusmjerenja i očekivane poruke iz ovog slučaja. AUTH-09: testiran vlasnik.
 
 ### [AUTH-20] Deaktivirani nalog gubi sesiju na sljedećem zahtjevu
 - **Prioritet:** Kritično
@@ -409,7 +415,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** menadžer je izbačen na `/login`. Ponovna prijava daje
   „Pogrešno korisničko ime/email ili lozinka.“ jer je nalog i u Auth zabranjen.
 - **Gdje provjeriti:** UI oba browsera
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [x] Prošlo  [ ] Palo  Napomena: **22.09.2026 — PROŠLO.** E2E auth.spec.ts + DB 0001: deaktiviran testni nalog na sljedećem zahtjevu gubi pristup.
 
 ### [AUTH-21] Osvježavanje, dugme nazad i dvije kartice
 - **Prioritet:** Visoko
@@ -423,7 +429,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** 1–3: sve radi, sesija se čuva, zaglavlje i značka smjene su isti u obje
   kartice. 4: druga kartica vas vraća na `/login` (sesija je zajednička za browser).
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** Dodatna SEC-06 provjera: Nazad nakon odjave ostaje na /login. Osvježavanje i sinhronizacija dvije kartice nisu izvršeni kao cijeli scenario.
 
 ### [AUTH-22] Razmaci i velika slova u korisničkom imenu
 - **Prioritet:** Srednje
@@ -433,7 +439,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** prijava uspijeva — ime se skraćuje i pretvara u mala slova prije nego
   što se preslika u internu adresu. Ako padne, to je bug.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [x] Prošlo  [ ] Palo  Napomena: **22.09.2026 — PROŠLO.** Dodatne UI provjere u Chromeu, na odvojenim test nalozima; izvršeni unosi, preusmjerenja i očekivane poruke iz ovog slučaja. AUTH-09: testiran vlasnik.
 
 ### [AUTH-23] HTML/JS i SQL znakovi u polju za prijavu
 - **Prioritet:** Kritično (bezbjednost)
@@ -444,7 +450,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** svaki put samo „Pogrešno korisničko ime/email ili lozinka.“ Nema
   iskačućeg prozora, nema greške servera (HTTP 500), tabela `members` i dalje postoji.
 - **Gdje provjeriti:** UI, Network tab, konzola browsera
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [x] Prošlo  [ ] Palo  Napomena: **22.09.2026 — PROŠLO.** Dodatne UI provjere u Chromeu, na odvojenim test nalozima; izvršeni unosi, preusmjerenja i očekivane poruke iz ovog slučaja. AUTH-09: testiran vlasnik.
 
 ### [AUTH-24] Vrlo dug unos
 - **Prioritet:** Srednje
@@ -454,7 +460,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** uredno odbijanje (ista poruka o pogrešnoj prijavi) ili poruka o grešci;
   aplikacija se ne ruši i stranica ostaje upotrebljiva.
 - **Gdje provjeriti:** UI, Network tab
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [x] Prošlo  [ ] Palo  Napomena: **22.09.2026 — PROŠLO.** Dodatne UI provjere u Chromeu, na odvojenim test nalozima; izvršeni unosi, preusmjerenja i očekivane poruke iz ovog slučaja. AUTH-09: testiran vlasnik.
 
 ---
 
@@ -474,7 +480,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** **sve** navedene rute daju 404. Dozvoljene su samo `/reception`,
   `/members`, `/members/<id>`, `/payments/today`, `/storage`, `/shift/close`, `/shift/gate`.
 - **Gdje provjeriti:** UI; Network tab (status 404)
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** Dodatna UI matrica otvorila je sve statičke rute za recepcionera, menadžera, vlasnika i admina: dozvoljene imaju naslov, zabranjene 404. Profil konkretnog člana i svi detalji menija nisu dio matrice; /shift/gate za recepcionera pokriva shifts.spec.ts.
 
 ### [PERM-02] Matrica pristupa — menadžer
 - **Prioritet:** Kritično
@@ -486,7 +492,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   Dozvoljeno: `/reception`, `/members`, `/payments/today`, `/storage`, `/stats/visits`,
   `/settings/users`, `/settings/trainers`, `/settings/cards`.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** Dodatna UI matrica otvorila je sve statičke rute za recepcionera, menadžera, vlasnika i admina: dozvoljene imaju naslov, zabranjene 404. Profil konkretnog člana i svi detalji menija nisu dio matrice; /shift/gate za recepcionera pokriva shifts.spec.ts.
 
 ### [PERM-03] Matrica pristupa — vlasnik i administrator
 - **Prioritet:** Kritično
@@ -496,7 +502,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** obje uloge otvaraju sve osim `/shift/close` i `/shift/gate` (404, to je
   samo recepcionerovo). Administrator vidi isto što i vlasnik, plus kolonu „Lozinka“ na S-23.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** Dodatna UI matrica otvorila je sve statičke rute za recepcionera, menadžera, vlasnika i admina: dozvoljene imaju naslov, zabranjene 404. Profil konkretnog člana i svi detalji menija nisu dio matrice; /shift/gate za recepcionera pokriva shifts.spec.ts.
 
 ### [PERM-04] Meni prikazuje samo dozvoljeno
 - **Prioritet:** Visoko
@@ -508,7 +514,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   Vlasnik/Administrator: + Finansije i Podešavanja (Korisnici, Treneri, Kartice, Planovi,
   Proizvodi, Podešavanja teretane); nema „Zaključi smjenu“.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — NIJE IZVRŠENO.** Nije pokriveno izvršenim testovima ovog prolaza; nije označeno kao prolaz. Potrebno je zasebno izvršiti navedene korake.
 
 ### [PERM-05] Menadžer ne smije da mijenja vlasnika ni administratora (AS-5, P-03)
 - **Prioritet:** Kritično
@@ -519,7 +525,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   [Deaktiviraj]). Menadžer u formi „Novi korisnik“ u padajućoj listi uloga **ne smije** moći da
   sačuva vlasnika ili administratora; ako pokuša, odgovor je „Nemate dozvolu za ovu radnju.“
 - **Gdje provjeriti:** UI; Network tab (odgovor server akcije)
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E auth/admin.spec.ts: menadžeru nisu ponuđeni vlasnik i akcija uređivanja vlasnika. Sve izmjene zahtjeva i administratorskog reda nisu ponovljene.
 
 ### [PERM-06] Recepcioner ne vidi tuđe uplate ni tuđe troškove
 - **Prioritet:** Kritično
@@ -529,7 +535,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** vidi **samo današnje** uplate koje nisu naknadni unos, i **samo svoje**
   troškove. Naslov sekcije troškova glasi „Moji troškovi danas“ (vlasnik vidi „Troškovi danas“).
 - **Gdje provjeriti:** UI; uporedite sa istim ekranom kao vlasnik
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** DB 0006_members i 0008_desk_money: RLS vidljivost uplata/troškova po ulogama prolazi. Nije u cijelosti upoređen svaki red i oznaka u UI-ju.
 
 ### [PERM-07] Profil člana: istorija uplata po ulogama
 - **Prioritet:** Visoko
@@ -539,7 +545,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** recepcioner vidi samo današnje uplate; vlasnik vidi sve, uključujući
   naknadne (oznaka „Naknadno“) i poništene (oznaka „Poništeno“, precrtano).
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** DB 0006_members i 0008_desk_money: RLS vidljivost uplata/troškova po ulogama prolazi. Nije u cijelosti upoređen svaki red i oznaka u UI-ju.
 
 ### [PERM-08] Lozinke zaposlenih vidi samo administrator
 - **Prioritet:** Kritično (bezbjednost)
@@ -549,7 +555,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** kolona „Lozinka“ **ne postoji** ni za vlasnika ni za menadžera. Samo
   administrator je vidi.
 - **Gdje provjeriti:** UI; Network tab (u odgovoru stranice ne smije biti lozinki)
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E admin.spec.ts i DB 0002: samo admin vidi lozinke; vlasnik/menadžer ne. Nije posebno pretražen svaki RSC odgovor za lozinke.
 
 ### [PERM-09] PDF izvještaja smjene je samo vlasnikov
 - **Prioritet:** Kritično
@@ -560,7 +566,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** vlasnik i administrator dobijaju PDF; menadžer i recepcioner dobijaju
   **404**, bez ikakvog sadržaja.
 - **Gdje provjeriti:** browser, Network tab
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** DB 0010 potvrđuje pristup podacima izvještaja, E2E close-shift potvrđuje privatni PDF. Sve četiri uloge nisu pozvale samu PDF rutu.
 
 ### [PERM-10] PDF lista kartica
 - **Prioritet:** Visoko
@@ -569,7 +575,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Test podaci:** id serije iz S-28
 - **Očekivani rezultat:** vlasnik, administrator i menadžer dobijaju PDF; recepcioner 404.
 - **Gdje provjeriti:** browser
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E cards.spec.ts: vlasnik preuzima PDF, recepcioner dobija 404. Admin/menadžer nisu zasebno preuzeli PDF.
 
 ### [PERM-11] Izmišljeni i tuđi identifikatori u URL-u
 - **Prioritet:** Kritično (bezbjednost)
@@ -584,7 +590,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** svaki put 404 stranica (ili prazan 404 odgovor za `/api/...`), nikad
   greška servera, nikad tuđi podaci.
 - **Gdje provjeriti:** UI, Network tab
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [x] Prošlo  [ ] Palo  Napomena: **22.09.2026 — PROŠLO.** Dodatni Chrome/HTTP test: sva tri neispravna URL-a člana prikazuju 404; oba navedena neispravna PDF URL-a vraćaju HTTP 404. Ovo ne dokazuje zasebno izolaciju dvije teretane na PDF ruti.
 
 ### [PERM-12] Ruta poslova nije javna
 - **Prioritet:** Kritično (bezbjednost)
@@ -599,7 +605,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** 1–3 vraćaju **401** i tijelo `{"error":"unauthorized"}`. 4 vraća **404**
   `{"error":"unknown job"}`. Ništa se ne izvršava.
 - **Gdje provjeriti:** Network tab / PowerShell izlaz; baza: `job_runs` se ne mijenja
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E jobs.spec.ts + dodatni HTTP: GET, POST bez/pogrešnom tajnom daju 401; nepostojeći posao sa ispravnom tajnom daje 404 i očekivani JSON. Broj redova job_runs nije mjeren prije/poslije.
 
 ### [PERM-13] Finansijske akcije odbijaju pogrešnu ulogu i kada se pozovu mimo ekrana
 - **Prioritet:** Kritično
@@ -612,7 +618,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** menadžer dobija 404 na stranici; i da nekako pošalje zahtjev, server
   akcija odgovara „Nemate dozvolu za ovu radnju.“ jer se uloga provjerava i na serveru i u bazi.
 - **Gdje provjeriti:** UI, Network tab
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E finance.spec.ts: zabranjene rute; DB 0012: RPC/finansijske tabele nedostupne pogrešnim ulogama. Prepravljeni Next server-action zahtjev nije poslat.
 
 ---
 
@@ -626,7 +632,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** idete pravo na `/reception`; značka u zaglavlju pokazuje **isto vrijeme
   početka** kao prije odjave (nova smjena nije otvorena).
 - **Gdje provjeriti:** UI; baza: u `shifts` i dalje samo jedan otvoren red
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [x] Prošlo  [ ] Palo  Napomena: **22.09.2026 — PROŠLO.** E2E shifts.spec.ts i DB 0005: nastavak smjene, S-02, preuzimanje sa 120,50 €, zatvaranje prethodne, nova značka i sačuvani PDF. Stvarno slanje izvještaja dodatno provjereno u §9.
 
 ### [SHIFT-02] Drugi recepcioner dobija ekran „Otvorena smjena“ (S-02)
 - **Prioritet:** Kritično
@@ -637,7 +643,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   „Otvorena je smjena: <ime A> (od dd.mm.gggg HH:MM).“ Ispod: polje „Prebrojana gotovina za
   prethodnu smjenu (€)“, dugmad [Preuzmi smjenu] i [Odjavi se].
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [x] Prošlo  [ ] Palo  Napomena: **22.09.2026 — PROŠLO.** E2E shifts.spec.ts i DB 0005: nastavak smjene, S-02, preuzimanje sa 120,50 €, zatvaranje prethodne, nova značka i sačuvani PDF. Stvarno slanje izvještaja dodatno provjereno u §9.
 
 ### [SHIFT-03] Preuzimanje smjene (E19)
 - **Prioritet:** Kritično
@@ -648,7 +654,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   Smjena A je zatvorena sa načinom „Preuzeo/la <ime B>“ i za nju je napravljen PDF izvještaj
   (vidljiv vlasniku na `/finance/shifts`).
 - **Gdje provjeriti:** UI; `/finance/shifts` kao vlasnik; email ako je `EMAIL_FROM` podešen
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [x] Prošlo  [ ] Palo  Napomena: **22.09.2026 — PROŠLO.** E2E shifts.spec.ts i DB 0005: nastavak smjene, S-02, preuzimanje sa 120,50 €, zatvaranje prethodne, nova značka i sačuvani PDF. Stvarno slanje izvještaja dodatno provjereno u §9.
 
 ### [SHIFT-04] Prebrojana gotovina na S-02 je neobavezna i validira se
 - **Prioritet:** Visoko
@@ -658,7 +664,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** prazno i `0` i `1000` prolaze. `abc`, `-5` i `12,345` (tri decimale)
   daju „Unesite iznos ili ostavite prazno.“
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E preuzimanje prihvata 120,50; pgTAP pokriva preuzimanje. Cijela tabela prazno/abc/-5/12,345/0/1000 nije izvršena.
 
 ### [SHIFT-05] Odjava sa S-02 ne dira tuđu smjenu
 - **Prioritet:** Visoko
@@ -667,7 +673,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Test podaci:** —
 - **Očekivani rezultat:** ste na `/login`; smjena recepcionera A je i dalje otvorena i pripada njemu.
 - **Gdje provjeriti:** UI; prijava kao A vodi pravo na recepciju
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — NIJE IZVRŠENO.** Nije pokriveno izvršenim testovima ovog prolaza; nije označeno kao prolaz. Potrebno je zasebno izvršiti navedene korake.
 
 ### [SHIFT-06] Značka smjene u zaglavlju za sve uloge
 - **Prioritet:** Srednje
@@ -678,7 +684,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** sa smjenom: „Smjena: <ime recepcionera> od HH:MM“. Bez smjene:
   „Nema otvorene smjene“.
 - **Gdje provjeriti:** UI zaglavlje
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** Značka recepcionera i odsustvo nove smjene pri prijavi vlasnika provjereni u shifts.spec.ts; sve kombinacije uloga i otvorena/zatvorena nisu upoređene.
 
 ### [SHIFT-07] Bez otvorene smjene novac se ne može unositi (BR-092)
 - **Prioritet:** Kritično
@@ -693,7 +699,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   „Nema otvorene smjene. Recepcioner mora biti prijavljen.“ (poruka ili tooltip). Kod [Nova roba]
   opcija „Iz kase“ je onemogućena, a „Van kase“ ostaje moguća.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** Unit money-action.test.ts + DB 0006/0009 odbijaju novčane radnje bez smjene i dozvoljavaju nabavku van kase. Sva navedena dugmad nisu posebno kliknuta u UI-ju.
 
 ### [SHIFT-08] Zatvaranje smjene izvana izbacuje recepcionera (BR-116/BR-119)
 - **Prioritet:** Kritično
@@ -705,7 +711,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** recepcioner je odjavljen i na `/login` vidi „Smjena je automatski
   zaključena.“ Vlasnik ostaje prijavljen (njegova sesija se ne dira).
 - **Gdje provjeriti:** UI oba browsera; adresa sadrži `?auto=1`
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E jobs.spec.ts: automatsko zatvaranje testne smjene odjavljuje recepcionera. Zatvaranje dugmetom vlasnika u drugom browseru nije zasebno izvedeno.
 
 ### [SHIFT-09] Ekran S-02 kada je smjena u međuvremenu zatvorena
 - **Prioritet:** Srednje
@@ -714,7 +720,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Test podaci:** —
 - **Očekivani rezultat:** B ne dobija grešku — otvara mu se nova smjena i prelazi na `/reception`.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — NIJE IZVRŠENO.** Nije pokriveno izvršenim testovima ovog prolaza; nije označeno kao prolaz. Potrebno je zasebno izvršiti navedene korake.
 
 ### [SHIFT-10] Ostale uloge nemaju S-02 ni S-14
 - **Prioritet:** Visoko
@@ -723,7 +729,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Test podaci:** —
 - **Očekivani rezultat:** 404 u sva četiri slučaja.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [x] Prošlo  [ ] Palo  Napomena: **22.09.2026 — PROŠLO.** Dodatna UI matrica: /shift/gate i /shift/close su 404 za vlasnika i menadžera.
 
 ### [SHIFT-11] Ogroman iznos prebrojane gotovine na S-02 (granica)
 - **Prioritet:** Srednje
@@ -733,7 +739,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** jasna poruka o neispravnom iznosu; **ne** smije se pojaviti opšte
   „Došlo je do greške. Pokušajte ponovo.“ niti 500. Ako se pojavi opšta greška, zabilježite kao bug.
 - **Gdje provjeriti:** UI; serverska konzola (`npm run dev`)
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — NIJE IZVRŠENO.** Nije pokriveno izvršenim testovima ovog prolaza; nije označeno kao prolaz. Potrebno je zasebno izvršiti navedene korake.
 
 ---
 
@@ -750,7 +756,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** otvara se dijalog „Novi član“ sa već popunjenim poljem kartice i
   porukom „Kartica je prazna i spremna.“
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [x] Prošlo  [ ] Palo  Napomena: **22.09.2026 — PROŠLO.** E2E reception.spec.ts: skeniranje prazne kartice otvara registraciju; izvršena i uspješna registracija.
 
 ### [REC-02] Prijava člana jednim skeniranjem (bez klika)
 - **Prioritet:** Kritično
@@ -763,7 +769,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   („Aktivna“). Čuje se zvuk potvrde. Dijalog se sam zatvara nakon 5 sekundi. Član se pojavljuje u
   listi „U teretani“ i brojač „Danas dolazaka“ raste za 1.
 - **Gdje provjeriti:** UI; desna tabla „U teretani: N · Danas dolazaka: M“
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E reception.spec.ts + DB 0007: pokriveni/žuti/crveni dolazak i upis u bazu prolaze. Zvuk nije preslušan; svi vremenski i vizuelni detalji nisu pojedinačno provjereni.
 
 ### [REC-03] Izbor vrste dolaska kada članarina pokriva više toga (S-03a)
 - **Prioritet:** Kritično
@@ -775,7 +781,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   Kad izaberete Grupni, pojavljuju se „Trener“ i „Čas“. Trener je predložen, a čas je ili
   „Čas: HH:MM“ iz rasporeda (ako je u roku od 90 minuta) ili „Bez časa iz rasporeda“.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E reception.spec.ts: G+T izbor grupnog dolaska, trenera i aktuelnog časa. Sve ponuđene/predizabrane vrijednosti i varijanta bez časa nisu zasebno provjerene.
 
 ### [REC-04] Grupni dolazak bez trenera se ne može sačuvati
 - **Prioritet:** Visoko
@@ -784,7 +790,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Test podaci:** —
 - **Očekivani rezultat:** poruka „Izaberite trenera.“, dolazak nije evidentiran.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** DB 0007 provjerava pravila trenera/programa i izbor termina; UI poruke i kompletne liste trenera nisu ponovljene.
 
 ### [REC-05] Trener koji nije na programu (BR-023)
 - **Prioritet:** Visoko
@@ -796,7 +802,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   Ako ipak pokušate da sačuvate takvog trenera (npr. izmjenom zahtjeva), odgovor je
   „Trener nije dodijeljen ovom programu.“
 - **Gdje provjeriti:** UI, Network tab
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** DB 0007 provjerava pravila trenera/programa i izbor termina; UI poruke i kompletne liste trenera nisu ponovljene.
 
 ### [REC-06] Prvi neplaćeni dolazak — žuto upozorenje
 - **Prioritet:** Kritično
@@ -807,7 +813,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   dolazak.“ i dugmadima [Produži članarinu] i [Zatvori]. Zvuk je drugačiji nego kod zelenog.
   Dijalog se **ne** zatvara sam. Dolazak je ipak evidentiran (ulaz se ne brani, BR-078).
 - **Gdje provjeriti:** UI; profil člana → kartica „Dolasci“ (oznaka „Neplaćeno“)
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E reception.spec.ts + DB 0007: pokriveni/žuti/crveni dolazak i upis u bazu prolaze. Zvuk nije preslušan; svi vremenski i vizuelni detalji nisu pojedinačno provjereni.
 
 ### [REC-07] Drugi neplaćeni dolazak — crveni ekran preko cijelog prozora
 - **Prioritet:** Kritično
@@ -820,7 +826,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** **crveni** ekran preko cijelog prozora sa tekstom „PAŽNJA: 2. neplaćeni
   dolazak!“, dugmad [Produži članarinu] i [Zatvori], i treći, uzbunjujući zvuk.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E reception.spec.ts + DB 0007: pokriveni/žuti/crveni dolazak i upis u bazu prolaze. Zvuk nije preslušan; svi vremenski i vizuelni detalji nisu pojedinačno provjereni.
 
 ### [REC-08] Odjava skeniranjem i prikaz trajanja
 - **Prioritet:** Kritično
@@ -831,7 +837,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** zeleni „toast“ sa tekstom „Odjavljen/a: <ime> – Xh Ymin“. Član nestaje
   iz liste „U teretani“.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E reception.spec.ts i DB 0007 pokrivaju odjavu i zaštitu od duplog skena. Sve grane [Ne]/[Odjavi] i tačan prikaz trajanja nisu posebno upoređeni.
 
 ### [REC-09] Zaštita od duplog skeniranja
 - **Prioritet:** Visoko
@@ -841,7 +847,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** pitanje „<ime> je prijavljen/a prije N s. Odjaviti?“ sa [Odjavi] i [Ne].
   [Ne] ostavlja člana unutra; [Odjavi] ga odjavljuje.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E reception.spec.ts i DB 0007 pokrivaju odjavu i zaštitu od duplog skena. Sve grane [Ne]/[Odjavi] i tačan prikaz trajanja nisu posebno upoređeni.
 
 ### [REC-10] Promjena praga duplog skeniranja
 - **Prioritet:** Srednje
@@ -851,7 +857,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Test podaci:** `0`, zatim vratite na `120`
 - **Očekivani rezultat:** sa 0 nema pitanja — drugo skeniranje odmah odjavljuje člana.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — NIJE IZVRŠENO.** Nije pokriveno izvršenim testovima ovog prolaza; nije označeno kao prolaz. Potrebno je zasebno izvršiti navedene korake.
 
 ### [REC-11] Nepoznata, poništena i neispravna kartica
 - **Prioritet:** Kritično
@@ -864,7 +870,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   „Nepoznata kartica.“ · „Kartica je poništena. Pronađite člana pretragom.“ ·
   „Neispravan kod kartice.“ (za sva tri neispravna oblika).
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E: neispravan i nepoznat kod; DB 0007: i poništena kartica. Dodatno UI: neispravan kod nestaje nakon 5 s. Nisu svih pet unosa ponovljeni u UI-ju.
 
 ### [REC-12] Član je već u teretani (ručna prijava)
 - **Prioritet:** Visoko
@@ -873,7 +879,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Test podaci:** —
 - **Očekivani rezultat:** poruka „Član je već u teretani.“, ništa se ne evidentira.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** DB 0007 potvrđuje jedan otvoreni dolazak i odbijanje ponovne prijave. Ručni klik rezultata pretrage nije zasebno izvršen.
 
 ### [REC-13] Pretraga člana na recepciji
 - **Prioritet:** Visoko
@@ -885,7 +891,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   redova. Pretraga po imenu ignoriše velika/mala slova i kvačice (`anic` nalazi „Anić“). Za `zzzz`:
   „Nema članova koji odgovaraju pretrazi.“ Svaki red ima dugme [Otvori profil].
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** DB 0006 i E2E members.spec.ts potvrđuju pretragu bez kvačica; dodatna UI provjera praznog rezultata. Ostali upiti i mjerenje 250 ms nisu potpuno izvršeni.
 
 ### [REC-14] Escape i brisanje pretrage
 - **Prioritet:** Nisko
@@ -895,7 +901,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** lista rezultata se zatvara i polje se prazni; ekran ostaje upotrebljiv za
   skeniranje.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [x] Prošlo  [ ] Palo  Napomena: **22.09.2026 — PROŠLO.** Dodatni UI test: Escape prazni polje i uklanja rezultate pretrage.
 
 ### [REC-15] Skeniranje ne smije da krade tastaturu dok kucate u polje
 - **Prioritet:** Visoko
@@ -905,7 +911,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** to je pretraga, a **ne** skeniranje: ne pojavljuje se poruka o kartici.
   Isto važi dok je otvoren dijalog „Novi član“, „Dnevna karta“ ili „Trošak“.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** Dodatni UI test: 1234567890 + Enter u pretrazi ne skenira karticu. Nije ponovljeno u sva tri navedena dijaloga.
 
 ### [REC-16] Slučajno kucanje po ekranu
 - **Prioritet:** Srednje
@@ -915,7 +921,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** `55` + Enter daje „Neispravan kod kartice.“ Samo slovo `a` (bez prethodne
   cifre) se ignoriše i Enter ne pokreće ništa. (Vidi SUSPECT-09.)
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [x] Prošlo  [ ] Palo  Napomena: **22.09.2026 — PROŠLO.** Dodatni UI test: zalutala cifra, pauza 1,2 s, Space aktivira fokusirano dugme Počni rad; regresija SUSPECT-09 nije reprodukovana.
 
 ### [REC-17] Lista „U teretani“ i brojači
 - **Prioritet:** Visoko
@@ -926,7 +932,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   oznaku vrste dolaska, vrijeme ulaska i trajanje koje se osvježava svakog minuta. Nakon [Odjavi]
   član nestaje, a brojač „U teretani“ pada na 1. Prazno stanje: „Trenutno nema nikoga u teretani.“
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** DB 0007 reception_panel i E2E reception provjeravaju prisutne članove; sve promjene brojača između dva pulta nisu upoređene.
 
 ### [REC-18] Zvuk se uključuje jednom po sesiji browsera
 - **Prioritet:** Srednje
@@ -938,7 +944,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   [Počni rad] pojavljuje se jednom; zaglavlje i navigacija ostaju upotrebljivi ispod njega.
   Poslije klika se više ne pojavljuje do zatvaranja browsera.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** Dodatni UI test: Počni rad uklanja početni ekran, osvježavanje ga ne vraća. Nova kartica browsera i stvarni audio nisu provjereni.
 
 ### [REC-19] Dolazak preko ponoći i trajanje
 - **Prioritet:** Srednje
@@ -949,7 +955,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** dolazak se broji u dan **kada je počeo**; trajanje je ispravno (prelazi
   ponoć). Noćni posao u 23:00 ga automatski odjavljuje (vidi JOB-01), pa to provjerite prije 23:00.
 - **Gdje provjeriti:** profil člana → „Dolasci“; `/stats/visits`
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** Unit format.test.ts i DB 0000/0001 provjeravaju lokalni datum/prelaz ponoći i trajanje. Stvarni noćni UI scenario nije izvršen.
 
 ### [REC-20] Ručna prijava iz profila člana
 - **Prioritet:** Visoko
@@ -959,7 +965,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** prolazi isti tok kao skeniranje (zeleni/žuti/crveni dijalog), a dolazak je
   u bazi označen kao ručni.
 - **Gdje provjeriti:** UI; profil → „Dolasci“
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — NIJE IZVRŠENO.** Nije pokriveno izvršenim testovima ovog prolaza; nije označeno kao prolaz. Potrebno je zasebno izvršiti navedene korake.
 
 ### [REC-21] Dva pulta prijavljuju istog člana (trka)
 - **Prioritet:** Srednje
@@ -969,7 +975,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** tačno jedan dolazak je evidentiran; drugi browser dobija
   „Član je već u teretani.“ ili pitanje o odjavi. Nikada dva otvorena dolaska za istog člana.
 - **Gdje provjeriti:** UI; profil člana → „Dolasci“
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** DB 0007 potvrđuje zabranu drugog otvorenog dolaska. Nije izvršena istovremena trka iz dva browsera.
 
 ---
 
@@ -992,7 +998,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   Poslije [Zatvori] odmah slijedi **zeleni** dijalog prijave dolaska. Član je u listi „U teretani“.
   Na `/payments/today` postoji uplata od 79,00 € sa opisom „Mjesečna – Ana Anić“.
 - **Gdje provjeriti:** UI; `/payments/today`; profil člana
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [x] Prošlo  [ ] Palo  Napomena: **22.09.2026 — PROŠLO.** E2E members.spec.ts/reception.spec.ts: sačuvan član, kartica, članarina, uplata i trenutni dolazak; bez validne skenirane kartice Sačuvaj je onemogućen.
 
 ### [MEM-02] Bez skenirane kartice se ne može sačuvati (BR-033)
 - **Prioritet:** Kritično
@@ -1003,7 +1009,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** dugme za čuvanje je onemogućeno dok kartica nije potvrđena; uz polje
   kartice stoji „Skenirajte praznu karticu.“
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [x] Prošlo  [ ] Palo  Napomena: **22.09.2026 — PROŠLO.** E2E members.spec.ts/reception.spec.ts: sačuvan član, kartica, članarina, uplata i trenutni dolazak; bez validne skenirane kartice Sačuvaj je onemogućen.
 
 ### [MEM-03] Kartica koja nije prazna
 - **Prioritet:** Visoko
@@ -1012,7 +1018,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Test podaci:** kartica člana Ana Anić
 - **Očekivani rezultat:** „Ova kartica nije prazna.“ i dugme za čuvanje ostaje onemogućeno.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** DB 0006 provjerava karticu pri registraciji; kompletne UI varijante zauzete/poništene kartice nisu izvršene.
 
 ### [MEM-04] Validacija polja — prazna i predugačka
 - **Prioritet:** Kritično
@@ -1027,7 +1033,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** poruke stoje **ispod odgovarajućeg polja**, ništa nije sačuvano, dijalog
   ostaje otvoren sa unesenim podacima.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** Unit members.test.ts provjerava neispravna polja i putanju greške, DB 0006 ograničenja registracije; nisu svi granični unosi izvedeni kroz formu.
 
 ### [MEM-05] Telefon — normalizacija i granice (BR-041)
 - **Prioritet:** Kritično
@@ -1047,7 +1053,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   | `+3821234567890123456` | ista poruka (više od 15 cifara) |
 - **Očekivani rezultat:** kako je u tablici; ispravan broj se u profilu prikazuje u `+382…` obliku.
 - **Gdje provjeriti:** UI; profil člana
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** Unit phone.test.ts + members.test.ts, DB 0006 i UI normalizacija 067 123 456 → +38267123456. Cijela tabela unosa nije ponovljena u UI-ju.
 
 ### [MEM-06] Datum rođenja — format i granice
 - **Prioritet:** Kritično
@@ -1069,7 +1075,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** kako je u tablici. Dugme sa ikonicom kalendara otvara biranje datuma i
   upisuje izabrani datum u polje u obliku `dd.mm.gggg`.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** Unit members.test.ts provjerava oba formata, nepostojeće datume i donju granicu. Gornja granica i poruka server akcije nisu ponovo testirane uživo.
 
 ### [MEM-07] Naša slova, ćirilica, emoji i razmaci
 - **Prioritet:** Visoko
@@ -1085,7 +1091,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   pretraga, PDF). Razmaci ispred i iza se uklanjaju prije čuvanja. Emoji: ako se prihvata, mora se
   ispravno prikazati svuda uključujući PDF; ako PDF prikazuje kvadratiće, zabilježite kao bug.
 - **Gdje provjeriti:** UI; PDF izvještaja smjene; PDF kartica
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E registracija i pretraga Ćosić, unit normalizacija razmaka i PDF testovi čćšžđ prolaze. Ćirilica i emoji nisu provjereni.
 
 ### [MEM-08] Upozorenje o duplikatu (BR-043)
 - **Prioritet:** Visoko
@@ -1096,7 +1102,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   brojem i imenom postojećeg člana, dugmetom [Otvori postojećeg] i dugmetom [Ipak sačuvaj].
   Ovo je **upozorenje, ne zabrana** — [Ipak sačuvaj] pravi drugog člana.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** DB 0006 provjerava duplikate BR-043; dijalog upozorenja i potvrda u UI-ju nisu provjereni.
 
 ### [MEM-09] Lista članova: pretraga, filter i straničenje
 - **Prioritet:** Visoko
@@ -1113,7 +1119,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   `page=999` daje praznu listu, `page=-1` i `page=abc` se ponašaju kao prva strana,
   nepoznat `status` se ponaša kao „Svi“. Prazna pretraga: „Nema članova koji odgovaraju pretrazi.“
 - **Gdje provjeriti:** UI, adresna linija
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E members.spec.ts pretraga cosic nalazi Ćosić. Statusni filteri i straničenje preko 25 članova nisu potpuno izvršeni.
 
 ### [MEM-10] Prazno stanje kad nema nijednog člana
 - **Prioritet:** Srednje
@@ -1122,7 +1128,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Test podaci:** —
 - **Očekivani rezultat:** „Još nema članova. Skenirajte praznu karticu na recepciji da dodate prvog.“
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [x] Prošlo  [ ] Palo  Napomena: **22.09.2026 — PROŠLO.** E2E screens.spec.ts/members.spec.ts: tačno očekivano prazno stanje na oba viewporta.
 
 ### [MEM-11] Profil člana i tri kartice
 - **Prioritet:** Visoko
@@ -1135,7 +1141,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   ista nakon osvježavanja. Prazna stanja: „Član još nema članarinu.“, „Nema uplata za prikaz.“,
   „Nema dolazaka.“
 - **Gdje provjeriti:** UI, adresna linija
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E members/payments provjeravaju profil, prodaju/produženje i povezane zapise. Sve tri kartice i sva polja nisu pojedinačno provjereni.
 
 ### [MEM-12] Straničenje dolazaka u profilu
 - **Prioritet:** Nisko
@@ -1144,7 +1150,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Test podaci:** —
 - **Očekivani rezultat:** po 20 dolazaka po strani; nevažeći broj strane ne ruši stranicu.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — NIJE IZVRŠENO.** Nije pokriveno izvršenim testovima ovog prolaza; nije označeno kao prolaz. Potrebno je zasebno izvršiti navedene korake.
 
 ### [MEM-13] Izmjena podataka o članu
 - **Prioritet:** Visoko
@@ -1154,7 +1160,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** „Podaci su sačuvani.“, novi podaci se odmah vide u profilu i u listi.
   Ista validacija kao pri unosu (probajte prazno ime — mora pasti).
 - **Gdje provjeriti:** UI; vlasnik: `/finance/audit` mora imati zapis izmjene
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** DB 0006 provjerava izmjenu člana i audit; forma nije zasebno izvršena.
 
 ### [MEM-14] Anonimizacija smije samo vlasnik/administrator (BR-046)
 - **Prioritet:** Kritično
@@ -1165,7 +1171,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** dugmeta nema za recepcionera i menadžera; postoji za vlasnika i
   administratora.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E members.spec.ts: recepcioneru nema anonimizacije, vlasnik anonimizuje i profil postaje read-only; DB 0006 provjerava podatke. Admin i svi detalji istorije nisu posebno provjereni.
 
 ### [MEM-15] Anonimizacija traži tačan broj člana
 - **Prioritet:** Kritično
@@ -1180,7 +1186,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   „Član je anonimiziran.“ Članarine, uplate i dolasci **ostaju**. Anonimizovan član se više ne
   pojavljuje u pretrazi ni u statistici.
 - **Gdje provjeriti:** UI; `/members` pretraga; `/stats/visits` → „Najčešći članovi“
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E members.spec.ts uspješna potvrda brojem i anonimizacija. Pogrešan broj i izmijenjeno skriveno polje nisu ponovo testirani.
 
 ### [MEM-16] Izgubljena kartica (F-11, BR-034)
 - **Prioritet:** Visoko
@@ -1193,7 +1199,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   Na `/payments/today` je uplata „Zamjenska kartica – <ime>“. Skeniranje **stare** kartice daje
   „Kartica je poništena. Pronađite člana pretragom.“
 - **Gdje provjeriti:** UI; `/payments/today`
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E members.spec.ts + DB 0006: zamjena praznom karticom, naknada i statusi kartica. Sve navedene negativne kombinacije nisu izvedene u UI-ju.
 
 ### [MEM-17] Zamjena kartice bez otvorene smjene
 - **Prioritet:** Visoko
@@ -1203,7 +1209,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** radnja je onemogućena ili odbijena porukom „Nema otvorene smjene.
   Recepcioner mora biti prijavljen.“
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** DB i unit zaštita novčanih radnji bez smjene prolaze; konkretan dijalog zamjene nije otvoren bez smjene.
 
 ### [MEM-18] HTML i SQL znakovi u podacima člana
 - **Prioritet:** Kritično (bezbjednost)
@@ -1214,7 +1220,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** tekst se svuda prikazuje **doslovno**, kao običan tekst. Nema iskačućeg
   prozora, nema greške u konzoli, PDF se pravi normalno. Apostrof u prezimenu se uredno čuva.
 - **Gdje provjeriti:** UI, konzola browsera, PDF
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — NIJE IZVRŠENO.** Nije pokriveno izvršenim testovima ovog prolaza; nije označeno kao prolaz. Potrebno je zasebno izvršiti navedene korake.
 
 ---
 
@@ -1230,7 +1236,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   „Počinje danas“, a „Važi do“ je isti dan sljedećeg mjeseca umanjen za jedan dan.
   Na kartici „Članarine“ je nova članarina sa statusom „Aktivna“.
 - **Gdje provjeriti:** UI; `/payments/today`
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [x] Prošlo  [ ] Palo  Napomena: **22.09.2026 — PROŠLO.** E2E members.spec.ts + DB 0006: prodaja Personalni, odbijanje ispod minimuma i produženje mjesečne od dana nakon isteka; sintetički datumi/podaci.
 
 ### [MSHIP-02] Produženje se nadovezuje na postojeću članarinu (BR-052, E2)
 - **Prioritet:** Kritično
@@ -1241,7 +1247,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   a „Početak“ je **prvi dan poslije** isteka postojeće. Nakon čuvanja status nove članarine je
   „Buduća“.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [x] Prošlo  [ ] Palo  Napomena: **22.09.2026 — PROŠLO.** E2E members.spec.ts + DB 0006: prodaja Personalni, odbijanje ispod minimuma i produženje mjesečne od dana nakon isteka; sintetički datumi/podaci.
 
 ### [MSHIP-03] Članarina počinje od prvog neplaćenog dolaska (E3)
 - **Prioritet:** Kritično
@@ -1252,7 +1258,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   je datum tog dolaska. Nakon čuvanja, ti dolasci **više nisu neplaćeni** (oznaka „Neplaćeno“ je
   nestala), a značka „Neplaćeni dolasci“ u zaglavlju profila je nestala.
 - **Gdje provjeriti:** UI; profil → „Dolasci“
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E reception.spec.ts i DB 0006/0007 potvrđuju povezivanje neplaćenih dolazaka i početak članarine. Sve poruke pregleda nisu pojedinačno upoređene.
 
 ### [MSHIP-04] Prestari neplaćeni dolasci (E5, upozorenje)
 - **Prioritet:** Srednje
@@ -1263,7 +1269,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** upozorenje „Neplaćeni dolasci su stariji od trajanja ove članarine i
   ostaju neplaćeni.“, a početak je **danas**. Nakon čuvanja ti dolasci ostaju neplaćeni.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** DB 0006/0007: datumi BR-052, prestari dolasci, vlasnikova prava, E14 kraj mjeseca, limiti/statusi, smjena i finansijski snapshot. Ovo potvrđuje baznu logiku, ne sve korake/poruke UI slučaja.
 
 ### [MSHIP-05] Samo vlasnik smije da pomjeri početak (BR-052 korak 4)
 - **Prioritet:** Visoko
@@ -1276,7 +1282,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   obrazloženje glasi „Početak je odredio vlasnik.“
   Neispravan datum (`32.13.2026`) daje „Unesite datum u formatu dd.mm.gggg.“
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** DB 0006/0007: datumi BR-052, prestari dolasci, vlasnikova prava, E14 kraj mjeseca, limiti/statusi, smjena i finansijski snapshot. Ovo potvrđuje baznu logiku, ne sve korake/poruke UI slučaja.
 
 ### [MSHIP-06] Iznos može da mijenja samo vlasnik (BR-059)
 - **Prioritet:** Kritično
@@ -1287,7 +1293,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** recepcioner ne može promijeniti iznos (ili dobija „Samo vlasnik može
   mijenjati iznos.“). Vlasnik može, i uplata je 70,00 €.
 - **Gdje provjeriti:** UI; `/payments/today`
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** DB 0006/0007: datumi BR-052, prestari dolasci, vlasnikova prava, E14 kraj mjeseca, limiti/statusi, smjena i finansijski snapshot. Ovo potvrđuje baznu logiku, ne sve korake/poruke UI slučaja.
 
 ### [MSHIP-07] Personalni: iznos i broj termina su obavezni
 - **Prioritet:** Kritično
@@ -1297,7 +1303,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** „Unesite iznos, na primjer 79 ili 79,50.“ uz iznos i „Unesite broj termina
   od 1 do 50.“ uz termine. Uz polje iznosa stoji podsjetnik „Minimalno 80,00 €“.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** Unit members.test.ts i DB 0006: obavezni iznos/termini/trener/način plaćanja i format iznosa. Cijela tabela graničnih vrijednosti nije ponovljena kroz UI.
 
 ### [MSHIP-08] Personalni: minimalna cijena (E13)
 - **Prioritet:** Kritično
@@ -1307,7 +1313,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** „Iznos ne može biti manji od 80.00 €.“ (tačna vrijednost iz podešavanja).
   Sa `80` prolazi.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [x] Prošlo  [ ] Palo  Napomena: **22.09.2026 — PROŠLO.** E2E members.spec.ts + DB 0006: prodaja Personalni, odbijanje ispod minimuma i produženje mjesečne od dana nakon isteka; sintetički datumi/podaci.
 
 ### [MSHIP-09] Broj termina — granice
 - **Prioritet:** Visoko
@@ -1317,7 +1323,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** `1` i `50` prolaze; `0`, `51`, `2.5`, `-3`, `abc` daju
   „Unesite broj termina od 1 do 50.“
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** Unit members.test.ts i DB 0006: obavezni iznos/termini/trener/način plaćanja i format iznosa. Cijela tabela graničnih vrijednosti nije ponovljena kroz UI.
 
 ### [MSHIP-10] Iznos — format i granice
 - **Prioritet:** Visoko
@@ -1329,7 +1335,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   negativan iznos, slova i prazno daju „Unesite iznos, na primjer 79 ili 79,50.“
   `0` pada na minimalnoj cijeni (E13). Vrlo veliki iznos mora dati jasnu poruku, ne opštu grešku.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** Unit members.test.ts i DB 0006: obavezni iznos/termini/trener/način plaćanja i format iznosa. Cijela tabela graničnih vrijednosti nije ponovljena kroz UI.
 
 ### [MSHIP-11] Trener je obavezan za Grupni, G+T i Personalni (BR-058)
 - **Prioritet:** Kritično
@@ -1339,7 +1345,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Test podaci:** —
 - **Očekivani rezultat:** svaki put „Izaberite trenera.“ Za `Mjesečna` polje trenera se ne traži.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** Unit members.test.ts i DB 0006: obavezni iznos/termini/trener/način plaćanja i format iznosa. Cijela tabela graničnih vrijednosti nije ponovljena kroz UI.
 
 ### [MSHIP-12] Način plaćanja je obavezan
 - **Prioritet:** Visoko
@@ -1348,7 +1354,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Test podaci:** —
 - **Očekivani rezultat:** „Izaberite način plaćanja.“
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** Unit members.test.ts i DB 0006: obavezni iznos/termini/trener/način plaćanja i format iznosa. Cijela tabela graničnih vrijednosti nije ponovljena kroz UI.
 
 ### [MSHIP-13] Granica trajanja: 31.01 + 1 mjesec (E14)
 - **Prioritet:** Visoko
@@ -1359,7 +1365,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** `31.01.2027` → važi do `27.02.2027`; `31.01.2028` → do `28.02.2028`;
   `31.12.2026` → do `30.01.2027`. (Posljednji važeći dan je uključen.)
 - **Gdje provjeriti:** UI (prikaz „Važi do“ prije čuvanja)
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** DB 0006/0007: datumi BR-052, prestari dolasci, vlasnikova prava, E14 kraj mjeseca, limiti/statusi, smjena i finansijski snapshot. Ovo potvrđuje baznu logiku, ne sve korake/poruke UI slučaja.
 
 ### [MSHIP-14] Iskorišćeni termini i status „Iskorištena“ (BR-054, BR-055)
 - **Prioritet:** Visoko
@@ -1370,7 +1376,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** brojač opada 12, 11, 10 … Kada dođe na 0, status članarine postaje
   „Iskorištena“, a sljedeći dolazak je **neplaćen** (žuti dijalog).
 - **Gdje provjeriti:** UI; profil → „Članarine“, kolona „Preostalo termina“
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** DB 0006/0007: datumi BR-052, prestari dolasci, vlasnikova prava, E14 kraj mjeseca, limiti/statusi, smjena i finansijski snapshot. Ovo potvrđuje baznu logiku, ne sve korake/poruke UI slučaja.
 
 ### [MSHIP-15] [Produži članarinu] iz upozorenja o neplaćenom dolasku
 - **Prioritet:** Visoko
@@ -1381,7 +1387,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   posljednje članarine iste vrste. Nakon prodaje, neplaćeni dolasci koje nova članarina pokriva
   postaju plaćeni.
 - **Gdje provjeriti:** UI; profil → „Dolasci“
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [x] Prošlo  [ ] Palo  Napomena: **22.09.2026 — PROŠLO.** E2E reception.spec.ts: produženje iz upozorenja o neplaćenom dolasku i povezivanje oba dolaska.
 
 ### [MSHIP-16] Prodaja bez otvorene smjene
 - **Prioritet:** Kritično
@@ -1391,7 +1397,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** dugme je onemogućeno sa razlogom „Nema otvorene smjene. Recepcioner mora
   biti prijavljen.“
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** DB 0006/0007: datumi BR-052, prestari dolasci, vlasnikova prava, E14 kraj mjeseca, limiti/statusi, smjena i finansijski snapshot. Ovo potvrđuje baznu logiku, ne sve korake/poruke UI slučaja.
 
 ### [MSHIP-17] Promjena cijene plana ne mijenja prodate članarine (BR-004)
 - **Prioritet:** Visoko
@@ -1404,7 +1410,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** stara uplata i dalje glasi 79,00 €; nova je 89,00 €. Na ekranu planova
   stoji napomena „Promjena cijene važi samo za nove prodaje.“ Vratite cijenu na 79 nakon testa.
 - **Gdje provjeriti:** UI; `/payments/today`
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** DB 0006/0007: datumi BR-052, prestari dolasci, vlasnikova prava, E14 kraj mjeseca, limiti/statusi, smjena i finansijski snapshot. Ovo potvrđuje baznu logiku, ne sve korake/poruke UI slučaja.
 
 ---
 
@@ -1421,7 +1427,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   Nakon čuvanja poruka „Prodato: 3 × dnevna karta = 30,00 €“. Na `/payments/today` je stavka
   „Dnevna karta × 3“ na 30,00 €.
 - **Gdje provjeriti:** UI; `/payments/today`
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [x] Prošlo  [ ] Palo  Napomena: **22.09.2026 — PROŠLO.** E2E payments.spec.ts + DB 0008: dnevne karte i trošak pulta, iznosi i zapisi u bazi.
 
 ### [PAY-02] Dnevne karte — granice količine
 - **Prioritet:** Visoko
@@ -1433,7 +1439,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   [Jedna više] na 20. Ako ipak prođe neispravna vrijednost, server odgovara
   „Provjerite unesene podatke.“ i ništa se ne evidentira.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** Unit payments.test.ts + DB 0008: količina, način plaćanja, opis/kategorija i novčane granice. Nisu svi unosi ponovljeni kroz UI.
 
 ### [PAY-03] Dnevna karta bez načina plaćanja
 - **Prioritet:** Visoko
@@ -1442,7 +1448,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Test podaci:** —
 - **Očekivani rezultat:** „Izaberite način plaćanja.“
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** Unit payments.test.ts + DB 0008: količina, način plaćanja, opis/kategorija i novčane granice. Nisu svi unosi ponovljeni kroz UI.
 
 ### [PAY-04] Dnevna karta kada plan nije podešen
 - **Prioritet:** Nisko
@@ -1452,7 +1458,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** „Dnevna karta nije podešena. Vlasnik je dodaje u planovima.“
   Vratite plan u aktivno stanje poslije testa.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — NIJE IZVRŠENO.** Nije pokriveno izvršenim testovima ovog prolaza; nije označeno kao prolaz. Potrebno je zasebno izvršiti navedene korake.
 
 ### [PAY-05] Trošak sa pulta (happy path)
 - **Prioritet:** Kritično
@@ -1463,7 +1469,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** u dijalogu stoji nepromjenjiva napomena „Plaćeno iz kase · danas“.
   Nakon čuvanja „Trošak je sačuvan.“ Stavka je na `/payments/today` u sekciji troškova.
 - **Gdje provjeriti:** UI; `/payments/today`
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [x] Prošlo  [ ] Palo  Napomena: **22.09.2026 — PROŠLO.** E2E payments.spec.ts + DB 0008: dnevne karte i trošak pulta, iznosi i zapisi u bazi.
 
 ### [PAY-06] Trošak — validacija
 - **Prioritet:** Visoko
@@ -1484,7 +1490,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   | iznos `abc` | poruka o iznosu |
 - **Očekivani rezultat:** kako je u tablici; poruka stoji ispod pravog polja.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** Unit payments.test.ts + DB 0008: količina, način plaćanja, opis/kategorija i novčane granice. Nisu svi unosi ponovljeni kroz UI.
 
 ### [PAY-07] Kategorija „Plate“ nije dostupna na pultu (D-37)
 - **Prioritet:** Visoko
@@ -1494,7 +1500,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** kategorije `Plate` nema u listi. (Vlasnik je ima na `/finance/expenses`.)
   Ako se ipak pošalje, odgovor je „Ova kategorija nije dozvoljena.“
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** DB 0008 provjerava ograničenja troškova pulta. Cijeli spisak ponuđenih kategorija nije zasebno upoređen.
 
 ### [PAY-08] Ispravka uplate — način i napomena (BR-094)
 - **Prioritet:** Kritično
@@ -1505,7 +1511,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** „Uplata je ispravljena.“ Način je promijenjen. Polje iznosa je
   recepcioneru nedostupno ili daje „Samo vlasnik može mijenjati iznos.“
 - **Gdje provjeriti:** UI; vlasnik: `/finance/audit`
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E payments.spec.ts i DB 0008 pokrivaju ispravke, vlasnikovu promjenu iznosa, zaključenu smjenu i poništavanje članarine. Nisu sve negativne varijante i svaki tekst iz plana izvršeni kroz UI.
 
 ### [PAY-09] Ispravka iznosa je vlasnikova
 - **Prioritet:** Kritično
@@ -1515,7 +1521,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** iznos je izmijenjen i vidi se u dnevnim ukupnostima i u izvještaju smjene.
   Napomena duža od 500 znakova daje „Napomena može imati najviše 500 znakova.“
 - **Gdje provjeriti:** UI; `/finance/audit`
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E payments.spec.ts i DB 0008 pokrivaju ispravke, vlasnikovu promjenu iznosa, zaključenu smjenu i poništavanje članarine. Nisu sve negativne varijante i svaki tekst iz plana izvršeni kroz UI.
 
 ### [PAY-10] Stavka iz zaključene smjene nije izmjenjiva (AS-14)
 - **Prioritet:** Kritično
@@ -1526,7 +1532,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   mijenjati.“ i dugmad [Ispravi]/[Poništi] su nedostupna. Vlasnik ih ima. Pokušaj ispravke bez
   dozvole daje „Ova stavka se ne može mijenjati (smjena je zaključena).“
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E payments.spec.ts i DB 0008 pokrivaju ispravke, vlasnikovu promjenu iznosa, zaključenu smjenu i poništavanje članarine. Nisu sve negativne varijante i svaki tekst iz plana izvršeni kroz UI.
 
 ### [PAY-11] Poništavanje uplate traži razlog (BR-095)
 - **Prioritet:** Kritično
@@ -1537,7 +1543,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   „Stavka je poništena.“ Stavka ostaje u listi, precrtana, sa oznakom „Poništeno“, i **ne ulazi** u
   ukupnosti smjene.
 - **Gdje provjeriti:** UI; `/shift/close` ukupnosti
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E payments.spec.ts i DB 0008 pokrivaju ispravke, vlasnikovu promjenu iznosa, zaključenu smjenu i poništavanje članarine. Nisu sve negativne varijante i svaki tekst iz plana izvršeni kroz UI.
 
 ### [PAY-12] Poništavanje uplate članarine poništava i članarinu (E16)
 - **Prioritet:** Kritično
@@ -1549,7 +1555,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   njeni dolasci postaju neplaćeni.“ Nakon potvrde: članarina ima status „Poništena“, dolazak je
   ponovo „Neplaćeno“, a u zaglavlju profila se vraća značka „Neplaćeni dolasci: 1“.
 - **Gdje provjeriti:** UI; profil člana (kartice „Članarine“ i „Dolasci“)
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E payments.spec.ts i DB 0008 pokrivaju ispravke, vlasnikovu promjenu iznosa, zaključenu smjenu i poništavanje članarine. Nisu sve negativne varijante i svaki tekst iz plana izvršeni kroz UI.
 
 ### [PAY-13] Poništena stavka se ne poništava dvaput
 - **Prioritet:** Srednje
@@ -1559,7 +1565,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** dugmad nisu dostupna; ako se zahtjev ipak pošalje, odgovor je jasna
   poruka o grešci, a ne dupli zapis.
 - **Gdje provjeriti:** UI; `/finance/audit` (samo jedan zapis poništenja)
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** DB 0008 potvrđuje pravila poništavanja uplata/troškova. UI ponovnog poništavanja nije posebno testiran.
 
 ### [PAY-14] Poništavanje troška
 - **Prioritet:** Visoko
@@ -1569,7 +1575,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** „Stavka je poništena.“ Trošak je precrtan i ne ulazi u „Troškovi iz kase“
   na zaključenju smjene.
 - **Gdje provjeriti:** UI; `/shift/close`
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** DB 0008 potvrđuje pravila poništavanja uplata/troškova. UI ponovnog poništavanja nije posebno testiran.
 
 ### [PAY-15] Prazno stanje ekrana „Uplate danas“
 - **Prioritet:** Srednje
@@ -1579,7 +1585,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** „Danas još nema uplata.“ i „Danas još nema troškova.“ (odnosno
   „Danas još nema prodaje.“ za magacin).
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [x] Prošlo  [ ] Palo  Napomena: **22.09.2026 — PROŠLO.** E2E screens.spec.ts: „Danas još nema uplata.“ na oba viewporta.
 
 ### [PAY-16] Dupli klik na [Naplati]
 - **Prioritet:** Visoko
@@ -1589,7 +1595,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** evidentira se **tačno jedna** uplata. Dugme se onemogućava dok traje
   čuvanje i prikazuje indikator učitavanja.
 - **Gdje provjeriti:** UI; `/payments/today` (broj stavki)
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — NIJE IZVRŠENO.** Nije pokriveno izvršenim testovima ovog prolaza; nije označeno kao prolaz. Potrebno je zasebno izvršiti navedene korake.
 
 ---
 
@@ -1604,7 +1610,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** „Roba je evidentirana.“ Stanje postaje 24, nabavna cijena proizvoda
   postaje 0,35 €. Na `/payments/today` se pojavljuje trošak kategorije „Roba za prodaju“ od 8,40 €.
 - **Gdje provjeriti:** UI; `/payments/today`
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E storage.spec.ts + DB 0009: nabavka iz kase, prodaja, odbijanje viška, ispravka i poništavanje prolaze. Nisu svi filteri i prikazi sa svih ekrana upoređeni.
 
 ### [STO-02] Unos robe van kase
 - **Prioritet:** Visoko
@@ -1614,7 +1620,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** stanje raste za 12; trošak je zabilježen bez načina plaćanja
   („Van kase“) i **ne** umanjuje očekivanu gotovinu u smjeni.
 - **Gdje provjeriti:** UI; `/shift/close` („Troškovi iz kase“ se ne mijenja)
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** DB 0009: nabavka van kase, negativna zaliha, poništavanje i vidljivost vrijednosti/zarade po ulogama. UI koraci nisu u cijelosti izvršeni.
 
 ### [STO-03] Nabavna cijena — granice (D-55)
 - **Prioritet:** Visoko
@@ -1624,7 +1630,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** samo `0,01` i više prolazi; ostalo daje
   „Nabavna cijena mora biti najmanje 0,01 €.“ Besplatna isporuka nije dozvoljena.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** Unit storage.test.ts + DB 0009: pozitivna nabavna cijena i količine; granice nisu sve ponovljene u browseru.
 
 ### [STO-04] Količina — granice
 - **Prioritet:** Visoko
@@ -1634,7 +1640,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** `1` i `10000` prolaze; ostalo daje „Unesite količinu od 1 do 10000.“
   (za prodaju je gornja granica stanje na zalihi).
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** Unit storage.test.ts + DB 0009: pozitivna nabavna cijena i količine; granice nisu sve ponovljene u browseru.
 
 ### [STO-05] Prodaja iz magacina
 - **Prioritet:** Visoko
@@ -1644,7 +1650,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** „Ukupno: 3,00 €“ prije naplate; poslije „Prodaja je sačuvana.“
   Stanje pada za 2. Na `/payments/today` je stavka „Voda × 2“.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E storage.spec.ts + DB 0009: nabavka iz kase, prodaja, odbijanje viška, ispravka i poništavanje prolaze. Nisu svi filteri i prikazi sa svih ekrana upoređeni.
 
 ### [STO-06] Prodaja više nego što ima na stanju (E17)
 - **Prioritet:** Kritično
@@ -1654,7 +1660,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** „Nema dovoljno na stanju (stanje: 5).“ Prodaja nije evidentirana i
   stanje se ne mijenja.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E storage.spec.ts + DB 0009: nabavka iz kase, prodaja, odbijanje viška, ispravka i poništavanje prolaze. Nisu svi filteri i prikazi sa svih ekrana upoređeni.
 
 ### [STO-07] Prodaja kada je stanje 0
 - **Prioritet:** Srednje
@@ -1663,7 +1669,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Test podaci:** —
 - **Očekivani rezultat:** stoji „Nema na stanju.“ i dugme [Prodaja] je nedostupno.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** DB 0009: nabavka van kase, negativna zaliha, poništavanje i vidljivost vrijednosti/zarade po ulogama. UI koraci nisu u cijelosti izvršeni.
 
 ### [STO-08] Ispravka i poništavanje prodaje iz magacina
 - **Prioritet:** Visoko
@@ -1674,7 +1680,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** ispravka mijenja samo način plaćanja. Poništavanje vraća **količinu na
   stanje** (provjerite na `/storage`) i stavka je precrtana.
 - **Gdje provjeriti:** UI; `/storage`
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E storage.spec.ts + DB 0009: nabavka iz kase, prodaja, odbijanje viška, ispravka i poništavanje prolaze. Nisu svi filteri i prikazi sa svih ekrana upoređeni.
 
 ### [STO-09] Poništavanje nabavke kada je roba već prodata (E18)
 - **Prioritet:** Visoko
@@ -1684,7 +1690,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** „Poništavanje nije moguće – stanje bi bilo negativno.“ Ako stanje
   dozvoljava, poništavanje uspijeva i **zajedno s njim** se poništava automatski trošak nabavke.
 - **Gdje provjeriti:** UI; `/payments/today` ili `/finance/expenses`
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** DB 0009: nabavka van kase, negativna zaliha, poništavanje i vidljivost vrijednosti/zarade po ulogama. UI koraci nisu u cijelosti izvršeni.
 
 ### [STO-10] Trošak nabavke se ne poništava zasebno
 - **Prioritet:** Srednje
@@ -1694,7 +1700,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** radnja nije dozvoljena; stoji objašnjenje „Trošak nabavke poništava
   vlasnik zajedno sa nabavkom.“
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** DB 0009: nabavka van kase, negativna zaliha, poništavanje i vidljivost vrijednosti/zarade po ulogama. UI koraci nisu u cijelosti izvršeni.
 
 ### [STO-11] Recepcioner ne vidi vrijednost zalihe ni zaradu (BR-144)
 - **Prioritet:** Visoko
@@ -1704,7 +1710,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** recepcioner vidi kolone Proizvod, Stanje, Nabavna cijena, Prodajna
   cijena — ali nigdje ukupnu vrijednost zalihe ni zaradu. Te brojke su samo na vlasnikovom ekranu.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** DB 0009: nabavka van kase, negativna zaliha, poništavanje i vidljivost vrijednosti/zarade po ulogama. UI koraci nisu u cijelosti izvršeni.
 
 ### [STO-12] Prazan magacin
 - **Prioritet:** Nisko
@@ -1714,7 +1720,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** „Nema proizvoda. Vlasnik dodaje proizvode u Podešavanjima.“
   Vratite proizvod u aktivno stanje.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — NIJE IZVRŠENO.** Nije pokriveno izvršenim testovima ovog prolaza; nije označeno kao prolaz. Potrebno je zasebno izvršiti navedene korake.
 
 ---
 
@@ -1731,7 +1737,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   Linija brojača: „Uplate: N · Dnevne karte: N · Prodaja: N · Poništeno: N“.
   Poništene stavke **ne ulaze** u iznose. Ako je neko u teretani: „U teretani je još N osoba.“
 - **Gdje provjeriti:** UI; ručno saberite stavke sa `/payments/today`
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E close-shift.spec.ts i DB 0010 provjeravaju E15 obračun i stavke smjene. Nije ručno vizuelno upoređen svaki red sa štampanim izvještajem.
 
 ### [CLOSE-02] Pregled stavki
 - **Prioritet:** Srednje
@@ -1741,7 +1747,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** razvija se spisak svih stavki smjene po grupama (uplate, dnevne karte,
   zamjenske kartice, prodaja, troškovi, poništeno). Recepcioner vidi **samo svoje** troškove.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E close-shift.spec.ts i DB 0010 provjeravaju E15 obračun i stavke smjene. Nije ručno vizuelno upoređen svaki red sa štampanim izvještajem.
 
 ### [CLOSE-03] Prebrojana gotovina je obavezna i računa razliku
 - **Prioritet:** Kritično
@@ -1751,7 +1757,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** prazno i neispravni oblici daju „Unesite prebrojanu gotovinu, na primjer
   225 ili 225,50.“ Kod manjeg iznosa piše „Razlika: … (Manjak)“, kod većeg „(Višak)“.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E E15 provjerava razliku za 225,00 €, DB 0010 pravila zaključenja. Svi neispravni iznosi nisu ponovljeni u formi.
 
 ### [CLOSE-04] Potvrda i zaključenje smjene
 - **Prioritet:** Kritično
@@ -1763,7 +1769,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   „Pravim izvještaj…“, „Šaljem izvještaj…“. Na kraju ste **odjavljeni**, na `/login` piše
   „Smjena je zaključena.“
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [x] Prošlo  [ ] Palo  Napomena: **22.09.2026 — PROŠLO.** E2E close-shift.spec.ts: potvrda, zatvaranje, odjava i PDF; namjerno pogrešan Resend ključ daje failed, smjena ostaje zaključena.
 
 ### [CLOSE-05] Izvještaj smjene je sačuvan i poslat
 - **Prioritet:** Kritično
@@ -1776,7 +1782,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   razliku i broj osoba u teretani pri zaključenju. Status emaila je „poslato“. Email ima
   naslov „Izvještaj smjene – <ime> – <datum> <od>–<do>“ i PDF u prilogu.
 - **Gdje provjeriti:** UI; PDF; email
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** PDF generisan, preuzet iz Storage i email stvarno poslat sa noreply@stamenkovicc.com; Resend delivered za testnog primaoca. Nisu vizuelno upoređeni svi PDF redovi sa UI-jem. Sa postojećim EMAIL_FROM=onboarding@resend.dev slanje na tu adresu pada 403, vidi N-04.
 
 ### [CLOSE-06] Neuspjelo slanje ne ruši zaključenje (BR-118)
 - **Prioritet:** Visoko
@@ -1787,7 +1793,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   je „neuspješno“ sa dugmetom [Pošalji ponovo]. Vratite ispravan ključ i kliknite [Pošalji ponovo]
   → status postaje „poslato“ i pojavljuje se „Izvještaj je ponovo poslat.“
 - **Gdje provjeriti:** UI; email
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [x] Prošlo  [ ] Palo  Napomena: **22.09.2026 — PROŠLO.** E2E close-shift.spec.ts: potvrda, zatvaranje, odjava i PDF; namjerno pogrešan Resend ključ daje failed, smjena ostaje zaključena.
 
 ### [CLOSE-07] Zaključena smjena se više ne mijenja
 - **Prioritet:** Kritično
@@ -1798,7 +1804,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** radnja je nedostupna; poruka „Ova stavka se ne može mijenjati
   (smjena je zaključena).“ Samo vlasnik može.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** DB 0010 i E2E payments provjeravaju zatvorenu/tuđu smjenu i prava izmjene. Sve UI putanje ovog slučaja nisu ponovljene.
 
 ### [CLOSE-08] Zaključenje kada nema svoje smjene
 - **Prioritet:** Srednje
@@ -1807,7 +1813,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Test podaci:** —
 - **Očekivani rezultat:** „Nemate otvorenu smjenu.“ bez forme za zaključenje.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** DB 0010 i E2E payments provjeravaju zatvorenu/tuđu smjenu i prava izmjene. Sve UI putanje ovog slučaja nisu ponovljene.
 
 ---
 
@@ -1823,7 +1829,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** „Korisnik je kreiran.“ Red se pojavljuje u tabeli sa kolonama
   Ime, Korisničko ime/Email, Uloga, Aktivan, Kreiran. Polje za email **nije** prikazano za ovu ulogu.
 - **Gdje provjeriti:** UI; prijava novim nalogom vodi na S-01b
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E auth.spec.ts: kreiranje recepcionera, prva prijava, nova lozinka, ulazak na recepciju. Sve druge uloge kreiranja nisu provjerene.
 
 ### [SET-02] Korisničko ime — pravila (doc 07 §3)
 - **Prioritet:** Kritično
@@ -1843,7 +1849,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   | `marija.m` ponovo | „Korisničko ime je zauzeto.“ |
 - **Očekivani rezultat:** kako je u tablici; poruka stoji uz polje korisničkog imena.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** Unit auth-schemas.test.ts + DB 0002 provjeravaju username, uloge i identitet administratora. Cijele tabele graničnih unosa nisu ponovljene kroz S-23.
 
 ### [SET-03] Ime i prezime i privremena lozinka — granice
 - **Prioritet:** Visoko
@@ -1853,7 +1859,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** 1 i 101 znak: „Unesite ime i prezime (2–100 znakova).“ 2 i 100 prolaze.
   Lozinka od 7: „Lozinka mora imati najmanje 8 znakova.“; 8 prolazi.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** Unit auth-schemas.test.ts + DB 0002 provjeravaju username, uloge i identitet administratora. Cijele tabele graničnih unosa nisu ponovljene kroz S-23.
 
 ### [SET-04] Administrator se pravi sa emailom
 - **Prioritet:** Visoko
@@ -1864,7 +1870,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** za administratora se traži **email**, ne korisničko ime.
   `nijeemail` daje „Unesite ispravan email.“; već zauzeta adresa daje „Email je zauzet.“
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** Unit auth-schemas.test.ts + DB 0002 provjeravaju username, uloge i identitet administratora. Cijele tabele graničnih unosa nisu ponovljene kroz S-23.
 
 ### [SET-05] Izmjena korisnika mijenja samo ime
 - **Prioritet:** Srednje
@@ -1874,7 +1880,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** mijenja se samo ime i prezime; korisničko ime i uloga su nepromjenjivi.
   Poruka „Podaci su sačuvani.“
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — NIJE IZVRŠENO.** Nije pokriveno izvršenim testovima ovog prolaza; nije označeno kao prolaz. Potrebno je zasebno izvršiti navedene korake.
 
 ### [SET-06] Postavljanje nove lozinke zaposlenom
 - **Prioritet:** Visoko
@@ -1886,7 +1892,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   postavi svoju lozinku pri sljedećoj prijavi.“ Pri prijavi zaista slijedi ekran S-01b.
   Kod administratora se u koloni „Lozinka“ odmah vidi nova vrijednost.
 - **Gdje provjeriti:** UI; prijava
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — NIJE IZVRŠENO.** Nije pokriveno izvršenim testovima ovog prolaza; nije označeno kao prolaz. Potrebno je zasebno izvršiti navedene korake.
 
 ### [SET-07] Deaktivacija i ponovna aktivacija
 - **Prioritet:** Visoko
@@ -1897,7 +1903,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** „Korisnik je deaktiviran.“, kolona „Aktivan“ = Ne; prijava daje
   „Pogrešno korisničko ime/email ili lozinka.“ Nakon aktivacije prijava radi.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E auth.spec.ts: deaktivacija prekida pristup. Ponovna aktivacija nije izvršena kroz UI.
 
 ### [SET-08] Ne možete deaktivirati sami sebe (D-60)
 - **Prioritet:** Kritično
@@ -1907,7 +1913,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** dugmeta nema. Ako se zahtjev ipak pošalje, odgovor je
   „Ne možete deaktivirati sopstveni nalog.“
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [x] Prošlo  [ ] Palo  Napomena: **22.09.2026 — PROŠLO.** E2E admin.spec.ts: sopstveni nalog ne može da se deaktivira.
 
 ### [SET-09] Posljednji vlasnik (ili administrator) mora ostati (D-60)
 - **Prioritet:** Kritično
@@ -1917,7 +1923,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** „Mora ostati bar jedan aktivan nalog ove uloge. Prvo dodajte zamjenu.“
   Nakon što napravite drugog vlasnika (`vlasnik.test`), deaktivacija prvog prolazi.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E admin.spec.ts: posljednji vlasnik ne može da se deaktivira. Posljednji administrator nije zasebno testiran.
 
 ### [SET-10] Treneri: dodavanje, izmjena, deaktivacija
 - **Prioritet:** Visoko
@@ -1928,7 +1934,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** „Sačuvano.“ Kratko/dugo ime daje „Unesite ime trenera (2–100 znakova).“
   Neaktivan trener se više ne nudi pri prodaji ni pri prijavi dolaska.
 - **Gdje provjeriti:** UI; dijalog „Nova članarina“
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** DB 0003 i E2E settings.spec.ts provjeravaju katalog i da se za čas nude samo dodijeljeni treneri. Cijeli CRUD i deaktivacije trenera/programa/rasporeda nisu izvršeni.
 
 ### [SET-11] Naknada trenera i udio za grupne vidi samo vlasnik (BR-026, D-62)
 - **Prioritet:** Kritično
@@ -1940,7 +1946,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   prazna naknada znači „nije definisano“, prazan udio znači „sa plana“; `101` i `-5` daju
   „Udio mora biti između 0 i 100, ili prazno.“
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E settings.spec.ts: vlasnik vidi/mijenja naknadu, menadžer je ne vidi. DB 0003 provjerava D-62 udio; svi UI unosi nisu izvršeni.
 
 ### [SET-12] Programi i dodjela trenera
 - **Prioritet:** Visoko
@@ -1952,7 +1958,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   poruka „Sačuvano.“ Kratak/dug naziv daje „Unesite naziv programa (2–50 znakova).“
   Trener bez dodjele se ne nudi za tu vrstu dolaska (vidi REC-05).
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** DB 0003 i E2E settings.spec.ts provjeravaju katalog i da se za čas nude samo dodijeljeni treneri. Cijeli CRUD i deaktivacije trenera/programa/rasporeda nisu izvršeni.
 
 ### [SET-13] Raspored časova
 - **Prioritet:** Visoko
@@ -1964,7 +1970,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   „Unesite vrijeme u formatu HH:mm.“ Novi čas se pojavljuje kao ponuđeni „Čas“ pri grupnoj prijavi
   tog dana (u okviru ±90 minuta).
 - **Gdje provjeriti:** UI; dijalog prijave dolaska
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** DB 0003 i E2E settings.spec.ts provjeravaju katalog i da se za čas nude samo dodijeljeni treneri. Cijeli CRUD i deaktivacije trenera/programa/rasporeda nisu izvršeni.
 
 ### [SET-14] Planovi — pravila trajanja i cijene
 - **Prioritet:** Kritično
@@ -1985,7 +1991,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   | redoslijed `1000` | odbijeno (dozvoljeno 0–999) |
 - **Očekivani rezultat:** kako je u tablici.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** DB 0003 provjerava ograničenja plana, E2E settings izmjenu cijene i napomenu. Sve kombinacije trajanja nisu unesene kroz formu.
 
 ### [SET-15] Deaktiviranje plana
 - **Prioritet:** Srednje
@@ -1995,7 +2001,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** plan i dalje stoji u tabeli planova (sa oznakom da je neaktivan), ali se
   **ne nudi** pri prodaji. Ranije prodate članarine tog plana ostaju netaknute.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — NIJE IZVRŠENO.** Nije pokriveno izvršenim testovima ovog prolaza; nije označeno kao prolaz. Potrebno je zasebno izvršiti navedene korake.
 
 ### [SET-16] Proizvodi
 - **Prioritet:** Visoko
@@ -2007,7 +2013,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   vrijednosti i slova daju „Unesite iznos, na primjer 79 ili 79,50.“; naziv van 2–50 znakova daje
   „Unesite naziv proizvoda (2–50 znakova).“ Novi proizvod se odmah vidi na `/storage`.
 - **Gdje provjeriti:** UI; `/storage`
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E settings.spec.ts: dodavanje proizvoda i cijena. Izmjena i deaktivacija nisu potpuno izvršene.
 
 ### [SET-17] Kategorije troškova (BR-131)
 - **Prioritet:** Srednje
@@ -2018,7 +2024,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** nova kategorija se čuva i odmah nudi u dijalogu troška. Sistemska
   kategorija se **ne može** deaktivirati (označena je kao „Sistemska“). Kategorije se nikad ne brišu.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E settings dodaje kategoriju; DB 0003 zabranjuje deaktivaciju sistemske kategorije. Sve UI varijante nisu izvršene.
 
 ### [SET-18] Podešavanja teretane — granice
 - **Prioritet:** Visoko
@@ -2040,7 +2046,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** kako je u tablici; poslije uspješnog čuvanja „Sačuvano.“
   **Vratite podrazumijevane vrijednosti poslije testa.**
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E settings i dodatni UI: ogromna cijena zamjenske kartice odbijena porukom ispod polja. Unit schema-bounds prolazi. Sva ostala polja/granice iz plana nisu izvršeni.
 
 ### [SET-19] Logo teretane (upload)
 - **Prioritet:** Visoko
@@ -2053,7 +2059,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   Preimenovani `.txt` **mora** biti odbijen ili bar ne smije ništa da pokvari — zabilježite šta se
   desi. Bez izbora fajla: ista poruka o dozvoljenim formatima.
 - **Gdje provjeriti:** UI; `/api/pdf/cards/<batchId>`
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** Tekst preimenovan u PNG i SVG odbijeni; logo_path ostaje null. PNG od 5 MB je davao HTTP 500 — popravljeno, vidi SEC-07 i N-01. Validan PNG/JPG upload i dalje nije ponovljen.
 
 ### [SET-20] Prikaz posljednje rezervne kopije
 - **Prioritet:** Nisko
@@ -2064,7 +2070,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** prije: „Posljednja rezervna kopija: Još nije napravljena“.
   Poslije: „Posljednja rezervna kopija: dd.mm.gggg HH:MM – uspješno“ (ili „neuspješno: <greška>“).
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [x] Prošlo  [ ] Palo  Napomena: **22.09.2026 — PROŠLO.** E2E jobs.spec.ts: nije napravljena, neuspješna i uspješna posljednja kopija na S-27.
 
 ---
 
@@ -2078,7 +2084,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** „Kartice su generisane.“ U tabeli „Serije“ je novi red sa datumom,
   brojem kartica i brojem praznih (10).
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [x] Prošlo  [ ] Palo  Napomena: **22.09.2026 — PROŠLO.** E2E cards.spec.ts + DB 0004: 100 jedinstvenih desetocifrenih kodova, bez vodeće nule, prazne kartice i serija.
 
 ### [CARD-02] Granice broja kartica
 - **Prioritet:** Visoko
@@ -2087,7 +2093,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Test podaci:** kao gore
 - **Očekivani rezultat:** `1` i `100` prolaze; ostalo daje „Unesite broj između 1 i 100.“
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** Dodatni UI: 0, 101, -1 i 1.5 ne kreiraju seriju; E2E 100 prolazi, DB 0/101 odbija. Nisu sve poruke i sve ostale vrijednosti iz plana provjerene.
 
 ### [CARD-03] PDF liste kartica
 - **Prioritet:** Visoko
@@ -2098,7 +2104,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   predviđen), naziv teretane, logo ako je otpremljen, i liniju „Ime i prezime:“ za upisivanje.
   Kodovi u PDF-u se poklapaju sa onima koje aplikacija prihvata pri skeniranju.
 - **Gdje provjeriti:** PDF; skeniranje jednog koda iz PDF-a
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E PDF preuzimanje + unit card-sheet.test.ts: QR payload, broj kartica po A4, dimenzije i čćšžđ. Fizička štampa, rezanje i skeniranje papira nisu izvršeni.
 
 ### [CARD-04] Brojač praznih kartica se smanjuje
 - **Prioritet:** Srednje
@@ -2107,7 +2113,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Test podaci:** —
 - **Očekivani rezultat:** kolona „Prazne“ pada sa 10 na 9.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E members i DB 0006 potvrđuju prelazak kartice iz unassigned u active. Brojač na S-28 nije zasebno upoređen prije/poslije.
 
 ### [CARD-05] Prazno stanje
 - **Prioritet:** Nisko
@@ -2116,7 +2122,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Test podaci:** —
 - **Očekivani rezultat:** „Nema generisanih serija.“
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [x] Prošlo  [ ] Palo  Napomena: **22.09.2026 — PROŠLO.** Dodatni UI + E2E cards.spec.ts: prazna serija prikazuje Nema generisanih serija.
 
 ---
 
@@ -2132,7 +2138,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   „Aktivni članovi“ se mijenjaju sa periodom, i period je vidljiv u adresi (`?period=…`).
   „Ova sedmica“ ide od ponedjeljka do nedjelje.
 - **Gdje provjeriti:** UI, adresna linija
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E finance.spec.ts + DB 0012: zbirni prihodi/troškovi, podjele i grafikon za 12 mjeseci. Svi periodi i svaki detalj iz plana nisu provjereni.
 
 ### [FIN-02] Proizvoljan period — neispravne vrijednosti
 - **Prioritet:** Srednje
@@ -2142,7 +2148,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Test podaci:** kao gore
 - **Očekivani rezultat:** stranica se ne ruši; vraća se na podrazumijevani period „Ovaj mjesec“.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — NIJE IZVRŠENO.** Nije pokriveno izvršenim testovima ovog prolaza; nije označeno kao prolaz. Potrebno je zasebno izvršiti navedene korake.
 
 ### [FIN-03] Raščlanjenja i liste na pregledu
 - **Prioritet:** Visoko
@@ -2154,7 +2160,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   broje. Prazna stanja: „Nema podataka za izabrani period.“, „Nijedna članarina ne ističe u
   narednih 7 dana.“, „Nema članova sa neplaćenim dolascima.“ Imena u listama vode na profil člana.
 - **Gdje provjeriti:** UI; ručna kontrola zbira
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E finance.spec.ts + DB 0012: zbirni prihodi/troškovi, podjele i grafikon za 12 mjeseci. Svi periodi i svaki detalj iz plana nisu provjereni.
 
 ### [FIN-04] Grafikon prihoda i troškova po mjesecima
 - **Prioritet:** Srednje
@@ -2165,7 +2171,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   pojavljuju. Na uskom ekranu grafikon ostaje čitljiv i ne izlazi iz ekrana (bez vodoravnog
   pomjeranja cijele stranice).
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E finance.spec.ts + DB 0012: zbirni prihodi/troškovi, podjele i grafikon za 12 mjeseci. Svi periodi i svaki detalj iz plana nisu provjereni.
 
 ### [FIN-05] Novi trošak — puna forma (BR-133)
 - **Prioritet:** Kritično
@@ -2177,7 +2183,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** „Trošak je sačuvan.“ Stavka je u listi sa svim kolonama i ulazi u ukupne
   troškove izabranog perioda.
 - **Gdje provjeriti:** UI; `/finance` kartica „Troškovi“
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E finance.spec.ts i DB 0012: vlasnik unosi trošak za raniji datum. Sve opcione kombinacije forme nisu provjerene.
 
 ### [FIN-06] Trošak — validacija i granice
 - **Prioritet:** Kritično
@@ -2196,7 +2202,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   | Račun | 51 znak | odbijeno |
 - **Očekivani rezultat:** kako je u tablici.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** Unit schema-bounds i DB 0012 provjeravaju dio validacije. Budući datum i svi rubni iznosi nisu ponovljeni kroz UI.
 
 ### [FIN-07] Trošak „Iz kase“
 - **Prioritet:** Visoko
@@ -2209,7 +2215,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   „Nema otvorene smjene. Recepcioner mora biti prijavljen.“ Sa smjenom: trošak umanjuje očekivanu
   gotovinu u zaključenju smjene.
 - **Gdje provjeriti:** UI; `/shift/close`
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** Unit schema-bounds: on/true/false/null i niska false; DB 0012 finansijski obračun. Checkbox i sve kombinacije plaćanja nisu ponovljeni kroz UI.
 
 ### [FIN-08] Trener se bira samo uz kategoriju „Plate“
 - **Prioritet:** Visoko
@@ -2220,7 +2226,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** polje „Trener“ se pojavljuje samo za `Plate`. Trošak sa trenerom u
   nesalarijskoj kategoriji mora biti odbijen („Provjerite unesene podatke.“).
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** DB 0012 provjerava vlasnikov trošak/isplatu treneru; prikaz/skrivanje trenera po kategoriji nije zasebno izvršen.
 
 ### [FIN-09] Filteri na ekranu troškova
 - **Prioritet:** Srednje
@@ -2231,7 +2237,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** lista se sužava, ukupan iznos se mijenja, izbor ostaje u adresi.
   Prazan rezultat: „Nema troškova u izabranom periodu.“
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — NIJE IZVRŠENO.** Nije pokriveno izvršenim testovima ovog prolaza; nije označeno kao prolaz. Potrebno je zasebno izvršiti navedene korake.
 
 ### [FIN-10] Poništavanje troška vlasnika
 - **Prioritet:** Visoko
@@ -2241,7 +2247,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** prvo „Unesite razlog (3–200 znakova).“, zatim „Poništeno“ — stavka ostaje
   precrtana i izlazi iz ukupnih troškova.
 - **Gdje provjeriti:** UI; `/finance` kartica „Troškovi“
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** DB 0008 i 0012 pokrivaju prava troškova i obračun; kompletan vlasnikov UI tok poništavanja nije izvršen.
 
 ### [FIN-11] Ekran „Treneri“ (S-18)
 - **Prioritet:** Visoko
@@ -2254,7 +2260,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   nije definisana) stoji „nije definisano“. [Evidentiraj isplatu] otvara formu troška kategorije
   „Plate“ sa unaprijed izabranim trenerom. Prazan mjesec: „Nema uplata za izabrani mjesec.“
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E finance.spec.ts + DB 0012: E9–E12 obračun po treneru i nepoznata naknada. Sve isplate/filteri nisu provjereni kroz UI.
 
 ### [FIN-12] Ekran „Smjene“ (S-19)
 - **Prioritet:** Visoko
@@ -2267,7 +2273,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   Zaključenje daje „Smjena je zaključena.“, a vlasnikova sesija se **ne** prekida.
   Prazno: „Nema smjena u izabranom periodu.“
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E screens.spec.ts: ekran, kontrole i bez overflowa; DB 0010/0009/0001/0012 pokrivaju obračun i audit. Svi filteri/akcije/detalji nisu izvršeni.
 
 ### [FIN-13] Ekran „Magacin“ za vlasnika (S-20)
 - **Prioritet:** Srednje
@@ -2278,7 +2284,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** zarada na magacinu se poklapa sa karticom „Zarada na magacinu“ na
   pregledu. Prazan period: „Nema prometa u izabranom periodu.“
 - **Gdje provjeriti:** UI; ručna kontrola
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E screens.spec.ts: ekran, kontrole i bez overflowa; DB 0010/0009/0001/0012 pokrivaju obračun i audit. Svi filteri/akcije/detalji nisu izvršeni.
 
 ### [FIN-14] Dnevnik izmjena (S-21)
 - **Prioritet:** Visoko
@@ -2291,7 +2297,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   Kada ima više od 200 zapisa, stoji „Prikazano je prvih 200 izmjena. Suzite period da vidite ostale.“
   Prazno: „Nema izmjena u izabranom periodu.“
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E screens.spec.ts: ekran, kontrole i bez overflowa; DB 0010/0009/0001/0012 pokrivaju obračun i audit. Svi filteri/akcije/detalji nisu izvršeni.
 
 ### [FIN-15] Naknadni unos — dolazak (S-22, BR-120)
 - **Prioritet:** Visoko
@@ -2305,7 +2311,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   Budući datum: odbijeno („Unesite datum koji nije u budućnosti.“ ili „Provjerite unesene podatke.“ —
   zabilježite koja poruka stigne, vidi SUSPECT-08).
 - **Gdje provjeriti:** UI; profil člana → „Dolasci“; `/shift/close` (ne smije se pojaviti)
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** DB 0012: naknadni unos ulazi u finansije, ne u smjenu; E2E screens otvara ekran. Cijeli tok četiri forme i negativni datumi nisu izvršeni kroz UI.
 
 ### [FIN-16] Naknadni unos — članarina, dnevne karte, zamjenska kartica
 - **Prioritet:** Visoko
@@ -2321,7 +2327,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   pravilima (BR-052).“). Količina `0` i `21` daju „Unesite broj između 1 i 20.“
 - **Gdje provjeriti:** UI; `/payments/today` (ne smiju se pojaviti — to su samo današnje, neknadne
   stavke su isključene); profil člana
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** DB 0012: naknadni unos ulazi u finansije, ne u smjenu; E2E screens otvara ekran. Cijeli tok četiri forme i negativni datumi nisu izvršeni kroz UI.
 
 ### [FIN-17] Naknadni unos bez izabranog člana
 - **Prioritet:** Srednje
@@ -2330,7 +2336,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Test podaci:** —
 - **Očekivani rezultat:** „Izaberite člana.“
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — NIJE IZVRŠENO.** Nije pokriveno izvršenim testovima ovog prolaza; nije označeno kao prolaz. Potrebno je zasebno izvršiti navedene korake.
 
 ---
 
@@ -2346,7 +2352,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   **svaki** dan perioda (i prazne dane), a „Dolasci po satima (06–23)“ svaki sat.
   Najviše 10 članova u listi, svaki vodi na svoj profil.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** DB 0013 potvrđuje zbir, kompletne dane/sate i trajanje; E2E screens provjerava ekran. Grafikoni sa većim podacima nisu vizuelno provjereni.
 
 ### [STAT-02] Prazan period
 - **Prioritet:** Srednje
@@ -2355,7 +2361,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Test podaci:** `01.01.2025` – `31.01.2025`
 - **Očekivani rezultat:** „Nema dolazaka u izabranom periodu.“
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [x] Prošlo  [ ] Palo  Napomena: **22.09.2026 — PROŠLO.** E2E screens.spec.ts: prazan testni period prikazuje tačnu poruku na oba viewporta.
 
 ### [STAT-03] Vrlo dug period (granica 400 dana)
 - **Prioritet:** Visoko
@@ -2365,7 +2371,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** **jasna poruka o grešci.** Ako ekran umjesto toga prikaže
   „Nema dolazaka u izabranom periodu.“ iako dolazaka ima, to je pogrešno i treba zabilježiti kao bug.
 - **Gdje provjeriti:** UI; serverska konzola (`npm run dev`)
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [x] Prošlo  [ ] Palo  Napomena: **22.09.2026 — PROŠLO.** Dodatni UI: custom period 2020-01-01–2026-09-22 daje Provjerite unesene podatke., a ne lažno Nema dolazaka.
 
 ### [STAT-04] Automatska odjava se broji kao dolazak, ali ne u prosjek (BR-082)
 - **Prioritet:** Srednje
@@ -2375,7 +2381,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** ukupno uključuje automatski odjavljen dolazak; broj „mjerenih dolazaka“
   je za toliko manji.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** DB 0013: automatski odjavljeni dolazak ne ulazi u prosjek, anonimizovan član ne ulazi u top listu. Nije ponovljeno kroz UI sa tim podacima.
 
 ### [STAT-05] Anonimizovan član ne ulazi u listu najčešćih (BR-046)
 - **Prioritet:** Visoko
@@ -2385,7 +2391,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** njegovi dolasci se broje u ukupnom broju, ali ga **nema** u listi
   „Najčešći članovi“.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** DB 0013: automatski odjavljeni dolazak ne ulazi u prosjek, anonimizovan član ne ulazi u top listu. Nije ponovljeno kroz UI sa tim podacima.
 
 ---
 
@@ -2413,7 +2419,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   Korak 4 ne radi ništa drugi put (`ran: false`) — nema duplih zaključenja.
   **Vratite podešavanje na 23:00.**
 - **Gdje provjeriti:** izlaz komande; `/finance/shifts`; profil člana → „Dolasci“
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** DB 0011 u rollback transakciji: automatska odjava, zaključenje i idempotentnost. Globalni jobs:run nije pokrenut nad radnim projektom; slanje izvještaja odvojeno potvrđeno.
 
 ### [JOB-02] Recepcioner posle automatskog zaključenja
 - **Prioritet:** Kritično
@@ -2422,7 +2428,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Test podaci:** —
 - **Očekivani rezultat:** odjavljen je i na `/login` piše „Smjena je automatski zaključena.“
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [x] Prošlo  [ ] Palo  Napomena: **22.09.2026 — PROŠLO.** E2E jobs.spec.ts: nakon automatskog zatvaranja testne smjene recepcioner ide na /login i vidi očekivanu poruku.
 
 ### [JOB-03] Jutarnji posao: podsjetnik o isteku članarine (BR-160)
 - **Prioritet:** Visoko
@@ -2438,7 +2444,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** stiže email „Vaša članarina ističe dd.mm.gggg“ sa imenom člana, nazivom
   plana i nazivom teretane. Drugi poziv **ne šalje isti podsjetnik ponovo**.
 - **Gdje provjeriti:** izlaz komande; email
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** Stvarni runMorning sa testnim izborom samo jedne test teretane: 1 poslat, drugi poziv 0; Resend delivered. Raspored jobs_due nije pušten globalno; pokriva ga DB 0011. Lokalni default pošiljalac zahtijeva ispravku N-04.
 
 ### [JOB-04] Jutarnji posao bez podešenog emaila
 - **Prioritet:** Srednje
@@ -2448,7 +2454,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** izlaz pokazuje da je slanje preskočeno (`skipped`), bez greške; nijedan
   email ne odlazi.
 - **Gdje provjeriti:** izlaz komande
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** Unit jobs-morning.test.ts + shift-report.test.ts potvrđuju bez EMAIL_FROM nema slanja i not_sent/skipped. Nije pokrenut globalni jobs:run morning.
 
 ### [JOB-05] Sedmična rezervna kopija (BR-163)
 - **Prioritet:** Visoko
@@ -2461,7 +2467,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   „Posljednja rezervna kopija: … – uspješno“. Email ima ZIP u prilogu (ili poruku da je kopija
   prevelika i da je sačuvana u Storage). U emailu **nema lozinke ZIP-a**.
 - **Gdje provjeriti:** izlaz komande; UI; email; Supabase Storage → `backups`
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** Integracioni backup: 28 tabela, AES ZIP, loša lozinka odbijena, Storage i zadržavanje 8 kopija; dodatni stvarni test šalje ZIP, Resend delivered. Nedjeljni globalni scheduler nije pokrenut, pravila su DB-testirana.
 
 ### [JOB-06] Provjera oporavka iz rezervne kopije
 - **Prioritet:** Visoko
@@ -2473,7 +2479,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   primjenjuje migracije, učitava podatke i ispisuje poređenje broja redova sa `manifest.json`
   bez razlike. Lozinke zaposlenih se u obnovljenom projektu moraju postaviti ponovo.
 - **Gdje provjeriti:** izlaz komande
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [x] Prošlo  [ ] Palo  Napomena: **22.09.2026 — PROŠLO.** Uz izričitu dozvolu obnovljen odvojeni RESTORE_TEST projekat: migracije do 0025, svih 28 tabela/34 reda odgovara manifestu. Posebno izvršena zaštita za isti DATABASE_URL: odbijeno prije izmjena.
 
 ### [JOB-07] Ponovno slanje neuspjelih izvještaja
 - **Prioritet:** Srednje
@@ -2483,7 +2489,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** izvještaj je poslat, status na `/finance/shifts` postaje „poslato“.
   Posao ne pokušava više od pet puta po smjeni.
 - **Gdje provjeriti:** izlaz komande; UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** Na testnoj smjeni prvo izazvan failed nevažećim ključem, zatim stvarni runEmailRetry sa izborom samo te smjene: sent, Resend delivered. Interval i limit pet pokušaja pokriva DB 0011; globalni red drugih teretana nije obrađivan.
 
 ---
 
@@ -2501,7 +2507,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** nigdje se ne izvršava skripta; tekst se svuda prikazuje doslovno, i u
   PDF izvještaju. U konzoli browsera nema greške o CSP-u koju je izazvao vaš unos.
 - **Gdje provjeriti:** UI, konzola browsera, PDF
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** HTML/script i SQL tekst testirani u prijavi bez izvršavanja. Sva ostala tekstualna polja i PDF prikaz ovih payload-a nisu izvršeni.
 
 ### [SEC-02] SQL znakovi u pretragama i poljima
 - **Prioritet:** Kritično
@@ -2513,7 +2519,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   servera, nikad svi članovi zbog `OR 1=1`. Znakovi `%` i `_` ne smiju da se ponašaju kao džokeri
   koji vraćaju sve.
 - **Gdje provjeriti:** UI, Network tab
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [x] Prošlo  [ ] Palo  Napomena: **22.09.2026 — PROŠLO poslije popravke.** Nalaz N-02 je potvrđen u bazi: `member_search` je spajao unos u `LIKE` bez escape-a, pa su `%` i `_` radili kao džokeri. Migracija `0026_member_search_like_escape.sql` escape-uje `%`, `_` i samu obrnutu kosu crtu. Četiri nove pgTAP tvrdnje u `supabase/tests/0006_members.test.sql` padaju na staroj funkciji, prolaze na novoj. Apostrof, navodnik, `;` i `' OR 1=1 --` ni prije ni sada ne vraćaju člana.
 
 ### [SEC-03] Servisni ključ ne smije doći do browsera
 - **Prioritet:** Kritično
@@ -2525,7 +2531,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** nijedan pogodak. Vidljiv smije biti samo `NEXT_PUBLIC_SUPABASE_URL` i
   anon ključ.
 - **Gdje provjeriti:** Developer Tools (Network, Sources, „Search all files“)
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** Pretraženi svi produkcijski .next/static fajlovi i HTML prijavljene /members stranice: nema vrijednosti niti naziva pet serverskih tajni (service ključ, Resend, cron, backup). Nisu snimljeni svi mrežni odgovori svih uloga.
 
 ### [SEC-04] Sigurnosna zaglavlja
 - **Prioritet:** Visoko
@@ -2535,7 +2541,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** postoje `Content-Security-Policy` (sa `frame-ancestors 'none'`,
   `object-src 'none'`, `script-src` sa nonce-om) i `Cache-Control: private, no-store`.
 - **Gdje provjeriti:** Network tab
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [x] Prošlo  [ ] Palo  Napomena: **22.09.2026 — PROŠLO.** E2E foundation + dodatni HTTP prijavljene /reception: CSP/nonce, frame-ancestors, X-Frame-Options DENY, nosniff i no-store.
 
 ### [SEC-05] Stranica se ne smije učitati u okviru (iframe)
 - **Prioritet:** Srednje
@@ -2545,7 +2551,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Test podaci:** —
 - **Očekivani rezultat:** okvir ostaje prazan, u konzoli piše da je učitavanje odbijeno.
 - **Gdje provjeriti:** browser, konzola
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [x] Prošlo  [ ] Palo  Napomena: **22.09.2026 — PROŠLO.** Dodatni Chrome test: iframe sa /login je blokiran, browser konzola potvrđuje frame-ancestors/X-Frame-Options.
 
 ### [SEC-06] Podaci se ne zadržavaju u kešu poslije odjave
 - **Prioritet:** Visoko
@@ -2554,7 +2560,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Test podaci:** —
 - **Očekivani rezultat:** ne vidi se lista članova iz keša; završavate na `/login`.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [x] Prošlo  [ ] Palo  Napomena: **22.09.2026 — PROŠLO.** Dodatni UI: /members → Odjava → Nazad završava na /login.
 
 ### [SEC-07] Upload pogrešnog tipa i prevelikog fajla
 - **Prioritet:** Visoko
@@ -2564,7 +2570,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** oba odbijena porukom „Dozvoljeni su PNG i JPG do 1 MB.“ SVG je posebno
   važno odbiti jer može da nosi skriptu.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [x] Prošlo  [ ] Palo  Napomena: **22.09.2026 — PROŠLO poslije popravke.** Nalaz N-01 je potvrđen: tijelo veće od podrazumijevanog limita Server Actions nije ni stizalo do `uploadLogo`. Browser sada mjeri veličinu prije slanja i prikazuje „Dozvoljeni su PNG i JPG do 1 MB.“ uz onemogućeno dugme, a `next.config.ts` diže limit na 2 MB da legitiman fajl od 1 MB (sa multipart zaglavljima) stigne do provjere. E2E regresija u `tests/e2e/settings.spec.ts` sa PNG-om od 5 MB: poruka je prikazana, opšteg ekrana greške nema, `logo_path` ostaje null.
 
 ### [SEC-08] Tuđa sesija i izmjena kolačića
 - **Prioritet:** Visoko
@@ -2575,7 +2581,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** sesija je odbijena i vraćeni ste na `/login`; nema prikaza podataka sa
   pokvarenim tokenom.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [x] Prošlo  [ ] Palo  Napomena: **22.09.2026 — PROŠLO.** Dodatni UI: vrijednosti stvarnih sb-* auth kolačića zamijenjene neispravnim tokenom; /finance vraća /login bez podataka.
 
 ### [SEC-09] Pokušaj pristupa finansijskim podacima kroz odgovor stranice
 - **Prioritet:** Kritično
@@ -2586,7 +2592,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   uplatama iz ranijih dana. Finansijski podaci ne smiju da „procure“ kroz HTML koji je samo skriven
   u prikazu.
 - **Gdje provjeriti:** Network tab (tijelo odgovora)
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** DB RLS 0002/0003/0006/0009/0012 i E2E zabrane ruta prolaze. Kompletan HTML/RSC sadržaj svih finansijskih ekrana nije posebno pregledan po ulogama.
 
 ---
 
@@ -2605,7 +2611,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   evidentiraju novac su onemogućena. Po povratku veze traka nestaje u roku od 5 sekundi i sve
   ponovo radi.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E offline.spec.ts: offline banner i onemogućene novčane radnje na oba viewporta. Sve radnje tokom prekida i povratka interneta nisu izvedene.
 
 ### [UX-02] Spor odgovor servera
 - **Prioritet:** Srednje
@@ -2615,7 +2621,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** vidi se skelet ekrana dok se učitava; dugme za čuvanje pokazuje
   indikator i ne može se kliknuti dvaput; ništa se ne duplira.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — NIJE IZVRŠENO.** Nije pokriveno izvršenim testovima ovog prolaza; nije označeno kao prolaz. Potrebno je zasebno izvršiti navedene korake.
 
 ### [UX-03] Greška na ekranu se prikazuje na našem jeziku
 - **Prioritet:** Visoko
@@ -2626,7 +2632,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** „Došlo je do greške. Pokušajte ponovo.“ sa dugmetom [Pokušaj ponovo] i
   šifrom greške — **nikada** engleska Next.js poruka i nikada tekst baze.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** Unit errors.test.ts skriva sirove DB greške, dodatni UI auth/statistika daju lokalizovane poruke. Nisu namjerno izazvane sve greške svih ekrana.
 
 ### [UX-04] Tastatura i fokus (pristupačnost)
 - **Prioritet:** Srednje
@@ -2638,7 +2644,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   „bježi“ iza njega, Esc zatvara dijalog. Svako dugme i polje ima ime koje čitač ekrana može da
   pročita.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E screens.spec.ts: imenovane kontrole na 19 ekrana i Tab na recepciji. Nije potvrđena potpuna tastaturna pristupačnost svih dijaloga/fokus zamki.
 
 ### [UX-05] Poruke o uspjehu se same povlače
 - **Prioritet:** Nisko
@@ -2647,7 +2653,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Test podaci:** —
 - **Očekivani rezultat:** poruka se pojavi i nestane sama, ne zaklanja dugmad i ne ostaje zauvijek.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** Dodatni UI: scan status se povlači nakon 5 s. Sve druge success poruke/toastovi nisu posebno mjereni.
 
 ### [UX-06] Mnogo podataka (performanse)
 - **Prioritet:** Srednje
@@ -2658,7 +2664,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** stranice se učitavaju u razumnom vremenu (do par sekundi), straničenje
   radi, grafikoni ostaju čitljivi, dnevnik izmjena pokazuje poruku o ograničenju od 200 zapisa.
 - **Gdje provjeriti:** UI; Network tab (vrijeme odgovora)
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** perf:scan sa 3.000 članova/150.000 dolazaka, 300 skenova: server p95 34,9 ms; round-trip p95 72,3 ms. Priprema 50,5 s, rollback. UI pretraga/straničenje sa velikim skupom nisu mjereni.
 
 ---
 
@@ -2684,7 +2690,7 @@ Ovo su cjeloviti tokovi kroz više modula i uloga, onako kako će ih koristiti t
 - **Očekivani rezultat:** očekivana gotovina = (članarina + voda) − trošak iz kase; razlika 0,00 €;
   dnevne karte su u kartičnom prihodu; PDF sadrži sve stavke; status emaila „poslato“; recepcioner
   je odjavljen.
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** Postojeći E2E odvojeno izvršavaju registraciju, dolaske, prodaju, troškove, magacin i zaključenje; nisu izvršeni kao jedna ista cjelodnevna smjena iz ovog scenarija.
 
 ### [E2E-02] Predaja smjene između dva recepcionera
 - **Prioritet:** Kritično · **Uloge:** Recepcioner A, Recepcioner B, Vlasnik
@@ -2697,7 +2703,7 @@ Ovo su cjeloviti tokovi kroz više modula i uloga, onako kako će ih koristiti t
 - **Očekivani rezultat:** prva smjena je zaključena kao „Preuzeo/la <B>“ sa prebrojanom gotovinom
   koju je unio B i svojim izvještajem; druga smjena sadrži samo ono što je B naplatio.
   Stavke iz prve smjene B ne može da mijenja.
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** shifts.spec.ts potvrđuje predaju između dva recepcionera i izvještaj. Sve uplate/ukupnosti iz cjelovitog scenarija nisu zajedno upoređene.
 
 ### [E2E-03] Član koji je prestao da plaća pa produžio članarinu
 - **Prioritet:** Kritično · **Uloge:** Recepcioner, Vlasnik
@@ -2708,7 +2714,7 @@ Ovo su cjeloviti tokovi kroz više modula i uloga, onako kako će ih koristiti t
 5. Skenira karticu ponovo sljedeći put.
 - **Očekivani rezultat:** početak članarine je datum prvog neplaćenog dolaska; sva tri dolaska
   postaju plaćena; značka „Neplaćeni dolasci“ nestaje; sljedeći dolazak je zelen.
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** reception.spec.ts potvrđuje dva neplaćena dolaska i produženje koje ih pokriva. Nisu svi koraci proširene priče iz ovog scenarija ponovljeni.
 
 ### [E2E-04] Novi zaposleni od kreiranja do deaktivacije
 - **Prioritet:** Visoko · **Uloge:** Vlasnik/Administrator, novi Recepcioner
@@ -2722,7 +2728,7 @@ Ovo su cjeloviti tokovi kroz više modula i uloga, onako kako će ih koristiti t
 - **Očekivani rezultat:** korak 2 ne preskače promjenu lozinke i **obavezno** otvara smjenu
   (ranije je ovdje bila greška); korak 6 izbacuje zaposlenog na sljedećem kliku, a njegova smjena
   ostaje otvorena dok je neko ne preuzme ili dok je noćni posao ne zaključi.
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** auth/admin E2E pokrivaju kreiranje, prvu lozinku i deaktivaciju, ali ne kao jedan isti nalog kroz sve korake scenarija.
 
 ### [E2E-05] Vlasnikov mjesečni pregled
 - **Prioritet:** Visoko · **Uloge:** Vlasnik
@@ -2735,7 +2741,7 @@ Ovo su cjeloviti tokovi kroz više modula i uloga, onako kako će ih koristiti t
 7. Ponovo `/finance` — prihod je porastao za taj iznos.
 - **Očekivani rezultat:** brojke se slažu na euro; naknadni unos se vidi u finansijama sa oznakom
   „Naknadno“, ali ne ulazi ni u jednu smjenu.
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** finance E2E i DB 0012 pokrivaju izvještaje, troškove/trenere i naknadne unose. Nije izvršen cijeli mjesečni tok sa svim promjenama u UI-ju.
 
 ### [E2E-06] Izgubljena kartica
 - **Prioritet:** Visoko · **Uloge:** Recepcioner
@@ -2747,7 +2753,7 @@ Ovo su cjeloviti tokovi kroz više modula i uloga, onako kako će ih koristiti t
 5. Provjeri `/payments/today`.
 - **Očekivani rezultat:** stara kartica daje „Kartica je poništena. Pronađite člana pretragom.“;
   nova radi normalno; uplata „Zamjenska kartica – <ime>“ je u današnjim uplatama i u smjeni.
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** members E2E + DB 0006/0007 provjeravaju zamjenu, naplatu i poništenu karticu; cjelovit UI tok sa oba naknadna skeniranja nije ponovljen.
 
 ### [E2E-07] Noć i jutro
 - **Prioritet:** Visoko · **Uloge:** Recepcioner, Vlasnik, terminal
@@ -2760,7 +2766,7 @@ Ovo su cjeloviti tokovi kroz više modula i uloga, onako kako će ih koristiti t
 - **Očekivani rezultat:** oba dolaska su automatski odjavljena u vrijeme zaključenja; smjena je
   zaključena kao „Automatski“ bez prebrojane gotovine; izvještaj je poslat; podsjetnik je stigao
   jednom; rezervna kopija je uspješna i vidi se na S-27.
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** DB 0011, E2E jobs i stvarni ciljano izolovani email testovi prolaze. Globalni noćni/jutarnji posao nije pokretan nad drugim teretanama.
 
 ### [E2E-08] Promjena cjenovnika
 - **Prioritet:** Srednje · **Uloge:** Vlasnik, Recepcioner
@@ -2770,7 +2776,7 @@ Ovo su cjeloviti tokovi kroz više modula i uloga, onako kako će ih koristiti t
 4. Vlasnik pogleda staru uplatu od 79 € i novu od 89 €, i `/finance/storage`.
 - **Očekivani rezultat:** stare uplate ostaju na staroj cijeni; nova je 89 €; zarada na magacinu
   za izotonik je 1,40 € po komadu.
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** settings/storage/finance E2E + DB 0006 provjeravaju cijene, prodaju i snapshot, ali ne kao jedan povezani scenario sa Izotonikom.
 
 ---
 
@@ -2779,6 +2785,8 @@ Ovo su cjeloviti tokovi kroz više modula i uloga, onako kako će ih koristiti t
 Aplikacija se razvija za dvije veličine: **desktop 1366×768** (pult) i **mobilni 375 px**.
 
 ### 5.1 Desktop (Chrome, Firefox, Edge)
+
+**22.09.2026 — djelimično:** Chrome 1366×768 i 375×812: 152 postojeće E2E provjere dale su `ok`; `screens.spec.ts` proverava 19 aplikacijskih ekrana, uz zasebnu prijavu, bez horizontalnog overflowa, sa imenovanim kontrolama i bez pageerror događaja. Snimci su u `test-results/`. Ovo ne potvrđuje sve redove ispod: Firefox/Edge, štampa, zoom, zvuk i fizički uređaji nisu testirani.
 
 | Provjera | Gdje | Prošlo |
 |---|---|---|
@@ -2796,6 +2804,8 @@ Aplikacija se razvija za dvije veličine: **desktop 1366×768** (pult) i **mobil
 > do REC-11 i CLOSE-01 do CLOSE-05 u Safariju i zabilježite razlike.
 
 ### 5.2 Mobilni telefon / uzak ekran (375 px)
+
+**22.09.2026 — djelimično:** izvršen Chrome desktop engine na 375×812, uključujući forme i 19 ekrana. Nije pravi telefon: virtuelna tastatura, dodir, landscape i veličina svih touch meta ostaju neprovjereni; kvadratići tih tvrdnji nisu označeni.
 
 | Provjera | Gdje | Prošlo |
 |---|---|---|
@@ -3064,8 +3074,146 @@ uradite korake 1–7 (to je oko 12 sati) — tu su svi testovi označeni kao **K
 
 ---
 
-*Kraj plana. Rezultate upisujte direktno u ovaj fajl (kvadratići i polje „Napomena“), pa
-nam prijavite šta je palo.*
+## 9. Izvještaj izvršavanja — 22.09.2026
 
+### 9.1 Obim, okruženje i dokazi
+
+Oznaka **PROŠLO** odnosi se na izvršene korake opisane u napomeni. **DJELOMIČNO** znači
+da postoji uspješan dokaz za dio slučaja (npr. bazna validacija), ali ne i za cijeli ručni
+scenario. **PALO** označava reprodukovano odstupanje. **NIJE IZVRŠENO** nije prolaz.
+Zbir ovih oznaka nije jednak broju automatizovanih testova: jedan test često pokriva dijelove
+više slučajeva, a jedan ručni slučaj zahtijeva više testova.
+
+- Windows, Node **24.20.0**, instalirani Chrome; aplikacija testirana iz produkcijskog builda.
+- Početno radno stablo bilo je čisto. Poslovni kod i `.env.local` nisu mijenjani radi popravki.
+- PowerShell blokira `npm.ps1`; komande izvršene preko `npm.cmd`, bez promjene ExecutionPolicy.
+- HTTPS testovima je bio potreban `NODE_OPTIONS=--use-system-ca`: Node inače prijavljuje
+  `UNABLE_TO_VERIFY_LEAF_SIGNATURE`. Nije isključena provjera HTTPS sertifikata.
+- Bazni testovi i benchmark koriste rollback; browser/integracioni testovi posebne `E2E`
+  teretane i uklanjaju ih. Globalni `jobs:run` nad svim teretanama nije pokretan.
+- Dodatni ciljani browser testovi izvršeni su na portu 3101; postojeći E2E na portu 3100,
+  sa `E2E_PRODUCTION=1`, desktop 1366×768 i uzak ekran 375×812.
+- Sirovi rezultati dodatnih provjera nalaze se lokalno u `test-results/test-plan-extra*.json`,
+  email u `test-results/test-plan-email*.json`, a snimci postojećih E2E u `test-results/`.
+  To su lokalni, git-ignorisanI artefakti; trajni sažetak je ovaj dokument.
+- Greške prvih pomoćnih testova zbog selektora, kodiranja teksta i `localhost` naspram
+  `127.0.0.1` ponovljene su sa ispravljenim testovima; nisu klasifikovane kao greške aplikacije.
+
+| Provjera | Rezultat |
+|---|---|
+| `npm.cmd run lint` | **PROŠLO**, bez upozorenja |
+| `npm.cmd run typecheck` | **PROŠLO** |
+| `npm.cmd run build` | **PROŠLO**, produkcijski bundle napravljen |
+| `npm.cmd run test` uz sistemski CA | **PROŠLO: 122/122**, 15 fajlova; uključuje stvarni Storage backup |
+| `npm.cmd run test:db` | **PROŠLO: 428 tvrdnji**, 14 SQL fajlova, sve vraćeno rollbackom |
+| `npm.cmd run test:e2e`, production | **152/152 pojedinačnih testova ispisalo `ok`**. Proces nije završio gašenje servera nakon posljednjeg testa i prekinut je nakon čekanja; nema čistog završnog exit 0. Naknadni upit je potvrdio da nema preostalih `E2E` teretana. Ne predstavljati ovo kao uredno završen CI job. |
+| `npm.cmd run perf:scan` | **PROŠLO**: 3.000 članova, 150.000 dolazaka, 300 skenova; server p50 **13,5 ms**, p95 **34,9 ms**, max **921,8 ms**; round-trip p95 **72,3 ms**. Prag je p95 ≤ 300 ms, ne maksimum. |
+| `npm.cmd run restore:test -- --file test-results/backup/2026-09-20.zip` | **PROŠLO uz dozvolu korisnika**: odvojeni RESTORE_TEST projekat, migracije do 0025, **28 tabela / 34 reda**, bez razlike sa manifestom. Provjeren i guard koji odbija isti izvor/cilj. |
+| `npm.cmd run format:check` | **PALO**: Prettier je na početnom stanju prijavio **83 fajla**, uključujući raniji TEST_PLAN.md. Nije primijenjeno masovno formatiranje. |
+| Dodatni stvarni email testovi | **4/4 PROŠLO** sa procesnim `EMAIL_FROM=noreply@stamenkovicc.com`; vidi §9.3. |
+
+### 9.2 Novi nalazi
+
+**N-01 — SEC-07: preveliki upload završava opštom greškom.**
+
+Na `/settings/gym` poslati PNG od 5 MB. Browser dobija **HTTP 500**, prikazuje se
+„Došlo je do greške. Pokušajte ponovo.“, a nema očekivane poruke
+„Dozvoljeni su PNG i JPG do 1 MB.“ ispod polja. Server prijavljuje
+`Body exceeded 1 MB limit`, sa internim `statusCode: 413`. U `next.config.ts` nije podešen
+veći limit za Server Actions, pa zahtjev ne stiže do validacije u `uploadLogo`.
+SVG i tekst preimenovan u PNG uredno se odbijaju. Testni `logo_path` ostaje `null`.
+Ovo je reprodukovana greška ponašanja/poruke; nije dokaz da je zlonamjerni fajl prihvaćen.
+
+> **Riješeno 22.09.2026.** Provjera veličine je dodata u browser (`gym-screen.tsx`), a
+> `experimental.serverActions.bodySizeLimit` je podignut na 2 MB. Serverska provjera
+> `LOGO_MAX_BYTES` ostaje kao druga brana. Regresija: `tests/e2e/settings.spec.ts`.
+
+**N-02 — SEC-02: `%` i `_` u pretrazi ponašaju se kao džokeri.**
+
+U izolovanoj teretani sa članom `Ana Anic`, unos `%`, a zatim `_`, prikazuje tog člana i
+na recepciji i na `/members`. Plan izričito traži doslovno tumačenje ovih znakova.
+`member_search` u `supabase/migrations/0012_members_memberships.sql` spaja unos u obrazac
+`LIKE '%' || i.folded || '%'`, bez escape-a za ova dva znaka. Testovi sa apostrofom,
+navodnikom, `;` i `' OR 1=1 --` nisu vratili tog člana u recepcijskoj pretrazi.
+Nalaz ne znači da je izvršen proizvoljan SQL ili zaobiđena izolacija teretana.
+
+> **Riješeno 22.09.2026.** Migracija `0026_member_search_like_escape.sql` escape-uje `%`,
+> `_` i obrnutu kosu crtu prije `LIKE`. Regresija: četiri tvrdnje u
+> `supabase/tests/0006_members.test.sql`, koje su padale prije migracije.
+
+**N-03 — AUTH-16: filter odredišta callbacka propušta obrnutu kosu crtu.**
+
+U `app/auth/callback/route.ts` je prihvaćeno sve što počinje `/`, a ne počinje `//`.
+Izvršena je izolovana provjera tog tačnog izraza sa `next = '/\\example.org'`
+(jedna obična i jedna obrnuta kosa crta): filter ga prihvata, a `new URL(target, origin)`
+daje spoljašnji origin `http://example.org`. To potvrđuje grešku filtera na grani nakon
+uspješne razmjene koda. **Nije izvršen kompletan napad sa validnim recovery kodom.**
+HTTP provjere sa nevažećim kodom uredno završavaju na lokalnom `/login`, zato AUTH-16
+nije označen kao kompletno pao ili prošao. Potrebna je provjera finalnog origin-a,
+uz regresioni test za `/\\...`, prije tvrdnje da je open-redirect zaštita potpuna.
+
+> **Riješeno 22.09.2026.** `inAppRedirect` u `features/auth/schemas.ts` razrješava
+> odredište i odbija sve čiji origin nije origin aplikacije. Regresija: pet tvrdnji u
+> `tests/unit/auth-schemas.test.ts`.
+
+**N-04 — lokalni pošiljalac ograničava stvarno slanje.**
+
+Postojeći `EMAIL_FROM=onboarding@resend.dev` vraća **Resend HTTP 403** za odobrenog testnog
+primaoca. Read-only provjera Resend API-ja pokazala je da je `stamenkovicc.com` već
+`verified`. Ponovljena četiri testa sa `noreply@stamenkovicc.com` iz README-a prolaze.
+Promjena je važila samo za proces testa; `.env.local` i podešavanja naloga nisu promijenjeni.
+Prvobitni 403 nije kvar zatvaranja smjene ili ZIP-a: oni ostaju sačuvani, a slanje je `failed`.
+
+**N-05 — zaostali dev server tjera E2E da šalje prave emailove.**
+
+`playwright.config.ts` je imao `reuseExistingServer: !process.env.CI`. Ako na portu 3000
+već radi Next dev server koji nije pokrenuo taj config, Playwright ga preuzme — a
+`webServer.env` (koji podmeće `RESEND_API_KEY: "re_e2e_invalid_key"`) se na njega **ne**
+primjenjuje. Takav server radi sa pravim ključem iz `.env.local` i pošiljaocem
+`noreply@stamenkovicc.com`, pa zatvaranje smjene u testu zaista pošalje izvještaj na
+adresu iz `gym_settings`, čiji je podrazumijevani sadržaj iz migracije 0001
+`mihajlo@stamenkovicc.com`. Reprodukovano: `close-shift.spec.ts:238` je pao sa
+`email_status: "sent"` umjesto `"failed"` na oba projekta. Pošto Next odbija da pokrene
+drugi dev server za isti projekat, ni prelazak na drugi port ne pomaže dok zaostali
+server radi.
+
+> **Riješeno 22.09.2026.** Zaostali server je ugašen, a `reuseExistingServer` je sada
+> `false`, pa se tiha zamjena okruženja pretvara u glasan prekid pokretanja. Poslije toga
+> `close-shift` i `shifts` prolaze sa `email_status: "failed"`, dakle bez stvarnog slanja.
+
+### 9.3 Stvarni emailovi i oporavak
+
+Korisnik je izričito odobrio slanje na `petarsosic4@gmail.com`. Svi testni primaoci postavljeni
+su samo na tu adresu. Podaci su sintetički, bez podataka radne teretane.
+
+Sa verifikovanim pošiljaocem poslato je četiri poruke:
+
+1. Izvještaj testne smjene sa PDF prilogom — `sent`.
+2. Podsjetnik „Vaša članarina ističe 25.09.2026“ — `sent`; drugi poziv ne šalje duplikat.
+3. Šifrovani ZIP testne teretane — `emailed: true`, svih 28 tabela.
+4. Ponovno slanje izvještaja nakon namjerno nevažećeg ključa — `failed` prelazi u `sent`.
+
+Resend API za sve četiri poruke potvrđuje **`delivered`** (22.09.2026, oko 13:37 lokalno).
+Nije provjereno u kom Gmail folderu su završile niti su prilozi otvoreni u tom sandučetu.
+Izbor dospjelih teretana/reda za retry u ovom dodatnom harnessu ograničen je na testnu teretanu;
+stvarne RPC funkcije, slanje, PDF, Storage i ZIP nisu mockovani. Pravila rasporeda i limit
+ponovnih pokušaja zasebno su provjereni pgTAP testovima.
+
+Za restore je korisnik posebno odobrio zamjenu stare testne teretane u odvojenom projektu.
+Prije pokretanja potvrđeno je da izvorni i ciljni DB/API nisu isti. Prvi pokušaj je blokirao
+sandbox pri upisu Supabase CLI telemetry fajla; nakon eskalacije restore je završen.
+RESTORE_TEST projekat sada namjerno sadrži obnovljene testne podatke. Radni projekat nije
+resetovan. Skripta za restore trenutno koristi `rejectUnauthorized: false` za svoj PG klijent;
+to je postojeće ponašanje skripte, ne promjena uvedena ovim testiranjem.
+
+### 9.4 Šta ovaj prolaz ne potvrđuje
+
+Preostali koraci navedeni su uz svaki djelimičan/neizvršen slučaj. Posebno nisu potvrđeni:
+stvarni Supabase Auth reset link iz sandučeta, fizički skener/štampa/zvuk, Firefox/Edge/Safari,
+pravi mobilni uređaj sa tastaturom i dodirom, sve kombinacije obrazaca i svi cjeloviti tokovi
+iz §4 kao jedna povezana istorija podataka. Postojeći automatizovani testovi ne dokazuju te
+tvrdnje samo time što su prošli. Otvorena poslovna pitanja iz §7 ostaju odluke vlasnika.
+
+*Kraj plana. Novi rezultati upisani su uz slučajeve; neoznačeni kvadratići nisu automatski prolaz.*
 
 

@@ -204,3 +204,43 @@ test("BR-012 and BR-131: the owner edits gym settings and a category", async ({
     page.getByRole("cell", { name: "E2E Kategorija" }),
   ).toBeVisible();
 });
+
+// SEC-07 and finding N-01: an oversized logo used to travel to the server, where Next
+// refused the body before uploadLogo could answer, so the owner saw the general error
+// screen with an HTTP 500 instead of the sentence under the field.
+test("US-21.1: a logo over 1 MB is refused with the field message, not an error page", async ({
+  page,
+}) => {
+  await signIn(page, owner);
+  await page.goto("/settings/gym");
+
+  // A real PNG header followed by filler, so only the size makes it invalid.
+  const png = Buffer.concat([
+    Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]),
+    Buffer.alloc(5 * 1024 * 1024, 0),
+  ]);
+  await page.locator("#logo").setInputFiles({
+    name: "veliki-logo.png",
+    mimeType: "image/png",
+    buffer: png,
+  });
+
+  await expect(
+    page.getByText("Dozvoljeni su PNG i JPG do 1 MB."),
+  ).toBeVisible();
+  // The file input is also exposed as a button with the label's name, so the submit
+  // button is addressed by its type.
+  await expect(
+    page.locator('form:has(#logo) button[type="submit"]'),
+  ).toBeDisabled();
+  // The general error screen never appears and the gym keeps no logo.
+  await expect(
+    page.getByText("Došlo je do greške. Pokušajte ponovo."),
+  ).toHaveCount(0);
+  const { data } = await adminClient()
+    .from("gym_settings")
+    .select("logo_path")
+    .eq("gym_id", gymId)
+    .single<{ logo_path: string | null }>();
+  expect(data?.logo_path).toBeNull();
+});

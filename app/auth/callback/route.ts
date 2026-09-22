@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { inAppRedirect } from "@/features/auth/schemas";
 import { createClient } from "@/lib/supabase/server";
 
 // Landing route for the Supabase password-reset link (US-01.2). The code is exchanged
@@ -6,10 +7,9 @@ import { createClient } from "@/lib/supabase/server";
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = request.nextUrl;
   const code = searchParams.get("code");
-  const next = searchParams.get("next") ?? "/change-password";
-  // Only in-app destinations, so the link cannot be pointed at another site.
-  const target =
-    next.startsWith("/") && !next.startsWith("//") ? next : "/change-password";
+  // N-03: only in-app destinations, decided by the resolved origin rather than by the
+  // shape of the string, so the link cannot be pointed at another site.
+  const target = inAppRedirect(searchParams.get("next"), origin);
 
   if (code) {
     const supabase = await createClient();

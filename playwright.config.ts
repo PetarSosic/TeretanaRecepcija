@@ -40,7 +40,11 @@ export default defineConfig({
   webServer: {
     command: `node node_modules/next/dist/bin/next ${process.env.E2E_PRODUCTION ? "start" : "dev"} --hostname 127.0.0.1 --port ${port}`,
     url: baseURL,
-    reuseExistingServer: !process.env.CI,
+    // N-05: never reuse a server this config did not start. A stray dev server runs
+    // with the real .env.local, so the env below is not applied to it and the tests
+    // send real email from a verified sender to the address in gym_settings. Refusing
+    // to reuse turns that silent accident into a loud failure to start.
+    reuseExistingServer: false,
     // BR-118 and BR-161: tests exercise the email path with a key Resend rejects, so no
     // real email ever leaves a test run, and a failed send is what the tests expect.
     env: {

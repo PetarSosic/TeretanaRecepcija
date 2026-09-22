@@ -230,3 +230,6 @@ export const gymSettingsSchema = z.object({
   shiftReportEmails: emailList,
   backupEmails: emailList,
 });
+
+/** US-21.1: the gym logo is a PNG or JPG of at most 1 MB. */
+export const LOGO_MAX_BYTES = 1_048_576;
