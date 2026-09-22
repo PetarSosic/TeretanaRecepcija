@@ -387,7 +387,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** odmah ste na `/login`, bez dijaloga (samo recepcioner ostavlja smjenu
   za sobom).
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: ____
+- [x] Prošlo  [ ] Palo  Napomena: prvo PALO 22.09.2026 — [Odjava] nije radila ni za jednu ulogu bez potvrde (forma je bila unutar Radix stavke menija, koja se odmontira pri izboru, pa je slanje otkazano). Popravljeno u components/common/app-header.tsx; regresioni test dodat u tests/e2e/auth.spec.ts. Ponovljeno: prolazi.
 
 ### [AUTH-19] Prijavljeni korisnik na `/login`
 - **Prioritet:** Srednje

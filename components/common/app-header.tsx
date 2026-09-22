@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { ChevronDown, Dumbbell, Menu } from "lucide-react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import {
   Dialog,
   DialogClose,
@@ -42,6 +42,10 @@ export function AppHeader({
 }) {
   const pathname = usePathname();
   const [confirming, setConfirming] = useState(false);
+  // The sign-out form is rendered outside the menu and submitted through this ref:
+  // Radix unmounts the menu when an item is selected, which cancelled a submit that
+  // started inside it, so [Odjava] did nothing for the roles that skip the question.
+  const signOutForm = useRef<HTMLFormElement>(null);
   const isCurrent = (href: string) =>
     pathname === href || pathname.startsWith(`${href}/`);
 
@@ -117,29 +121,21 @@ export function AppHeader({
                 <DropdownMenu.Item
                   asChild
                   onSelect={(event) => {
+                    // BR-113: a receptionist is asked first; every other role leaves at once.
                     if (confirmSignOut) {
                       event.preventDefault();
                       setConfirming(true);
+                    } else {
+                      signOutForm.current?.requestSubmit();
                     }
                   }}
                 >
-                  {confirmSignOut ? (
-                    <button
-                      type="button"
-                      className="w-full rounded-md px-3 py-2 text-left text-sm outline-hidden hover:bg-muted focus:bg-muted"
-                    >
-                      {me.account.signOut}
-                    </button>
-                  ) : (
-                    <form action={onSignOut}>
-                      <button
-                        type="submit"
-                        className="w-full rounded-md px-3 py-2 text-left text-sm outline-hidden hover:bg-muted focus:bg-muted"
-                      >
-                        {me.account.signOut}
-                      </button>
-                    </form>
-                  )}
+                  <button
+                    type="button"
+                    className="w-full rounded-md px-3 py-2 text-left text-sm outline-hidden hover:bg-muted focus:bg-muted"
+                  >
+                    {me.account.signOut}
+                  </button>
                 </DropdownMenu.Item>
               </DropdownMenu.Content>
             </DropdownMenu.Portal>
@@ -147,14 +143,16 @@ export function AppHeader({
         </div>
       </div>
 
+      {/* Outside the menu on purpose: the menu unmounts when an item is selected, and a
+          form that unmounts mid-submit never reaches the server action. */}
+      <form ref={signOutForm} action={onSignOut} className="hidden" />
+
       {/* BR-113: logging out leaves the shift open, so it is confirmed first. */}
       <Dialog open={confirming} onOpenChange={setConfirming}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>{me.shift.logoutTitle}</DialogTitle>
-            <DialogDescription>
-              {me.shift.logoutConfirm}
-            </DialogDescription>
+            <DialogDescription>{me.shift.logoutConfirm}</DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <DialogClose asChild>

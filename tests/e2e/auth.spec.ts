@@ -178,3 +178,19 @@ test("US-01.3 AC5: a deactivated user is signed out on the next request", async 
   await page.goto("/reception");
   await expect(page).toHaveURL(/\/login/);
 });
+
+// AUTH-18 (TEST_PLAN §3.1): every role but a receptionist with an open shift leaves
+// straight from the menu. The form used to live inside the Radix menu item, which
+// unmounts on select, so the submit was cancelled and [Odjava] did nothing.
+test("BR-113: an owner signs out from the header menu without a question", async ({
+  page,
+}) => {
+  await signIn(page, owner.identifier, owner.password);
+  await page.getByRole("button", { name: "Nalog" }).click();
+  await page.getByRole("menuitem", { name: "Odjava" }).click();
+
+  await expect(page).toHaveURL(/\/login/);
+  // The session is really gone: a protected route bounces back to the sign-in screen.
+  await page.goto("/finance");
+  await expect(page).toHaveURL(/\/login/);
+});
