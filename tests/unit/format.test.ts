@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   formatDate,
+  formatClockTime,
   formatTime,
   formatDateTime,
   formatDuration,
@@ -22,6 +23,12 @@ describe("BR-001/002 dates and durations", () => {
   it("rejects invalid and ambiguous dates", () => {
     expect(() => formatDate("2026-02-30")).toThrow();
     expect(() => formatTime("2026-09-18T08:30:00")).toThrow();
+  });
+  it("shows a Postgres time column as typed, with no timezone shift", () => {
+    expect(formatClockTime("18:00:00")).toBe("18:00");
+    expect(formatClockTime("07:30")).toBe("07:30");
+    expect(() => formatClockTime("25:00:00")).toThrow();
+    expect(() => formatClockTime("2026-09-18T08:30:00Z")).toThrow();
   });
   it("shows whole elapsed minutes", () => {
     expect(formatDuration(3661)).toBe("1h 1min");

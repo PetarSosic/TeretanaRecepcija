@@ -16,13 +16,19 @@ const optionalUuid = z
 const name = (min: number, max: number, message: string) =>
   z.string().trim().min(min, message).max(max, message);
 
-/** BR-003: the money input accepts a comma or a dot. */
+/**
+ * BR-003: the money input accepts a comma or a dot.
+ *
+ * SUSPECT-11: six digits before the decimal point. Every price column is numeric(10,2),
+ * so a longer number used to reach the database and come back as a general error with
+ * nothing under the field; €999,999.99 is far above any price this gym charges.
+ */
 const money = (message: string) =>
   z
     .string()
     .trim()
     .transform((value) => value.replace(",", "."))
-    .refine((value) => /^\d+(\.\d{1,2})?$/.test(value), { message })
+    .refine((value) => /^\d{1,6}(\.\d{1,2})?$/.test(value), { message })
     .transform(Number);
 
 const checkbox = z
@@ -48,7 +54,8 @@ export const trainerFeeSchema = z.object({
     .string()
     .trim()
     .transform((value) => (value === "" ? null : value.replace(",", ".")))
-    .refine((value) => value === null || /^\d+(\.\d{1,2})?$/.test(value), {
+    // SUSPECT-11: the same six-digit bound as money() (numeric(10,2)).
+    .refine((value) => value === null || /^\d{1,6}(\.\d{1,2})?$/.test(value), {
       message: me.settings.feeInvalid,
     })
     .transform((value) => (value === null ? null : Number(value))),
@@ -122,7 +129,8 @@ export const planSchema = z
       .string()
       .trim()
       .transform((value) => (value === "" ? null : value.replace(",", ".")))
-      .refine((value) => value === null || /^\d+(\.\d{1,2})?$/.test(value), {
+      // SUSPECT-11: the same six-digit bound as money() above (numeric(10,2)).
+      .refine((value) => value === null || /^\d{1,6}(\.\d{1,2})?$/.test(value), {
         message: me.settings.priceInvalid,
       })
       .transform((value) => (value === null ? null : Number(value))),

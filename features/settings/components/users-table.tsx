@@ -203,7 +203,8 @@ function CreateDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      {/* S-23: the title says everything; Radix wants the absence stated. */}
+      <DialogContent aria-describedby={undefined}>
         <DialogHeader>
           <DialogTitle>{me.users.createTitle}</DialogTitle>
         </DialogHeader>
@@ -301,7 +302,7 @@ function EditDialog({
 
   return (
     <Dialog open={Boolean(row)} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent>
+      <DialogContent aria-describedby={undefined}>
         <DialogHeader>
           <DialogTitle>{me.users.editTitle}</DialogTitle>
         </DialogHeader>
@@ -353,10 +354,10 @@ function PasswordDialog({
 
   return (
     <Dialog open={Boolean(row)} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent aria-describedby="password-description">
+      <DialogContent>
         <DialogHeader>
           <DialogTitle>{me.users.passwordTitle}</DialogTitle>
-          <DialogDescription id="password-description">
+          <DialogDescription>
             {me.users.passwordDescription}
           </DialogDescription>
         </DialogHeader>

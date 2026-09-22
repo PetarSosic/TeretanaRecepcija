@@ -162,10 +162,10 @@ function SaleDialog({
 
   return (
     <Dialog open onOpenChange={(open) => !open && onClose()}>
-      <DialogContent aria-describedby="sale-product">
+      <DialogContent>
         <DialogHeader>
           <DialogTitle>{me.storage.sale}</DialogTitle>
-          <DialogDescription id="sale-product">
+          <DialogDescription>
             {product.name} · {formatMoney(product.sale_price)}
           </DialogDescription>
         </DialogHeader>
@@ -263,10 +263,10 @@ function StockInDialog({
 
   return (
     <Dialog open onOpenChange={(open) => !open && onClose()}>
-      <DialogContent aria-describedby="stock-in-product">
+      <DialogContent>
         <DialogHeader>
           <DialogTitle>{me.storage.stockIn}</DialogTitle>
-          <DialogDescription id="stock-in-product">
+          <DialogDescription>
             {product.name}
           </DialogDescription>
         </DialogHeader>

@@ -84,8 +84,9 @@ function Table({ columns, rows }: { columns: Column[]; rows: string[][] }) {
   return (
     <View>
       <View style={styles.headRow} fixed>
-        {columns.map((column) => (
-          <Text key={column.label} style={cell(column)}>
+        {/* The position, not the label: the totals table has two unlabelled columns. */}
+        {columns.map((column, index) => (
+          <Text key={index} style={cell(column)}>
             {column.label}
           </Text>
         ))}

@@ -78,10 +78,10 @@ function ResetDialog() {
       >
         {me.login.forgot}
       </Button>
-      <DialogContent aria-describedby="reset-description">
+      <DialogContent>
         <DialogHeader>
           <DialogTitle>{me.login.resetTitle}</DialogTitle>
-          <DialogDescription id="reset-description">
+          <DialogDescription>
             {me.login.resetDescription}
           </DialogDescription>
         </DialogHeader>

@@ -524,10 +524,10 @@ function CorrectDialog({
 
   return (
     <Dialog open onOpenChange={(open) => !open && onClose()}>
-      <DialogContent aria-describedby="correct-subject">
+      <DialogContent>
         <DialogHeader>
           <DialogTitle>{me.payments.correctTitle}</DialogTitle>
-          <DialogDescription id="correct-subject">
+          <DialogDescription>
             {describe(payment)} · {formatMoney(payment.amount)}
           </DialogDescription>
         </DialogHeader>
@@ -599,10 +599,10 @@ function CorrectSaleDialog({
 
   return (
     <Dialog open onOpenChange={(open) => !open && onClose()}>
-      <DialogContent aria-describedby="correct-sale-subject">
+      <DialogContent>
         <DialogHeader>
           <DialogTitle>{me.storage.correctSaleTitle}</DialogTitle>
-          <DialogDescription id="correct-sale-subject">
+          <DialogDescription>
             {saleLabel(sale)} · {formatMoney(sale.amount)}
           </DialogDescription>
         </DialogHeader>
@@ -654,10 +654,10 @@ function VoidDialog({
 
   return (
     <Dialog open onOpenChange={(open) => !open && onClose()}>
-      <DialogContent aria-describedby="void-subject">
+      <DialogContent>
         <DialogHeader>
           <DialogTitle>{me.payments.voidTitle}</DialogTitle>
-          <DialogDescription id="void-subject">{subject}</DialogDescription>
+          <DialogDescription>{subject}</DialogDescription>
         </DialogHeader>
         <form onSubmit={onSubmit} className="grid gap-4" noValidate>
           <input type="hidden" name="id" value={id} />

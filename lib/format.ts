@@ -76,6 +76,17 @@ export function formatTime(value: Date | string): string {
   return `${p.hour}:${p.minute}`;
 }
 
+/**
+ * A Postgres `time` value (HH:MM[:SS]) is a wall-clock time of day with no instant and
+ * no timezone, so it is shown as typed — never converted through GYM_TIME_ZONE.
+ */
+export function formatClockTime(value: string): string {
+  const match = /^(\d{1,2}):(\d{2})(?::\d{2}(?:\.\d+)?)?$/.exec(value.trim());
+  if (!match || Number(match[1]) > 23 || Number(match[2]) > 59)
+    throw new RangeError("Invalid time of day");
+  return `${match[1].padStart(2, "0")}:${match[2]}`;
+}
+
 export function formatDateTime(value: Date | string): string {
   return `${formatDate(instant(value))} ${formatTime(value)}`;
 }

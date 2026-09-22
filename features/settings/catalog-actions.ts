@@ -309,6 +309,19 @@ export async function saveGymSettings(
 }
 
 /**
+ * SUSPECT-07: `file.type` is whatever the browser guessed from the name, so a text file
+ * renamed to .png used to be stored and then broke the PDF that embeds it. The first
+ * bytes are the file itself and cannot be renamed away.
+ */
+async function imageKind(file: File): Promise<"png" | "jpg" | null> {
+  const head = new Uint8Array(await file.slice(0, 4).arrayBuffer());
+  if (head[0] === 0x89 && head[1] === 0x50 && head[2] === 0x4e && head[3] === 0x47)
+    return "png";
+  if (head[0] === 0xff && head[1] === 0xd8 && head[2] === 0xff) return "jpg";
+  return null;
+}
+
+/**
  * US-21.1: the owner uploads a PNG or JPG of at most 1 MB. Doc 08 §6 keeps this in a
  * server action because the bucket is private and only the service role writes to it.
  */
@@ -326,12 +339,15 @@ export async function uploadLogo(
   if (file.size > 1_048_576 || !["image/png", "image/jpeg"].includes(file.type))
     return { fieldErrors: { logo: me.settings.logoInvalid } };
 
-  const extension = file.type === "image/png" ? "png" : "jpg";
+  const extension = await imageKind(file);
+  if (!extension) return { fieldErrors: { logo: me.settings.logoInvalid } };
+
+  const contentType = extension === "png" ? "image/png" : "image/jpeg";
   const path = `${staff.gym_id}/logo.${extension}`;
   const admin = createAdminClient();
   const upload = await admin.storage
     .from("gym-assets")
-    .upload(path, file, { upsert: true, contentType: file.type });
+    .upload(path, file, { upsert: true, contentType });
   if (upload.error) {
     console.error(`uploadLogo failed: ${upload.error.message}`);
     return { error: me.errors.unexpected };

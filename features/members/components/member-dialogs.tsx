@@ -114,10 +114,10 @@ export function AnonymizeDialog({
 }: DialogProps & { memberNumber: number }) {
   return (
     <Dialog open={props.open} onOpenChange={props.onOpenChange}>
-      <DialogContent aria-describedby="anonymize-description">
+      <DialogContent>
         <DialogHeader>
           <DialogTitle>{me.members.anonymize}</DialogTitle>
-          <DialogDescription id="anonymize-description">
+          <DialogDescription>
             {me.members.anonymizeText.replace("{number}", String(memberNumber))}
           </DialogDescription>
         </DialogHeader>

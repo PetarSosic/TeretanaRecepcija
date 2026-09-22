@@ -55,13 +55,22 @@ export function DialogTitle({
   );
 }
 
+/**
+ * Radix gives the description its own id and points the content's `aria-describedby`
+ * at it. With `asChild` the description is an element the screen already shows — a list
+ * of details, say — which then keeps its own styling instead of this one.
+ */
 export function DialogDescription({
   className,
+  asChild,
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Description>) {
   return (
     <DialogPrimitive.Description
-      className={cn("text-sm text-muted-foreground", className)}
+      asChild={asChild}
+      className={
+        asChild ? className : cn("text-sm text-muted-foreground", className)
+      }
       {...props}
     />
   );

@@ -24,15 +24,17 @@ export async function resolveLoginShift(): Promise<ShiftState> {
 }
 
 // AS-10: the counted cash for the shift being taken over is optional.
+// SUSPECT-05: the same eight-digit bound as closeSchema below, so an amount too large
+// for numeric(10,2) is answered under the field instead of by a database overflow; and
+// BR-003 keeps it a decimal string all the way to the RPC rather than a float.
 const takeOverSchema = z.object({
   countedCash: z
     .string()
     .trim()
     .transform((value) => (value === "" ? null : value.replace(",", ".")))
-    .refine((value) => value === null || /^\d+(\.\d{1,2})?$/.test(value), {
+    .refine((value) => value === null || /^\d{1,8}(\.\d{1,2})?$/.test(value), {
       message: me.shift.cashInvalid,
-    })
-    .transform((value) => (value === null ? null : Number(value))),
+    }),
 });
 
 /**

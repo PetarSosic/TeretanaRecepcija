@@ -43,15 +43,14 @@ export function ActionDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent
-        aria-describedby={description ? "action-dialog-description" : undefined}
-      >
+      {/* Radix links its own DialogDescription; the escape hatch is only needed by a
+          dialog that has none, and naming the id by hand left Radix's generated one
+          unused, which is what its "Missing `Description`" warning reports. */}
+      <DialogContent {...(description ? {} : { "aria-describedby": undefined })}>
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
           {description ? (
-            <DialogDescription id="action-dialog-description">
-              {description}
-            </DialogDescription>
+            <DialogDescription>{description}</DialogDescription>
           ) : null}
         </DialogHeader>
         <form action={formAction} className="grid gap-4" noValidate>

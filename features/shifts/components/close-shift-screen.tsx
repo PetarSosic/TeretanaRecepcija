@@ -203,10 +203,10 @@ export function CloseShiftScreen({
       {reviewing ? <ShiftItems summary={summary} /> : null}
 
       <Dialog open={confirming} onOpenChange={setConfirming}>
-        <DialogContent aria-describedby="close-shift-confirm">
+        <DialogContent>
           <DialogHeader>
             <DialogTitle>{me.closeShift.confirmTitle}</DialogTitle>
-            <DialogDescription id="close-shift-confirm">
+            <DialogDescription>
               {me.closeShift.confirm}
             </DialogDescription>
           </DialogHeader>

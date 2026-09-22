@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { requireStaff } from "@/lib/auth";
 import { getErrorMessage } from "@/lib/errors";
+import { gymToday } from "@/lib/gym-date";
 import { me } from "@/lib/i18n/me";
 import { fieldErrorsOf, rpcCode, rpcFailure } from "@/lib/rpc";
 import { parseCardCode } from "@/lib/scan";
@@ -20,6 +21,19 @@ import {
   replaceCardSchema,
   updateMemberSchema,
 } from "./schemas";
+
+/**
+ * SUSPECT-02: AS-2 allows 01.01.1900 up to gym_today, and only the database knows that
+ * date (BR-001). The schema therefore checks the shape and the lower bound, and the
+ * upper bound is checked here — otherwise clean_member() rejects it as a general
+ * "Provjerite unesene podatke." and the field's own message is never shown.
+ */
+async function futureDateOfBirth(
+  gymId: string,
+  dateOfBirth: string,
+): Promise<boolean> {
+  return dateOfBirth > (await gymToday(gymId));
+}
 
 function memberFieldsFrom(formData: FormData) {
   return {
@@ -90,7 +104,7 @@ export async function registerMember(
   _state: ActionState<RegisteredMember>,
   formData: FormData,
 ): Promise<ActionState<RegisteredMember>> {
-  await requireStaff();
+  const staff = await requireStaff();
   const parsed = registerSchema.safeParse({
     ...memberFieldsFrom(formData),
     ...saleFieldsFrom(formData),
@@ -100,6 +114,9 @@ export async function registerMember(
     return { fieldErrors: fieldErrorsOf(parsed.error.issues) };
 
   const value = parsed.data;
+  if (await futureDateOfBirth(staff.gym_id, value.dateOfBirth))
+    return { fieldErrors: { dateOfBirth: me.members.dateOfBirthInvalid } };
+
   const supabase = await createClient();
   const { data, error } = await supabase.rpc("register_member", {
     p_card_code: value.cardCode,
@@ -146,7 +163,7 @@ export async function updateMember(
   _state: ActionState,
   formData: FormData,
 ): Promise<ActionState> {
-  await requireStaff();
+  const staff = await requireStaff();
   const parsed = updateMemberSchema.safeParse({
     ...memberFieldsFrom(formData),
     memberId: formData.get("memberId"),
@@ -155,6 +172,9 @@ export async function updateMember(
     return { fieldErrors: fieldErrorsOf(parsed.error.issues) };
 
   const value = parsed.data;
+  if (await futureDateOfBirth(staff.gym_id, value.dateOfBirth))
+    return { fieldErrors: { dateOfBirth: me.members.dateOfBirthInvalid } };
+
   const supabase = await createClient();
   const { error } = await supabase.rpc("update_member", {
     p_member: value.memberId,
@@ -171,7 +191,14 @@ export async function updateMember(
   return { success: me.members.updated };
 }
 
-/** US-07.4 and BR-046: the owner types the member number to confirm. */
+/**
+ * US-07.4 and BR-046: the owner types the member number to confirm.
+ *
+ * SUSPECT-12: the number it is compared against comes from a hidden field of the same
+ * form, so the typing guards against the wrong member being picked by mistake, not
+ * against a determined browser. What actually protects the record is the role check
+ * below and `assert_staff_role(array['owner','admin'])` inside anonymize_member.
+ */
 export async function anonymizeMember(
   _state: ActionState,
   formData: FormData,

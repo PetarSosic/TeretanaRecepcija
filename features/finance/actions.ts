@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { requireStaff } from "@/lib/auth";
+import { gymToday } from "@/lib/gym-date";
 import { me } from "@/lib/i18n/me";
 import { fieldErrorsOf, rpcFailure } from "@/lib/rpc";
 import { deliverShiftReport } from "@/lib/shift-report";
@@ -14,6 +15,7 @@ import {
   backdatedVisitSchema,
   closeAnyShiftSchema,
   expenseSchema,
+  resendShiftSchema,
   voidExpenseSchema,
 } from "./schemas";
 
@@ -23,6 +25,22 @@ async function requireOwner() {
   if (staff.role !== "owner" && staff.role !== "admin")
     throw new Error("E_FORBIDDEN");
   return staff;
+}
+
+/**
+ * SUSPECT-06: BR-120 and BR-133 stop every one of these dates at gym_today, and only
+ * the database knows that date (BR-001). The schemas therefore check the shape and the
+ * bound is checked here, so the message the form already carries lands under its field
+ * instead of the general "Provjerite unesene podatke." the RPC would produce.
+ */
+async function futureDate(
+  gymId: string,
+  field: string,
+  value: string,
+): Promise<ActionState | null> {
+  return value > (await gymToday(gymId))
+    ? { fieldErrors: { [field]: me.finance.dateInvalid } }
+    : null;
 }
 
 function revalidateFinance() {
@@ -39,7 +57,7 @@ export async function saveExpense(
   _state: ActionState,
   formData: FormData,
 ): Promise<ActionState> {
-  await requireOwner();
+  const staff = await requireOwner();
   const parsed = expenseSchema.safeParse({
     categoryId: formData.get("categoryId") ?? "",
     description: formData.get("description") ?? "",
@@ -54,6 +72,9 @@ export async function saveExpense(
   });
   if (!parsed.success)
     return { fieldErrors: fieldErrorsOf(parsed.error.issues) };
+
+  const tooLate = await futureDate(staff.gym_id, "spentOn", parsed.data.spentOn);
+  if (tooLate) return tooLate;
 
   const supabase = await createClient();
   const { error } = await supabase.rpc("record_expense", {
@@ -104,7 +125,7 @@ export async function saveBackdatedVisit(
   _state: ActionState,
   formData: FormData,
 ): Promise<ActionState> {
-  await requireOwner();
+  const staff = await requireOwner();
   const parsed = backdatedVisitSchema.safeParse({
     memberId: formData.get("memberId") ?? "",
     date: formData.get("date") ?? "",
@@ -116,6 +137,9 @@ export async function saveBackdatedVisit(
   });
   if (!parsed.success)
     return { fieldErrors: fieldErrorsOf(parsed.error.issues) };
+
+  const tooLate = await futureDate(staff.gym_id, "date", parsed.data.date);
+  if (tooLate) return tooLate;
 
   const supabase = await createClient();
   const { error } = await supabase.rpc("backdated_visit", {
@@ -139,7 +163,7 @@ export async function saveBackdatedMembership(
   _state: ActionState,
   formData: FormData,
 ): Promise<ActionState> {
-  await requireOwner();
+  const staff = await requireOwner();
   const parsed = backdatedMembershipSchema.safeParse({
     memberId: formData.get("memberId") ?? "",
     planId: formData.get("planId") ?? "",
@@ -152,6 +176,9 @@ export async function saveBackdatedMembership(
   });
   if (!parsed.success)
     return { fieldErrors: fieldErrorsOf(parsed.error.issues) };
+
+  const tooLate = await futureDate(staff.gym_id, "paidOn", parsed.data.paidOn);
+  if (tooLate) return tooLate;
 
   const supabase = await createClient();
   const { error } = await supabase.rpc("backdated_membership", {
@@ -176,7 +203,7 @@ export async function saveBackdatedDayPasses(
   _state: ActionState,
   formData: FormData,
 ): Promise<ActionState> {
-  await requireOwner();
+  const staff = await requireOwner();
   const parsed = backdatedDayPassSchema.safeParse({
     quantity: formData.get("quantity") ?? "",
     method: formData.get("method") ?? "",
@@ -184,6 +211,9 @@ export async function saveBackdatedDayPasses(
   });
   if (!parsed.success)
     return { fieldErrors: fieldErrorsOf(parsed.error.issues) };
+
+  const tooLate = await futureDate(staff.gym_id, "paidOn", parsed.data.paidOn);
+  if (tooLate) return tooLate;
 
   const supabase = await createClient();
   const { error } = await supabase.rpc("backdated_day_passes", {
@@ -202,7 +232,7 @@ export async function saveBackdatedCardFee(
   _state: ActionState,
   formData: FormData,
 ): Promise<ActionState> {
-  await requireOwner();
+  const staff = await requireOwner();
   const parsed = backdatedCardFeeSchema.safeParse({
     memberId: formData.get("memberId") ?? "",
     method: formData.get("method") ?? "",
@@ -210,6 +240,9 @@ export async function saveBackdatedCardFee(
   });
   if (!parsed.success)
     return { fieldErrors: fieldErrorsOf(parsed.error.issues) };
+
+  const tooLate = await futureDate(staff.gym_id, "paidOn", parsed.data.paidOn);
+  if (tooLate) return tooLate;
 
   const supabase = await createClient();
   const { error } = await supabase.rpc("backdated_card_fee", {
@@ -259,21 +292,25 @@ export async function resendShiftReport(
   formData: FormData,
 ): Promise<ActionState> {
   const staff = await requireOwner();
-  const shiftId = String(formData.get("shiftId") ?? "");
-  if (!/^[0-9a-f-]{36}$/i.test(shiftId)) return { error: me.errors.E_VALIDATION };
+  // SUSPECT-10: a hand-rolled shape let through text that is not a UUID at all, and the
+  // query then failed with 22P02 whose error nobody read, so a malformed identifier
+  // answered "Nemate dozvolu" instead of saying the input was wrong.
+  const parsed = resendShiftSchema.safeParse({ shiftId: formData.get("shiftId") });
+  if (!parsed.success) return { error: me.errors.E_VALIDATION };
 
   // The report pipeline runs with the service role, so the shift is checked against the
   // owner's own gym first: a shift from anywhere else is simply not theirs to resend.
   const supabase = await createClient();
-  const { data: shift } = await supabase
+  const { data: shift, error } = await supabase
     .from("shifts")
     .select("id")
-    .eq("id", shiftId)
+    .eq("id", parsed.data.shiftId)
     .eq("gym_id", staff.gym_id)
     .maybeSingle<{ id: string }>();
+  if (error) return rpcFailure(error);
   if (!shift) return { error: me.errors.E_FORBIDDEN };
 
-  const outcome = await deliverShiftReport(shiftId);
+  const outcome = await deliverShiftReport(parsed.data.shiftId);
   revalidatePath("/finance/shifts");
   return outcome === "sent"
     ? { success: me.finance.resent }

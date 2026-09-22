@@ -16,10 +16,14 @@ export async function GET(
 
   const { batchId } = await params;
   const supabase = await createClient();
+  // SUSPECT-04: the batch is checked against the caller's own gym here as well, so the
+  // route does not rest on `card_batches_select` alone — the same two layers the shift
+  // report route has.
   const { data: batch } = await supabase
     .from("card_batches")
     .select("id, gym_id, created_at")
     .eq("id", batchId)
+    .eq("gym_id", staff.gym_id)
     .maybeSingle<{ id: string; gym_id: string; created_at: string }>();
   if (!batch) return new NextResponse(null, { status: 404 });
 

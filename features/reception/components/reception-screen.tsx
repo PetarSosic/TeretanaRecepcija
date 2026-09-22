@@ -40,6 +40,9 @@ import type { ReceptionPanel, ScanOutcome, SearchResult } from "../types";
 import { useCheckInFlow } from "./check-in-flow";
 
 /** BR-070: the card answers S-03 shows in its status area (red, 5 s, no dialog). */
+/** SUSPECT-09: how long a half-typed scan waits before it is forgotten. */
+const SCAN_IDLE_MS = 1000;
+
 const CARD_MESSAGES: Record<string, string> = {
   invalid: getErrorMessage("E_CARD_INVALID"),
   unknown: getErrorMessage("E_CARD_UNKNOWN"),
@@ -131,6 +134,11 @@ export function ReceptionScreen({
   // scan. A result dialog does not stop it (the next scan replaces it); S-03a, S-03e and
   // the form dialogs do, and a field with focus keeps its own typing.
   const buffer = useRef("");
+  // SUSPECT-09 and D-47: a scanner sends its ten digits in well under a second, so a
+  // buffer still sitting there a second later came from a stray keypress. Without this
+  // it never emptied on its own, and every later character — Space on a focused button
+  // included — was swallowed into it until someone pressed Enter.
+  const idle = useRef<ReturnType<typeof setTimeout> | null>(null);
   const blocked =
     flow.scanBlocked ||
     registerCard !== null ||
@@ -142,8 +150,14 @@ export function ReceptionScreen({
       const target = event.target as HTMLElement | null;
       if (target?.closest("input, textarea, select, [contenteditable=true]"))
         return;
+      function forget() {
+        if (idle.current) clearTimeout(idle.current);
+        idle.current = null;
+      }
+
       if (event.key === "Enter") {
         if (!buffer.current) return;
+        forget();
         // The Enter belongs to the scan, not to a focused dialog button.
         event.preventDefault();
         event.stopPropagation();
@@ -161,10 +175,18 @@ export function ReceptionScreen({
       ) {
         buffer.current = (buffer.current + event.key).slice(-40);
         event.preventDefault();
+        forget();
+        idle.current = setTimeout(() => {
+          buffer.current = "";
+          idle.current = null;
+        }, SCAN_IDLE_MS);
       }
     }
     window.addEventListener("keydown", onKey, true);
-    return () => window.removeEventListener("keydown", onKey, true);
+    return () => {
+      window.removeEventListener("keydown", onKey, true);
+      if (idle.current) clearTimeout(idle.current);
+    };
   }, [blocked, run]);
 
   return (

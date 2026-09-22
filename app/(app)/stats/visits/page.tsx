@@ -7,9 +7,11 @@ import { PeriodPicker } from "@/features/finance/components/period-picker";
 import { periodFromParams } from "@/features/finance/period";
 import { CountBars } from "@/features/stats/components/count-bars";
 import { requireStaff } from "@/lib/auth";
+import { getErrorMessage } from "@/lib/errors";
 import { formatDate, formatDuration } from "@/lib/format";
 import { gymToday } from "@/lib/gym-date";
 import { me } from "@/lib/i18n/me";
+import { rpcCode } from "@/lib/rpc";
 import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = {
@@ -52,18 +54,23 @@ export default async function VisitStatsPage({
   );
 
   const supabase = await createClient();
-  const { data } = await supabase.rpc("visit_stats", {
+  // SUSPECT-01: a rejected call answers with null data, so an unread error would read
+  // as an empty period — a period over 400 days (doc 08 §9) is the case that happens.
+  const { data, error } = await supabase.rpc("visit_stats", {
     p_from: period.from,
     p_to: period.to,
   });
-  const stats = data as Stats | null;
+  const failure = error ? getErrorMessage(rpcCode(error)) : null;
+  const stats = failure ? null : (data as Stats | null);
 
   return (
     <div className="grid gap-8">
       <h1 className="text-2xl font-semibold tracking-tight">{me.stats.title}</h1>
       <PeriodPicker period={period} />
 
-      {!stats || stats.total === 0 ? (
+      {failure ? (
+        <p className="text-sm text-danger">{failure}</p>
+      ) : !stats || stats.total === 0 ? (
         <p className="text-sm text-muted-foreground">{me.stats.empty}</p>
       ) : (
         <>

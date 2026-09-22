@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
 import { Table, TableWrapper, Td, Th } from "@/components/ui/table";
-import { formatMoney, formatTime } from "@/lib/format";
+import { formatClockTime, formatMoney } from "@/lib/format";
 import { me } from "@/lib/i18n/me";
 import {
   saveAssignment,
@@ -522,7 +522,7 @@ function ScheduleSection({
               slots.map((slot) => (
                 <tr key={slot.id}>
                   <Td>{me.settings.weekdays[slot.weekday - 1]}</Td>
-                  <Td>{formatTime(`1970-01-01T${slot.starts_at}`)}</Td>
+                  <Td>{formatClockTime(slot.starts_at)}</Td>
                   <Td>{trainerName.get(slot.trainer_id)}</Td>
                   <Td>{slot.is_active ? me.users.yes : me.users.no}</Td>
                   <Td className="text-right">

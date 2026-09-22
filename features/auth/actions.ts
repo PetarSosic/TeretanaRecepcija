@@ -33,9 +33,20 @@ export async function loginWithUsernameOrEmail(
   if (!parsed.success) return { error: me.login.failed };
 
   const { identifier, password } = parsed.data;
-  const email = isEmail(identifier)
-    ? identifier.toLowerCase()
-    : usernameEmail(identifier);
+  // SUSPECT-03: usernameEmail throws when STAFF_EMAIL_DOMAIN is missing or malformed
+  // (AS-4). Uncaught, that replaces S-01 with the error screen and nobody with a
+  // username can sign in; the misconfiguration belongs in the log, not on the screen.
+  let email: string;
+  try {
+    email = isEmail(identifier)
+      ? identifier.toLowerCase()
+      : usernameEmail(identifier);
+  } catch (misconfiguration) {
+    console.error(
+      `loginWithUsernameOrEmail: ${(misconfiguration as Error).message}`,
+    );
+    return { error: me.login.failed };
+  }
 
   const supabase = await createClient();
   const { error } = await supabase.auth.signInWithPassword({ email, password });
@@ -118,8 +129,16 @@ export async function changeOwnPassword(
   if (!staff.must_change_password) {
     const current = parsed.data.current ?? "";
     if (!current) return { fieldErrors: { current: me.password.wrongCurrent } };
+    // SUSPECT-03: loginEmail throws on the same misconfiguration as the sign-in above.
+    let email: string;
+    try {
+      email = loginEmail(staff);
+    } catch (misconfiguration) {
+      console.error(`changePassword: ${(misconfiguration as Error).message}`);
+      return { error: me.errors.unexpected };
+    }
     const { error } = await supabase.auth.signInWithPassword({
-      email: loginEmail(staff),
+      email,
       password: current,
     });
     if (error) return { fieldErrors: { current: me.password.wrongCurrent } };

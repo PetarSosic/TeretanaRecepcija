@@ -149,10 +149,10 @@ export function AppHeader({
 
       {/* BR-113: logging out leaves the shift open, so it is confirmed first. */}
       <Dialog open={confirming} onOpenChange={setConfirming}>
-        <DialogContent aria-describedby="signout-description">
+        <DialogContent>
           <DialogHeader>
             <DialogTitle>{me.shift.logoutTitle}</DialogTitle>
-            <DialogDescription id="signout-description">
+            <DialogDescription>
               {me.shift.logoutConfirm}
             </DialogDescription>
           </DialogHeader>

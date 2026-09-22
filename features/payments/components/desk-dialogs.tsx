@@ -149,10 +149,10 @@ export function DeskExpenseDialog({
 }: OpenProps & { categories: ExpenseCategory[] }) {
   return (
     <Dialog open={props.open} onOpenChange={props.onOpenChange}>
-      <DialogContent aria-describedby="desk-expense-note">
+      <DialogContent>
         <DialogHeader>
           <DialogTitle>{me.deskExpense.title}</DialogTitle>
-          <DialogDescription id="desk-expense-note">
+          <DialogDescription>
             {me.deskExpense.fixedNote}
           </DialogDescription>
         </DialogHeader>

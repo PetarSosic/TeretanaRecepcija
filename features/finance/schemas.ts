@@ -23,6 +23,18 @@ const time = z
     message: me.finance.timeInvalid,
   });
 
+/** The same tolerant checkbox reading the settings forms use (doc 08 §6). */
+const checkbox = z
+  .union([
+    z.literal("on"),
+    z.literal("true"),
+    z.literal("false"),
+    z.boolean(),
+    z.null(),
+    z.undefined(),
+  ])
+  .transform((value) => value === true || value === "on" || value === "true");
+
 /** BR-133: €0.01 to €100,000.00, as a decimal string (BR-003). */
 const expenseAmount = z
   .string()
@@ -49,7 +61,9 @@ export const expenseSchema = z
     method: z.enum(["cash", "card", "none"], {
       message: me.errors.E_VALIDATION,
     }),
-    fromTill: z.coerce.boolean(),
+    // SUSPECT-08: z.coerce.boolean() turns every non-empty string into true, "false"
+    // included. Only the checkbox's own values are accepted instead.
+    fromTill: checkbox,
     supplier: z.string().trim().max(100, me.errors.E_VALIDATION),
     invoice: z.string().trim().max(50, me.errors.E_VALIDATION),
     vat: z.enum(["yes", "no", "unset"]),
@@ -136,6 +150,9 @@ export const backdatedCardFeeSchema = z.object({
   method: z.enum(["cash", "card"], { message: me.memberships.methodRequired }),
   paidOn: isoDate,
 });
+
+/** S-19 [Pošalji ponovo] (BR-118): the shift whose report goes out again. */
+export const resendShiftSchema = z.object({ shiftId: z.string().uuid() });
 
 /** S-19: the owner closes an open shift, with the counted cash optional (BR-114). */
 export const closeAnyShiftSchema = z.object({

@@ -452,10 +452,10 @@ function ConfirmCheckOutDialog({
   const [pending, run] = useRunner();
   return (
     <Dialog open onOpenChange={(open) => !open && onCancel()}>
-      <DialogContent aria-describedby="confirm-checkout-text">
+      <DialogContent>
         <DialogHeader>
           <DialogTitle>{me.reception.checkOut}</DialogTitle>
-          <DialogDescription id="confirm-checkout-text" className="text-base">
+          <DialogDescription className="text-base">
             {me.reception.confirmCheckout
               .replace("{name}", fullName(member))
               .replace("{seconds}", String(seconds))}
@@ -511,7 +511,6 @@ function ResultDialog({
     return (
       <Dialog open onOpenChange={(open) => !open && onClose()}>
         <DialogContent
-          aria-describedby="checkin-ok-details"
           className="border-success border-4"
           data-result="covered"
         >
@@ -521,21 +520,27 @@ function ResultDialog({
               {name}
             </DialogTitle>
           </DialogHeader>
-          <dl
-            id="checkin-ok-details"
-            className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-base"
-          >
-            <dt className="text-muted-foreground">{me.reception.membership}</dt>
-            <dd className="font-medium">{result.plan_name}</dd>
-            <dt className="text-muted-foreground">{me.reception.validUntil}</dt>
-            <dd>{result.end_date ? formatDate(result.end_date) : "—"}</dd>
-            <dt className="text-muted-foreground">{me.reception.remaining}</dt>
-            <dd>{remaining}</dd>
-            <dt className="text-muted-foreground">{me.reception.status}</dt>
-            <dd>
-              {result.status ? me.memberships.status[result.status] : "—"}
-            </dd>
-          </dl>
+          {/* The details are the dialog's description, so Radix names them. */}
+          <DialogDescription asChild>
+            <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-base">
+              <dt className="text-muted-foreground">
+                {me.reception.membership}
+              </dt>
+              <dd className="font-medium">{result.plan_name}</dd>
+              <dt className="text-muted-foreground">
+                {me.reception.validUntil}
+              </dt>
+              <dd>{result.end_date ? formatDate(result.end_date) : "—"}</dd>
+              <dt className="text-muted-foreground">
+                {me.reception.remaining}
+              </dt>
+              <dd>{remaining}</dd>
+              <dt className="text-muted-foreground">{me.reception.status}</dt>
+              <dd>
+                {result.status ? me.memberships.status[result.status] : "—"}
+              </dd>
+            </dl>
+          </DialogDescription>
         </DialogContent>
       </Dialog>
     );
@@ -545,7 +550,6 @@ function ResultDialog({
   return (
     <Dialog open onOpenChange={(open) => !open && onClose()}>
       <DialogContent
-        aria-describedby="checkin-unpaid-text"
         data-result={red ? "red" : "yellow"}
         className={cn(
           red
@@ -568,7 +572,6 @@ function ResultDialog({
             {name}
           </DialogTitle>
           <DialogDescription
-            id="checkin-unpaid-text"
             className={cn(
               red
                 ? "text-5xl leading-tight font-bold text-white"

@@ -137,6 +137,14 @@ export async function deleteTestGym(gymId: string): Promise<void> {
       .from("backups")
       .remove(backups.data.map((file) => `${gymId}/${file.name}`));
 
+  // M-03 (S-26): an uploaded logo (gym-assets/<gym_id>/…). Without this the file
+  // outlives the gym it belonged to and leaves an orphan folder in the bucket.
+  const assets = await admin.storage.from("gym-assets").list(gymId);
+  if (assets.data?.length)
+    await admin.storage
+      .from("gym-assets")
+      .remove(assets.data.map((file) => `${gymId}/${file.name}`));
+
   const steps: [string, string][] = [
     ["audit_log", "gym_id"],
     // M-11: the job records, and the reminders that point at memberships.
