@@ -445,7 +445,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** 1–3: sve radi, sesija se čuva, zaglavlje i značka smjene su isti u obje
   kartice. 4: druga kartica vas vraća na `/login` (sesija je zajednička za browser).
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** Dodatna SEC-06 provjera: Nazad nakon odjave ostaje na /login. Osvježavanje i sinhronizacija dvije kartice nisu izvršeni kao cijeli scenario.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-high-a.spec.ts`: F5 na recepciji zadržava sesiju i značku; `/members` → nazad → naprijed radi; druga kartica na `/payments/today` ima istu značku; odjava u prvoj kartici (uz potvrdu da smjena ostaje otvorena), klik u meniju druge kartice vodi na `/login`. Raniji dokaz (22.09.): Dodatna SEC-06 provjera: Nazad nakon odjave ostaje na /login. Osvježavanje i sinhronizacija dvije kartice nisu izvršeni kao cijeli scenario.
 
 ### [AUTH-22] Razmaci i velika slova u korisničkom imenu
 - **Prioritet:** Srednje
@@ -561,7 +561,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** recepcioner vidi samo današnje uplate; vlasnik vidi sve, uključujući
   naknadne (oznaka „Naknadno“) i poništene (oznaka „Poništeno“, precrtano).
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** DB 0006_members i 0008_desk_money: RLS vidljivost uplata/troškova po ulogama prolazi. Nije u cijelosti upoređen svaki red i oznaka u UI-ju.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-high-a.spec.ts`: član sa naknadnom uplatom od prije 3 dana, poništenom od prije 2 dana i današnjom prodajom: recepcioner na kartici „Uplate“ vidi samo današnju; vlasnik vidi sve tri, dvije sa „Naknadno“, poništenu sa „Poništeno“ i precrtanu. Raniji dokaz (22.09.): DB 0006_members i 0008_desk_money: RLS vidljivost uplata/troškova po ulogama prolazi. Nije u cijelosti upoređen svaki red i oznaka u UI-ju.
 
 ### [PERM-08] Lozinke zaposlenih vidi samo administrator
 - **Prioritet:** Kritično (bezbjednost)
@@ -591,7 +591,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Test podaci:** id serije iz S-28
 - **Očekivani rezultat:** vlasnik, administrator i menadžer dobijaju PDF; recepcioner 404.
 - **Gdje provjeriti:** browser
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E cards.spec.ts: vlasnik preuzima PDF, recepcioner dobija 404. Admin/menadžer nisu zasebno preuzeli PDF.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-high-a.spec.ts`: `/api/pdf/cards/<batchId>` vraća PDF vlasniku, administratoru i menadžeru, a 404 bez PDF-a recepcioneru. Raniji dokaz (22.09.): E2E cards.spec.ts: vlasnik preuzima PDF, recepcioner dobija 404. Admin/menadžer nisu zasebno preuzeli PDF.
 
 ### [PERM-11] Izmišljeni i tuđi identifikatori u URL-u
 - **Prioritet:** Kritično (bezbjednost)
@@ -680,7 +680,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** prazno i `0` i `1000` prolaze. `abc`, `-5` i `12,345` (tri decimale)
   daju „Unesite iznos ili ostavite prazno.“
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E preuzimanje prihvata 120,50; pgTAP pokriva preuzimanje. Cijela tabela prazno/abc/-5/12,345/0/1000 nije izvršena.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO uz napomenu.** `test-plan-high-a.spec.ts`: `abc`, `-5`, `12,345` → „Unesite iznos ili ostavite prazno.“ i ostaje se na S-02; `1000`, `0` i prazno prolaze (tri uzastopna preuzimanja), u bazi 1000, 0 i `null`. Napomena: nakon poruke forma briše upisanu vrijednost (§9.9). Raniji dokaz (22.09.): E2E preuzimanje prihvata 120,50; pgTAP pokriva preuzimanje. Cijela tabela prazno/abc/-5/12,345/0/1000 nije izvršena.
 
 ### [SHIFT-05] Odjava sa S-02 ne dira tuđu smjenu
 - **Prioritet:** Visoko
@@ -806,7 +806,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Test podaci:** —
 - **Očekivani rezultat:** poruka „Izaberite trenera.“, dolazak nije evidentiran.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** DB 0007 provjerava pravila trenera/programa i izbor termina; UI poruke i kompletne liste trenera nisu ponovljene.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-high-a.spec.ts`: u dijalogu je prazan izbor trenera onemogućen i [Prijavi] traži trenera, pa se kroz UI ne može poslati. Krivotvoren zahtjev sa `trainerId: null` za grupni dolazak vraća „Izaberite trenera.“; dolazak nije upisan. Raniji dokaz (22.09.): DB 0007 provjerava pravila trenera/programa i izbor termina; UI poruke i kompletne liste trenera nisu ponovljene.
 
 ### [REC-05] Trener koji nije na programu (BR-023)
 - **Prioritet:** Visoko
@@ -818,7 +818,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   Ako ipak pokušate da sačuvate takvog trenera (npr. izmjenom zahtjeva), odgovor je
   „Trener nije dodijeljen ovom programu.“
 - **Gdje provjeriti:** UI, Network tab
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** DB 0007 provjerava pravila trenera/programa i izbor termina; UI poruke i kompletne liste trenera nisu ponovljene.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-high-a.spec.ts`: za Grupni se nude samo Milena i Julija (dodijeljene grupnom programu), za Personalni Julija i Tatjana. Krivotvoren zahtjev sa Tatjanom za grupni dolazak vraća „Trener nije dodijeljen ovom programu.“; dolazak nije upisan. Raniji dokaz (22.09.): DB 0007 provjerava pravila trenera/programa i izbor termina; UI poruke i kompletne liste trenera nisu ponovljene.
 
 ### [REC-06] Prvi neplaćeni dolazak — žuto upozorenje
 - **Prioritet:** Kritično
@@ -863,7 +863,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** pitanje „<ime> je prijavljen/a prije N s. Odjaviti?“ sa [Odjavi] i [Ne].
   [Ne] ostavlja člana unutra; [Odjavi] ga odjavljuje.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E reception.spec.ts i DB 0007 pokrivaju odjavu i zaštitu od duplog skena. Sve grane [Ne]/[Odjavi] i tačan prikaz trajanja nisu posebno upoređeni.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-reception.spec.ts` (REC-08/REC-07): ponovno skeniranje unutar 120 s pita „<ime> je prijavljen/a prije N s. Odjaviti?“; [Ne] ostavlja člana unutra, [Odjavi] ga odjavljuje uz „Odjavljen/a: … – 0h 0min“. Raniji dokaz (22.09.): E2E reception.spec.ts i DB 0007 pokrivaju odjavu i zaštitu od duplog skena. Sve grane [Ne]/[Odjavi] i tačan prikaz trajanja nisu posebno upoređeni.
 
 ### [REC-10] Promjena praga duplog skeniranja
 - **Prioritet:** Srednje
@@ -895,7 +895,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Test podaci:** —
 - **Očekivani rezultat:** poruka „Član je već u teretani.“, ništa se ne evidentira.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** DB 0007 potvrđuje jedan otvoreni dolazak i odbijanje ponovne prijave. Ručni klik rezultata pretrage nije zasebno izvršen.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-high-a.spec.ts`: član unutra, izabran iz rezultata pretrage na recepciji → „Član je već u teretani.“; i dalje tačno jedan dolazak u bazi. Raniji dokaz (22.09.): DB 0007 potvrđuje jedan otvoreni dolazak i odbijanje ponovne prijave. Ručni klik rezultata pretrage nije zasebno izvršen.
 
 ### [REC-13] Pretraga člana na recepciji
 - **Prioritet:** Visoko
@@ -907,7 +907,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   redova. Pretraga po imenu ignoriše velika/mala slova i kvačice (`anic` nalazi „Anić“). Za `zzzz`:
   „Nema članova koji odgovaraju pretrazi.“ Svaki red ima dugme [Otvori profil].
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** DB 0006 i E2E members.spec.ts potvrđuju pretragu bez kvačica; dodatna UI provjera praznog rezultata. Ostali upiti i mjerenje 250 ms nisu potpuno izvršeni.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO uz napomenu.** `test-plan-high-a.spec.ts`: `ani` daje tačno 8 redova (od 11 Anića), svaki sa [Otvori profil]; `anic` i `ANIĆ` nalaze „Anić“; broj `3` nalazi člana #3; `0691` nalazi po telefonu; `zzzz` → „Nema članova koji odgovaraju pretrazi.“ Napomene (§9.9): samo `069` ne nalazi nikoga po telefonu (potrebne su 3 cifre nakon vodeće nule); rezultati su stigli ~0,85 s nakon posljednjeg znaka na dev serveru (250 ms čekanja + upit). Raniji dokaz (22.09.): DB 0006 i E2E members.spec.ts potvrđuju pretragu bez kvačica; dodatna UI provjera praznog rezultata. Ostali upiti i mjerenje 250 ms nisu potpuno izvršeni.
 
 ### [REC-14] Escape i brisanje pretrage
 - **Prioritet:** Nisko
@@ -927,7 +927,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** to je pretraga, a **ne** skeniranje: ne pojavljuje se poruka o kartici.
   Isto važi dok je otvoren dijalog „Novi član“, „Dnevna karta“ ili „Trošak“.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** Dodatni UI test: 1234567890 + Enter u pretrazi ne skenira karticu. Nije ponovljeno u sva tri navedena dijaloga.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-high-a.spec.ts`: `1234567890` + Enter u polju pretrage je pretraga, bez poruke o kartici; kucanje cifara u otvorenim dijalozima „Trošak“, „Dnevna karta“ i „Novi član“ ne pokreće skeniranje; nije evidentirana nijedna uplata. Raniji dokaz (22.09.): Dodatni UI test: 1234567890 + Enter u pretrazi ne skenira karticu. Nije ponovljeno u sva tri navedena dijaloga.
 
 ### [REC-16] Slučajno kucanje po ekranu
 - **Prioritet:** Srednje
@@ -948,7 +948,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   oznaku vrste dolaska, vrijeme ulaska i trajanje koje se osvježava svakog minuta. Nakon [Odjavi]
   član nestaje, a brojač „U teretani“ pada na 1. Prazno stanje: „Trenutno nema nikoga u teretani.“
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** DB 0007 reception_panel i E2E reception provjeravaju prisutne članove; sve promjene brojača između dva pulta nisu upoređene.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO uz napomenu.** `test-plan-high-a.spec.ts`: sa dva člana „U teretani: 2 · Danas dolazaka: 2“; red ima ime, broj, vrstu dolaska, vrijeme ulaska i trajanje; trajanje prelazi sa „0h 1min“ na „0h 2min“ poslije minuta; [Odjavi] spušta brojač na 1, pa „Trenutno nema nikoga u teretani.“ Napomena: brojač otkucava od učitavanja stranice, pa trajanje kasni do minut (§9.9). Raniji dokaz (22.09.): DB 0007 reception_panel i E2E reception provjeravaju prisutne članove; sve promjene brojača između dva pulta nisu upoređene.
 
 ### [REC-18] Zvuk se uključuje jednom po sesiji browsera
 - **Prioritet:** Srednje
