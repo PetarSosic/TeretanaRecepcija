@@ -777,7 +777,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   („Aktivna“). Čuje se zvuk potvrde. Dijalog se sam zatvara nakon 5 sekundi. Član se pojavljuje u
   listi „U teretani“ i brojač „Danas dolazaka“ raste za 1.
 - **Gdje provjeriti:** UI; desna tabla „U teretani: N · Danas dolazaka: M“
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E reception.spec.ts + DB 0007: pokriveni/žuti/crveni dolazak i upis u bazu prolaze. Zvuk nije preslušan; svi vremenski i vizuelni detalji nisu pojedinačno provjereni.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-reception.spec.ts`: jedno skeniranje, bez klika, otvara zeleni dijalog sa imenom i brojem člana, „Članarina“, „Važi do“, „Preostalo termina: Neograničeno“ i „Status: Aktivna“; dijalog je još otvoren nakon 3 s i sam se zatvara nakon ~5 s; „U teretani: 1 · Danas dolazaka: 1“ i član u listi. Zvuk nije preslušan (automatski test ga ne čuje). Raniji dokaz (22.09.): E2E reception.spec.ts + DB 0007: pokriveni/žuti/crveni dolazak i upis u bazu prolaze. Zvuk nije preslušan; svi vremenski i vizuelni detalji nisu pojedinačno provjereni.
 
 ### [REC-03] Izbor vrste dolaska kada članarina pokriva više toga (S-03a)
 - **Prioritet:** Kritično
@@ -789,7 +789,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   Kad izaberete Grupni, pojavljuju se „Trener“ i „Čas“. Trener je predložen, a čas je ili
   „Čas: HH:MM“ iz rasporeda (ako je u roku od 90 minuta) ili „Bez časa iz rasporeda“.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E reception.spec.ts: G+T izbor grupnog dolaska, trenera i aktuelnog časa. Sve ponuđene/predizabrane vrijednosti i varijanta bez časa nisu zasebno provjerene.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-reception.spec.ts`: G+T član → „Prijava: <ime>“, Teretana predizabrana, Grupni ponuđen; trener i čas se pojavljuju tek za Grupni, predložena je trenerica članarine i „Čas: HH:MM“ iz rasporeda. Bez časa u roku od 90 min nudi se „Bez časa iz rasporeda“. Zatvaranje dijaloga ne upisuje dolazak. Raniji dokaz (22.09.): E2E reception.spec.ts: G+T izbor grupnog dolaska, trenera i aktuelnog časa. Sve ponuđene/predizabrane vrijednosti i varijanta bez časa nisu zasebno provjerene.
 
 ### [REC-04] Grupni dolazak bez trenera se ne može sačuvati
 - **Prioritet:** Visoko
@@ -821,7 +821,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   dolazak.“ i dugmadima [Produži članarinu] i [Zatvori]. Zvuk je drugačiji nego kod zelenog.
   Dijalog se **ne** zatvara sam. Dolazak je ipak evidentiran (ulaz se ne brani, BR-078).
 - **Gdje provjeriti:** UI; profil člana → kartica „Dolasci“ (oznaka „Neplaćeno“)
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E reception.spec.ts + DB 0007: pokriveni/žuti/crveni dolazak i upis u bazu prolaze. Zvuk nije preslušan; svi vremenski i vizuelni detalji nisu pojedinačno provjereni.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-reception.spec.ts`: član bez članarine → žuti dijalog sa imenom, „Članarina nije važeća – neplaćeni dolazak.“, [Produži članarinu] i [Zatvori]; i nakon 7 s je otvoren. Dolazak je upisan (`is_unpaid`, bez članarine); profil pokazuje „Neplaćeno“ i „Neplaćeni dolasci: 1“. Zvuk nije preslušan. Raniji dokaz (22.09.): E2E reception.spec.ts + DB 0007: pokriveni/žuti/crveni dolazak i upis u bazu prolaze. Zvuk nije preslušan; svi vremenski i vizuelni detalji nisu pojedinačno provjereni.
 
 ### [REC-07] Drugi neplaćeni dolazak — crveni ekran preko cijelog prozora
 - **Prioritet:** Kritično
@@ -834,7 +834,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** **crveni** ekran preko cijelog prozora sa tekstom „PAŽNJA: 2. neplaćeni
   dolazak!“, dugmad [Produži članarinu] i [Zatvori], i treći, uzbunjujući zvuk.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E reception.spec.ts + DB 0007: pokriveni/žuti/crveni dolazak i upis u bazu prolaze. Zvuk nije preslušan; svi vremenski i vizuelni detalji nisu pojedinačno provjereni.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-reception.spec.ts`: odjava pa nova prijava istog člana → crveni ekran preko cijelog prozora (1366×768 od 1366×768) sa „PAŽNJA: 2. neplaćeni dolazak!“, [Produži članarinu] i [Zatvori]. Zvuk nije preslušan. Raniji dokaz (22.09.): E2E reception.spec.ts + DB 0007: pokriveni/žuti/crveni dolazak i upis u bazu prolaze. Zvuk nije preslušan; svi vremenski i vizuelni detalji nisu pojedinačno provjereni.
 
 ### [REC-08] Odjava skeniranjem i prikaz trajanja
 - **Prioritet:** Kritično
@@ -845,7 +845,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** zeleni „toast“ sa tekstom „Odjavljen/a: <ime> – Xh Ymin“. Član nestaje
   iz liste „U teretani“.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E reception.spec.ts i DB 0007 pokrivaju odjavu i zaštitu od duplog skena. Sve grane [Ne]/[Odjavi] i tačan prikaz trajanja nisu posebno upoređeni.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-reception.spec.ts`: unutar 120 s skeniranje pita „… prije N s. Odjaviti?“; [Ne] ostavlja člana unutra, [Odjavi] ga odjavljuje uz „Odjavljen/a: … – 0h 0min“. Član unutra 1 h 35 min se odjavljuje bez pitanja uz „Odjavljen/a: E2E Ana Anić – 1h 35min“ i nestaje iz liste. Raniji dokaz (22.09.): E2E reception.spec.ts i DB 0007 pokrivaju odjavu i zaštitu od duplog skena. Sve grane [Ne]/[Odjavi] i tačan prikaz trajanja nisu posebno upoređeni.
 
 ### [REC-09] Zaštita od duplog skeniranja
 - **Prioritet:** Visoko
@@ -878,7 +878,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   „Nepoznata kartica.“ · „Kartica je poništena. Pronađite člana pretragom.“ ·
   „Neispravan kod kartice.“ (za sva tri neispravna oblika).
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E: neispravan i nepoznat kod; DB 0007: i poništena kartica. Dodatno UI: neispravan kod nestaje nakon 5 s. Nisu svih pet unosa ponovljeni u UI-ju.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO uz napomenu o planu.** `test-plan-reception.spec.ts`: `1234567890` → „Nepoznata kartica.“; poništena kartica → „Kartica je poništena. Pronađite člana pretragom.“; `12345` i `12345678901` → „Neispravan kod kartice.“; svaka poruka je u statusnoj liniji, bez dijaloga, i nestaje. `abcdefghij` ne daje ništa: slova se namjerno ne tretiraju kao skener (REC-16, SUSPECT-09) — red iz plana za slova protivrječi REC-16. Raniji dokaz (22.09.): E2E: neispravan i nepoznat kod; DB 0007: i poništena kartica. Dodatno UI: neispravan kod nestaje nakon 5 s. Nisu svih pet unosa ponovljeni u UI-ju.
 
 ### [REC-12] Član je već u teretani (ručna prijava)
 - **Prioritet:** Visoko
@@ -1061,7 +1061,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   | `+3821234567890123456` | ista poruka (više od 15 cifara) |
 - **Očekivani rezultat:** kako je u tablici; ispravan broj se u profilu prikazuje u `+382…` obliku.
 - **Gdje provjeriti:** UI; profil člana
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** Unit phone.test.ts + members.test.ts, DB 0006 i UI normalizacija 067 123 456 → +38267123456. Cijela tabela unosa nije ponovljena u UI-ju.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-reception.spec.ts` (dijalog „Uredi podatke“, ista provjera kao „Novi član“): `069123456`, `+382…`, `00382…`, sa razmacima i sa `-`/`/` → sačuvano kao `+382…` i tako prikazano na profilu; `1234567`, `06912345a`, prazno i 19 cifara → „Unesite ispravan broj telefona sa pozivnim brojem.“ Raniji dokaz (22.09.): Unit phone.test.ts + members.test.ts, DB 0006 i UI normalizacija 067 123 456 → +38267123456. Cijela tabela unosa nije ponovljena u UI-ju.
 
 ### [MEM-06] Datum rođenja — format i granice
 - **Prioritet:** Kritično
@@ -1179,7 +1179,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** dugmeta nema za recepcionera i menadžera; postoji za vlasnika i
   administratora.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E members.spec.ts: recepcioneru nema anonimizacije, vlasnik anonimizuje i profil postaje read-only; DB 0006 provjerava podatke. Admin i svi detalji istorije nisu posebno provjereni.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-reception.spec.ts`: na istom profilu [Anonimiziraj] nema za recepcionera i menadžera, a ima za vlasnika i administratora. Raniji dokaz (22.09.): E2E members.spec.ts: recepcioneru nema anonimizacije, vlasnik anonimizuje i profil postaje read-only; DB 0006 provjerava podatke. Admin i svi detalji istorije nisu posebno provjereni.
 
 ### [MEM-15] Anonimizacija traži tačan broj člana
 - **Prioritet:** Kritično
@@ -1266,7 +1266,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   je datum tog dolaska. Nakon čuvanja, ti dolasci **više nisu neplaćeni** (oznaka „Neplaćeno“ je
   nestala), a značka „Neplaćeni dolasci“ u zaglavlju profila je nestala.
 - **Gdje provjeriti:** UI; profil → „Dolasci“
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E reception.spec.ts i DB 0006/0007 potvrđuju povezivanje neplaćenih dolazaka i početak članarine. Sve poruke pregleda nisu pojedinačno upoređene.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO uz napomenu o planu.** `test-plan-reception.spec.ts`: član sa 2 neplaćena dolaska danas → „Počinje od prvog neplaćenog dolaska dd.mm.gggg“, početak = datum dolaska; oba dolaska povezana sa novom članarinom, značka „Neplaćeni dolasci“ nestaje. Oznaka „Neplaćeno“ uz same dolaske **ostaje**: glosar (doc 02) kaže da neplaćeni dolazak ostaje označen zauvijek radi istorije, pa je očekivanje plana da nestane netačno. Raniji dokaz (22.09.): E2E reception.spec.ts i DB 0006/0007 potvrđuju povezivanje neplaćenih dolazaka i početak članarine. Sve poruke pregleda nisu pojedinačno upoređene.
 
 ### [MSHIP-04] Prestari neplaćeni dolasci (E5, upozorenje)
 - **Prioritet:** Srednje
@@ -1519,7 +1519,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** „Uplata je ispravljena.“ Način je promijenjen. Polje iznosa je
   recepcioneru nedostupno ili daje „Samo vlasnik može mijenjati iznos.“
 - **Gdje provjeriti:** UI; vlasnik: `/finance/audit`
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E payments.spec.ts i DB 0008 pokrivaju ispravke, vlasnikovu promjenu iznosa, zaključenu smjenu i poništavanje članarine. Nisu sve negativne varijante i svaki tekst iz plana izvršeni kroz UI.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-money.spec.ts`: recepcioner u dijalogu ispravke nema polje iznosa; promjena načina na „Platna kartica“ i napomena „Greška pri naplati“ → „Uplata je ispravljena.“; u bazi `method = card`, napomena upisana, iznos 10 nepromijenjen. Vlasnik u `/finance/audit` vidi red „Izmjena · Uplate danas · note: — → Greška pri naplati, method: cash → card“. Raniji dokaz (22.09.): E2E payments.spec.ts i DB 0008 pokrivaju ispravke, vlasnikovu promjenu iznosa, zaključenu smjenu i poništavanje članarine. Nisu sve negativne varijante i svaki tekst iz plana izvršeni kroz UI.
 
 ### [PAY-09] Ispravka iznosa je vlasnikova
 - **Prioritet:** Kritično
@@ -1529,7 +1529,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** iznos je izmijenjen i vidi se u dnevnim ukupnostima i u izvještaju smjene.
   Napomena duža od 500 znakova daje „Napomena može imati najviše 500 znakova.“
 - **Gdje provjeriti:** UI; `/finance/audit`
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E payments.spec.ts i DB 0008 pokrivaju ispravke, vlasnikovu promjenu iznosa, zaključenu smjenu i poništavanje članarine. Nisu sve negativne varijante i svaki tekst iz plana izvršeni kroz UI.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-money.spec.ts`: vlasnik mijenja iznos na 70 → „Uplata je ispravljena.“, red pokazuje 70,00 €; podnožje „Otvorena smjena“ na S-12 i S-14 recepcionera pokazuju „Platna kartica (prihod) 70,00 €“. Raniji dokaz (22.09.): E2E payments.spec.ts i DB 0008 pokrivaju ispravke, vlasnikovu promjenu iznosa, zaključenu smjenu i poništavanje članarine. Nisu sve negativne varijante i svaki tekst iz plana izvršeni kroz UI.
 
 ### [PAY-10] Stavka iz zaključene smjene nije izmjenjiva (AS-14)
 - **Prioritet:** Kritično
@@ -1540,7 +1540,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   mijenjati.“ i dugmad [Ispravi]/[Poništi] su nedostupna. Vlasnik ih ima. Pokušaj ispravke bez
   dozvole daje „Ova stavka se ne može mijenjati (smjena je zaključena).“
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E payments.spec.ts i DB 0008 pokrivaju ispravke, vlasnikovu promjenu iznosa, zaključenu smjenu i poništavanje članarine. Nisu sve negativne varijante i svaki tekst iz plana izvršeni kroz UI.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-money.spec.ts`: nakon zaključenja smjene isti recepcioner (nova smjena) i menadžer vide stavku stare smjene sa onemogućenim [Ispravi]/[Poništi] i razlogom „Stavka iz zaključene smjene – samo vlasnik je može mijenjati.“; vlasnik ih ima omogućene. Poruka RPC-a za zaobiđeni UI nije ponovo izazvana (pokriva je DB test 0008). Raniji dokaz (22.09.): E2E payments.spec.ts i DB 0008 pokrivaju ispravke, vlasnikovu promjenu iznosa, zaključenu smjenu i poništavanje članarine. Nisu sve negativne varijante i svaki tekst iz plana izvršeni kroz UI.
 
 ### [PAY-11] Poništavanje uplate traži razlog (BR-095)
 - **Prioritet:** Kritično
@@ -1551,7 +1551,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   „Stavka je poništena.“ Stavka ostaje u listi, precrtana, sa oznakom „Poništeno“, i **ne ulazi** u
   ukupnosti smjene.
 - **Gdje provjeriti:** UI; `/shift/close` ukupnosti
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E payments.spec.ts i DB 0008 pokrivaju ispravke, vlasnikovu promjenu iznosa, zaključenu smjenu i poništavanje članarine. Nisu sve negativne varijante i svaki tekst iz plana izvršeni kroz UI.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-money.spec.ts`: razlog `ab` i 201 znak → „Unesite razlog (3–200 znakova).“; `Greška u naplati` → „Stavka je poništena.“; red ostaje, precrtan, sa „(Poništeno)“; „Gotovina (prihod)“ na S-14 pada sa 10,00 € na 0,00 €. Raniji dokaz (22.09.): E2E payments.spec.ts i DB 0008 pokrivaju ispravke, vlasnikovu promjenu iznosa, zaključenu smjenu i poništavanje članarine. Nisu sve negativne varijante i svaki tekst iz plana izvršeni kroz UI.
 
 ### [PAY-12] Poništavanje uplate članarine poništava i članarinu (E16)
 - **Prioritet:** Kritično
@@ -1563,7 +1563,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   njeni dolasci postaju neplaćeni.“ Nakon potvrde: članarina ima status „Poništena“, dolazak je
   ponovo „Neplaćeno“, a u zaglavlju profila se vraća značka „Neplaćeni dolasci: 1“.
 - **Gdje provjeriti:** UI; profil člana (kartice „Članarine“ i „Dolasci“)
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E payments.spec.ts i DB 0008 pokrivaju ispravke, vlasnikovu promjenu iznosa, zaključenu smjenu i poništavanje članarine. Nisu sve negativne varijante i svaki tekst iz plana izvršeni kroz UI.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-money.spec.ts`: članarina prodata danas i ručna prijava koju pokriva; [Poništi] na uplati pokazuje „Poništavanjem ove uplate poništava se i članarina, a njeni dolasci postaju neplaćeni.“; nakon potvrde članarina ima status „Poništena“, dolazak „Neplaćeno“, a značka „Neplaćeni dolasci: 1“ se vraća. Raniji dokaz (22.09.): E2E payments.spec.ts i DB 0008 pokrivaju ispravke, vlasnikovu promjenu iznosa, zaključenu smjenu i poništavanje članarine. Nisu sve negativne varijante i svaki tekst iz plana izvršeni kroz UI.
 
 ### [PAY-13] Poništena stavka se ne poništava dvaput
 - **Prioritet:** Srednje
@@ -1668,7 +1668,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** „Nema dovoljno na stanju (stanje: 5).“ Prodaja nije evidentirana i
   stanje se ne mijenja.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E storage.spec.ts + DB 0009: nabavka iz kase, prodaja, odbijanje viška, ispravka i poništavanje prolaze. Nisu svi filteri i prikazi sa svih ekrana upoređeni.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-money.spec.ts`: stanje 5, prodaja 6 → „Nema dovoljno na stanju (stanje: 5).“; stanje ostaje 5, nema izlaza robe u bazi. Raniji dokaz (22.09.): E2E storage.spec.ts + DB 0009: nabavka iz kase, prodaja, odbijanje viška, ispravka i poništavanje prolaze. Nisu svi filteri i prikazi sa svih ekrana upoređeni.
 
 ### [STO-07] Prodaja kada je stanje 0
 - **Prioritet:** Srednje
@@ -1812,7 +1812,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** radnja je nedostupna; poruka „Ova stavka se ne može mijenjati
   (smjena je zaključena).“ Samo vlasnik može.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** DB 0010 i E2E payments provjeravaju zatvorenu/tuđu smjenu i prava izmjene. Sve UI putanje ovog slučaja nisu ponovljene.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-money.spec.ts`: isti recepcioner se nakon zaključenja ponovo prijavi (nova smjena); [Ispravi] i [Poništi] na stavci stare smjene su onemogućeni sa razlogom „Stavka iz zaključene smjene – samo vlasnik je može mijenjati.“; vlasnik ih može koristiti. Raniji dokaz (22.09.): DB 0010 i E2E payments provjeravaju zatvorenu/tuđu smjenu i prava izmjene. Sve UI putanje ovog slučaja nisu ponovljene.
 
 ### [CLOSE-08] Zaključenje kada nema svoje smjene
 - **Prioritet:** Srednje
