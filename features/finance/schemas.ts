@@ -122,7 +122,13 @@ export const backdatedMembershipSchema = z.object({
   sessions: z.preprocess(
     (value) =>
       typeof value === "string" && value.trim() === "" ? null : value,
-    z.coerce.number().int().min(1).max(50).nullable(),
+    // N-17: the sale dialog's message, not Zod's English default.
+    z.coerce
+      .number({ message: me.memberships.sessionsInvalid })
+      .int(me.memberships.sessionsInvalid)
+      .min(1, me.memberships.sessionsInvalid)
+      .max(50, me.memberships.sessionsInvalid)
+      .nullable(),
   ),
   method: z.enum(["cash", "card"], { message: me.memberships.methodRequired }),
   paidOn: isoDate,

@@ -142,3 +142,29 @@ describe("N-14 and N-15: plan duration and order (SET-14)", () => {
     },
   );
 });
+
+describe("N-17: whole-number gym settings answer in Montenegrin (SET-18)", () => {
+  it.each([
+    ["expiryReminderDays", "0", "Unesite broj dana od 1 do 14."],
+    ["expiryReminderDays", "15", "Unesite broj dana od 1 do 14."],
+    ["expiryReminderDays", "abc", "Unesite broj dana od 1 do 14."],
+    ["doubleScanSeconds", "-1", "Unesite broj sekundi od 0 do 600."],
+    ["doubleScanSeconds", "601", "Unesite broj sekundi od 0 do 600."],
+  ])("%s %s", (field, value, message) => {
+    const result = gymSettingsSchema.safeParse({ ...settings, [field]: value });
+    expect(result.success).toBe(false);
+    expect(result.error?.issues[0]?.path[0]).toBe(field);
+    expect(result.error?.issues[0]?.message).toBe(message);
+  });
+  it("keeps the bounds themselves", () => {
+    for (const [field, value] of [
+      ["expiryReminderDays", "1"],
+      ["expiryReminderDays", "14"],
+      ["doubleScanSeconds", "0"],
+      ["doubleScanSeconds", "600"],
+    ])
+      expect(
+        gymSettingsSchema.safeParse({ ...settings, [field]: value }).success,
+      ).toBe(true);
+  });
+});

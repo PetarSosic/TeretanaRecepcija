@@ -233,11 +233,20 @@ const emailList = z
 export const gymSettingsSchema = z.object({
   cardReplacementPrice: money(me.settings.priceInvalid),
   personalMinPrice: money(me.settings.priceInvalid),
-  expiryReminderDays: z.coerce.number().int().min(1).max(14),
+  // N-17: without their own message these fields showed Zod's English default.
+  expiryReminderDays: z.coerce
+    .number({ message: me.settings.reminderDaysInvalid })
+    .int(me.settings.reminderDaysInvalid)
+    .min(1, me.settings.reminderDaysInvalid)
+    .max(14, me.settings.reminderDaysInvalid),
   autoCloseTime: z
     .string()
     .regex(/^([01]\d|2[0-3]):[0-5]\d$/, me.settings.timeInvalid),
-  doubleScanSeconds: z.coerce.number().int().min(0).max(600),
+  doubleScanSeconds: z.coerce
+    .number({ message: me.settings.doubleScanInvalid })
+    .int(me.settings.doubleScanInvalid)
+    .min(0, me.settings.doubleScanInvalid)
+    .max(600, me.settings.doubleScanInvalid),
   shiftReportEmails: emailList,
   backupEmails: emailList,
 });

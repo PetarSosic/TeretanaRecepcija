@@ -239,6 +239,9 @@ export const me = {
     limitInvalid: "Unesite cijeli broj veći od 0 ili ostavite prazno.",
     // N-15: the order field had only Zod's English default.
     sortOrderInvalid: "Unesite cijeli broj od 0 do 999.",
+    // N-17: the same for the two whole-number gym settings.
+    reminderDaysInvalid: "Unesite broj dana od 1 do 14.",
+    doubleScanInvalid: "Unesite broj sekundi od 0 do 600.",
     durationInvalid: "Unesite trajanje kao cijeli broj.",
     durationForKind:
       "Dnevna karta nema trajanje; svi ostali planovi ga moraju imati.",

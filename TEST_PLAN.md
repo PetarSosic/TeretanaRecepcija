@@ -1875,7 +1875,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** 1 i 101 znak: „Unesite ime i prezime (2–100 znakova).“ 2 i 100 prolaze.
   Lozinka od 7: „Lozinka mora imati najmanje 8 znakova.“; 8 prolazi.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** Unit auth-schemas.test.ts + DB 0002 provjeravaju username, uloge i identitet administratora. Cijele tabele graničnih unosa nisu ponovljene kroz S-23.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-high-e.spec.ts`: ime od 1 i 101 znaka → „Unesite ime i prezime (2–100 znakova).“; 2 i 100 znakova se čuvaju; lozinka od 7 znakova → „Lozinka mora imati najmanje 8 znakova.“, od 8 se čuva. Raniji dokaz (22.09.): Unit auth-schemas.test.ts + DB 0002 provjeravaju username, uloge i identitet administratora. Cijele tabele graničnih unosa nisu ponovljene kroz S-23.
 
 ### [SET-04] Administrator se pravi sa emailom
 - **Prioritet:** Visoko
@@ -1886,7 +1886,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** za administratora se traži **email**, ne korisničko ime.
   `nijeemail` daje „Unesite ispravan email.“; već zauzeta adresa daje „Email je zauzet.“
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** Unit auth-schemas.test.ts + DB 0002 provjeravaju username, uloge i identitet administratora. Cijele tabele graničnih unosa nisu ponovljene kroz S-23.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-high-e.spec.ts`: za ulogu Administrator forma traži **email**, bez polja za korisničko ime; `nijeemail` → „Unesite ispravan email.“; email postojećeg administratora → „Email je zauzet.“; nova adresa se čuva. Raniji dokaz (22.09.): Unit auth-schemas.test.ts + DB 0002 provjeravaju username, uloge i identitet administratora. Cijele tabele graničnih unosa nisu ponovljene kroz S-23.
 
 ### [SET-05] Izmjena korisnika mijenja samo ime
 - **Prioritet:** Srednje
@@ -1919,7 +1919,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** „Korisnik je deaktiviran.“, kolona „Aktivan“ = Ne; prijava daje
   „Pogrešno korisničko ime/email ili lozinka.“ Nakon aktivacije prijava radi.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E auth.spec.ts: deaktivacija prekida pristup. Ponovna aktivacija nije izvršena kroz UI.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-high-e.spec.ts`: [Deaktiviraj] → „Korisnik je deaktiviran.“, „Aktivan: Ne“; prijava tim nalogom → „Pogrešno korisničko ime/email ili lozinka.“; [Aktiviraj] → „Korisnik je aktiviran.“ i prijava vodi na `/reception`. Raniji dokaz (22.09.): E2E auth.spec.ts: deaktivacija prekida pristup. Ponovna aktivacija nije izvršena kroz UI.
 
 ### [SET-08] Ne možete deaktivirati sami sebe (D-60)
 - **Prioritet:** Kritično
@@ -1950,7 +1950,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** „Sačuvano.“ Kratko/dugo ime daje „Unesite ime trenera (2–100 znakova).“
   Neaktivan trener se više ne nudi pri prodaji ni pri prijavi dolaska.
 - **Gdje provjeriti:** UI; dijalog „Nova članarina“
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** DB 0003 i E2E settings.spec.ts provjeravaju katalog i da se za čas nude samo dodijeljeni treneri. Cijeli CRUD i deaktivacije trenera/programa/rasporeda nisu izvršeni.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-high-e.spec.ts`: ime od 1 i 101 znaka → „Unesite ime trenera (2–100 znakova).“; „Novi Trener“ dodat i preimenovan; nakon skidanja „Aktivan“ ne nudi se ni u prodaji personalne članarine ni pri grupnoj prijavi dolaska. Raniji dokaz (22.09.): DB 0003 i E2E settings.spec.ts provjeravaju katalog i da se za čas nude samo dodijeljeni treneri. Cijeli CRUD i deaktivacije trenera/programa/rasporeda nisu izvršeni.
 
 ### [SET-11] Naknada trenera i udio za grupne vidi samo vlasnik (BR-026, D-62)
 - **Prioritet:** Kritično
@@ -1974,7 +1974,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   poruka „Sačuvano.“ Kratak/dug naziv daje „Unesite naziv programa (2–50 znakova).“
   Trener bez dodjele se ne nudi za tu vrstu dolaska (vidi REC-05).
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** DB 0003 i E2E settings.spec.ts provjeravaju katalog i da se za čas nude samo dodijeljeni treneri. Cijeli CRUD i deaktivacije trenera/programa/rasporeda nisu izvršeni.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-high-e.spec.ts`: naziv programa od 1 i 51 znaka → „Unesite naziv programa (2–50 znakova).“; „Pilates“ (Grupni) dodat; dodjela trenera se čuva odmah na klik uz „Sačuvano.“ i isto tako skida. Raniji dokaz (22.09.): DB 0003 i E2E settings.spec.ts provjeravaju katalog i da se za čas nude samo dodijeljeni treneri. Cijeli CRUD i deaktivacije trenera/programa/rasporeda nisu izvršeni.
 
 ### [SET-13] Raspored časova
 - **Prioritet:** Visoko
@@ -1986,7 +1986,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   „Unesite vrijeme u formatu HH:mm.“ Novi čas se pojavljuje kao ponuđeni „Čas“ pri grupnoj prijavi
   tog dana (u okviru ±90 minuta).
 - **Gdje provjeriti:** UI; dijalog prijave dolaska
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** DB 0003 i E2E settings.spec.ts provjeravaju katalog i da se za čas nude samo dodijeljeni treneri. Cijeli CRUD i deaktivacije trenera/programa/rasporeda nisu izvršeni.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO uz napomenu.** `test-plan-high-e.spec.ts`: čas bez vremena → „Unesite vrijeme u formatu HH:mm.“; Ponedjeljak 18:00 se čuva i vidi u rasporedu; čas za danas u ovom trenutku se nudi kao „Čas: HH:MM“ pri grupnoj prijavi. `25:00`, `8:0` i `abc` se ne mogu ni unijeti (polje je `type=time`). Raniji dokaz (22.09.): DB 0003 i E2E settings.spec.ts provjeravaju katalog i da se za čas nude samo dodijeljeni treneri. Cijeli CRUD i deaktivacije trenera/programa/rasporeda nisu izvršeni.
 
 ### [SET-14] Planovi — pravila trajanja i cijene
 - **Prioritet:** Kritično
@@ -2029,7 +2029,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   vrijednosti i slova daju „Unesite iznos, na primjer 79 ili 79,50.“; naziv van 2–50 znakova daje
   „Unesite naziv proizvoda (2–50 znakova).“ Novi proizvod se odmah vidi na `/storage`.
 - **Gdje provjeriti:** UI; `/storage`
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E settings.spec.ts: dodavanje proizvoda i cijena. Izmjena i deaktivacija nisu potpuno izvršene.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-high-e.spec.ts`: prodajna `0` → „Prodajna cijena mora biti veća od 0.“; nabavna `-1` i `abc` → „Unesite iznos, na primjer 79 ili 79,50.“; naziv od 1 i 51 znaka → „Unesite naziv proizvoda (2–50 znakova).“; „Izotonik“ 0,60/2,00 se odmah vidi na `/storage`. Raniji dokaz (22.09.): E2E settings.spec.ts: dodavanje proizvoda i cijena. Izmjena i deaktivacija nisu potpuno izvršene.
 
 ### [SET-17] Kategorije troškova (BR-131)
 - **Prioritet:** Srednje
@@ -2062,7 +2062,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** kako je u tablici; poslije uspješnog čuvanja „Sačuvano.“
   **Vratite podrazumijevane vrijednosti poslije testa.**
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E settings i dodatni UI: ogromna cijena zamjenske kartice odbijena porukom ispod polja. Unit schema-bounds prolazi. Sva ostala polja/granice iz plana nisu izvršeni.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO (nakon popravke N-17).** `test-plan-high-e.spec.ts`: zamjenska kartica `5` i `0` se čuvaju, `-1`/`abc` → „Unesite iznos, …“; minimalna cijena `80` i `0` se čuvaju; podsjetnik `1` i `14` prolaze, `0`/`15` → „Unesite broj dana od 1 do 14.“; zaštita `0` i `600` prolaze, `-1`/`601` → „Unesite broj sekundi od 0 do 600.“; prazni primaoci → „Unesite bar jednu adresu.“, `a@b.com, nijeemail` → „Jedna od adresa nije ispravna.“, dvije adrese u dva reda se čuvaju. Prvi pokušaj: podsjetnik i zaštita su vraćali englesku Zod poruku („Too small: expected number to be >=1“) — **N-17**. Vrijeme zaključivanja je `type=time`, pa `24:00`/`9:0` ne mogu ni da se unesu. Podrazumijevane vrijednosti vraćene. Raniji dokaz (22.09.): E2E settings i dodatni UI: ogromna cijena zamjenske kartice odbijena porukom ispod polja. Unit schema-bounds prolazi. Sva ostala polja/granice iz plana nisu izvršeni.
 
 ### [SET-19] Logo teretane (upload)
 - **Prioritet:** Visoko
@@ -2075,7 +2075,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   Preimenovani `.txt` **mora** biti odbijen ili bar ne smije ništa da pokvari — zabilježite šta se
   desi. Bez izbora fajla: ista poruka o dozvoljenim formatima.
 - **Gdje provjeriti:** UI; `/api/pdf/cards/<batchId>`
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** Tekst preimenovan u PNG i SVG odbijeni; logo_path ostaje null. PNG od 5 MB je davao HTTP 500 — popravljeno, vidi SEC-07 i N-01. Validan PNG/JPG upload i dalje nije ponovljen.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO uz napomenu.** `test-plan-high-e.spec.ts`: PDF i `.txt` preimenovan u `.png` → „Dozvoljeni su PNG i JPG do 1 MB.“, logo se ne čuva; JPG pa PNG → „Logo je sačuvan.“; PDF kartica tada ima sliku više (logo pored QR koda). Bez izabranog fajla forma se ne šalje — zaustavlja je browser jer je polje obavezno, bez poruke aplikacije (§9.9). Prevelik PNG: SEC-07/N-01. Raniji dokaz (22.09.): Tekst preimenovan u PNG i SVG odbijeni; logo_path ostaje null. PNG od 5 MB je davao HTTP 500 — popravljeno, vidi SEC-07 i N-01. Validan PNG/JPG upload i dalje nije ponovljen.
 
 ### [SET-20] Prikaz posljednje rezervne kopije
 - **Prioritet:** Nisko

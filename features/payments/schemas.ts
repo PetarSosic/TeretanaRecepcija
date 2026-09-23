@@ -19,8 +19,8 @@ const money = (message: string) =>
 /** BR-100: 1–20 passes. */
 export const dayPassSchema = z.object({
   quantity: z.coerce
-    .number()
-    .int()
+    .number({ message: me.errors.E_VALIDATION })
+    .int(me.errors.E_VALIDATION)
     .min(1, me.errors.E_VALIDATION)
     .max(20, me.errors.E_VALIDATION),
   method,
