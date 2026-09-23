@@ -23,7 +23,7 @@ import {
   CategoriesSection,
   type Category,
 } from "@/features/settings/components/categories-section";
-import { formatDate, formatMoney } from "@/lib/format";
+import { formatDate, formatMoney, sumMoney } from "@/lib/format";
 import { me } from "@/lib/i18n/me";
 import { saveExpense, voidExpense } from "../actions";
 import type { Period } from "../period";
@@ -85,11 +85,22 @@ export function ExpensesScreen({
   /** BR-001: gym_today, the newest date BR-133 allows. */
   today: string;
   /** S-18 [Evidentiraj isplatu] arrives here with the payout already filled in. */
-  prefill?: { categoryId: string; trainerId: string; amount: string; description: string };
+  prefill?: {
+    categoryId: string;
+    trainerId: string;
+    amount: string;
+    description: string;
+  };
 }) {
   const [creating, setCreating] = useState(Boolean(prefill));
   const [managing, setManaging] = useState(false);
   const [voiding, setVoiding] = useState<ExpenseRow | null>(null);
+  // D-63: what the period and filters list, without voided rows (BR-095), which is how
+  // S-16 counts its Troškovi card.
+  const total = sumMoney(
+    rows.filter((row) => !row.voided_at).map((row) => row.amount),
+  );
+  const anyVoided = rows.some((row) => row.voided_at);
 
   return (
     <div className="grid gap-6">
@@ -111,6 +122,17 @@ export function ExpensesScreen({
         filters={filters}
         period={period}
       />
+
+      <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+        <p className="text-lg font-semibold tabular-nums">
+          {me.finance.expensesTotal.replace("{amount}", formatMoney(total))}
+        </p>
+        {anyVoided ? (
+          <p className="text-sm text-muted-foreground">
+            {me.finance.expensesTotalVoided}
+          </p>
+        ) : null}
+      </div>
 
       {rows.length === 0 ? (
         <p className="text-sm text-muted-foreground">
@@ -297,7 +319,12 @@ function ExpenseDialog({
   categories: Category[];
   trainers: Trainer[];
   today: string;
-  prefill?: { categoryId: string; trainerId: string; amount: string; description: string };
+  prefill?: {
+    categoryId: string;
+    trainerId: string;
+    amount: string;
+    description: string;
+  };
 }) {
   const [state, onSubmit, pending] = useFormAction(saveExpense);
   useActionToast(state, () => onOpenChange(false));
@@ -504,7 +531,9 @@ function VoidDialog({
         <DialogHeader>
           <DialogTitle>{me.payments.void}</DialogTitle>
           <DialogDescription>
-            {expense ? `${expense.description} · ${formatMoney(expense.amount)}` : ""}
+            {expense
+              ? `${expense.description} · ${formatMoney(expense.amount)}`
+              : ""}
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={onSubmit} className="grid gap-4" noValidate>

@@ -317,6 +317,19 @@ test.beforeAll(async ({}, workerInfo) => {
           method: null,
           created_by: staff.manager.id,
         },
+        // D-63: listed, but left out of Ukupno.
+        {
+          gym_id: gymId,
+          spent_on: today,
+          category_id: category.struja,
+          description: "E2E struja poništena",
+          amount: 40,
+          method: "cash",
+          created_by: staff.owner.id,
+          voided_at: new Date().toISOString(),
+          voided_by: staff.owner.id,
+          void_reason: "E2E greška",
+        },
       ])
       .select("id"),
     "Test expenses",
@@ -900,14 +913,20 @@ test("FIN-02: malformed period parameters fall back to Ovaj mjesec", async ({
   expect(errors).toEqual([]);
 });
 
-test("FIN-09: the expense filters narrow the list and stay in the address", async ({
+test("FIN-09 and D-63: the filters narrow the list and its total, and stay in the address", async ({
   page,
 }) => {
   test.skip(test.info().project.name !== "desktop");
   await signIn(page, staff.owner);
   await page.goto("/finance/expenses?period=month");
   const rows = page.locator("table tbody tr");
-  await expect(rows).toHaveCount(3);
+  const total = (amount: string) =>
+    expect(page.getByText(`Ukupno: ${amount}`, { exact: true })).toBeVisible();
+  await expect(rows).toHaveCount(4);
+  await total("60,00 €");
+  await expect(
+    page.getByText("Poništeni troškovi nisu uračunati."),
+  ).toBeVisible();
 
   const apply = () => page.getByRole("button", { name: "Prikaži" }).click();
 
@@ -917,7 +936,8 @@ test("FIN-09: the expense filters narrow the list and stay in the address", asyn
   await apply();
   await expect(page).toHaveURL(new RegExp(`categoryId=${category.struja}`));
   await expect(page).toHaveURL(/period=month/);
-  await expect(rows).toHaveCount(2);
+  await expect(rows).toHaveCount(3);
+  await total("40,00 €");
 
   await page.getByLabel("Način", { exact: true }).selectOption("none");
   await apply();
@@ -925,12 +945,17 @@ test("FIN-09: the expense filters narrow the list and stay in the address", asyn
   await expect(
     page.getByRole("cell", { name: "E2E struja van kase" }),
   ).toBeVisible();
+  await total("30,00 €");
+  await expect(
+    page.getByText("Poništeni troškovi nisu uračunati."),
+  ).toHaveCount(0);
 
   await page.getByLabel("Način", { exact: true }).selectOption("card");
   await apply();
   await expect(
     page.getByText("Nema troškova u izabranom periodu."),
   ).toBeVisible();
+  await total("0,00 €");
 
   await page.getByLabel("Kategorija", { exact: true }).selectOption("");
   await page.getByLabel("Način", { exact: true }).selectOption("");
@@ -938,6 +963,7 @@ test("FIN-09: the expense filters narrow the list and stay in the address", asyn
   await apply();
   await expect(rows).toHaveCount(1);
   await expect(page.getByRole("cell", { name: "30,00 €" })).toBeVisible();
+  await total("30,00 €");
 
   await page.getByLabel("Period").selectOption("last_month");
   await expect(page).toHaveURL(/period=last_month/);
@@ -976,39 +1002,48 @@ test("UX-02: on a slow network the skeleton shows and a sale is not doubled", as
 
   const cdp = await page.context().newCDPSession(page);
   await cdp.send("Network.enable");
-  // Chrome DevTools' "Slow 3G" preset.
-  await cdp.send("Network.emulateNetworkConditions", {
-    offline: false,
-    latency: 2000,
-    downloadThroughput: (500 * 1024) / 8,
-    uploadThroughput: (500 * 1024) / 8,
-  });
+  // Chrome DevTools' "Slow 3G" preset, switched on only around the step under test:
+  // under it the dev server's unminified bundles alone take minutes to arrive.
+  const slow = (on: boolean) =>
+    cdp.send("Network.emulateNetworkConditions", {
+      offline: false,
+      latency: on ? 2000 : 0,
+      downloadThroughput: on ? (500 * 1024) / 8 : -1,
+      uploadThroughput: on ? (500 * 1024) / 8 : -1,
+    });
 
+  await slow(true);
   await page
     .getByRole("navigation", { name: "Meni" })
     .getByRole("link", { name: "Članovi" })
     .click();
   await expect(page.locator("[aria-busy=true]")).toBeVisible();
-  await expect(page).toHaveURL(/\/members$/, { timeout: 60_000 });
+  await expect(page).toHaveURL(/\/members$/, { timeout: 90_000 });
+  await slow(false);
 
-  await page.goto(`/members/${member.m6}`, { timeout: 90_000 });
-  await page.getByRole("button", { name: "Nova članarina" }).click();
+  await page.goto(`/members/${member.m6}`);
   const sell = page.getByRole("dialog");
+  // A click before hydration opens nothing, so click until the dialog is there.
+  await expect(async () => {
+    await page
+      .getByRole("button", { name: "Nova članarina" })
+      .click({ timeout: 2_000 });
+    await expect(sell.getByLabel("Vrsta članarine")).toBeVisible({
+      timeout: 1_000,
+    });
+  }).toPass();
   await sell.getByLabel("Vrsta članarine").selectOption(plan.mjesecna);
   await sell.getByText("Gotovina", { exact: true }).click();
   const submit = sell.getByRole("button", { name: "Naplati i sačuvaj" });
+  await slow(true);
   await submit.click();
   await expect(submit).toBeDisabled();
-  await submit.click({ force: true }).catch(() => {});
+  await expect(submit.locator("svg.animate-spin")).toBeVisible();
+  await submit.click({ force: true, timeout: 2_000 }).catch(() => {});
   await expect(page.getByText("Članarina sačuvana.").first()).toBeVisible({
-    timeout: 60_000,
+    timeout: 90_000,
   });
-  await cdp.send("Network.emulateNetworkConditions", {
-    offline: false,
-    latency: 0,
-    downloadThroughput: -1,
-    uploadThroughput: -1,
-  });
+  await slow(false);
   await page.waitForTimeout(3_000);
   const { count } = await adminClient()
     .from("memberships")

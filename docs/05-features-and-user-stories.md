@@ -167,6 +167,7 @@ Covered by US-04.4, BR-078 and BR-079.
 
 ## F-18 Owner expenses and categories
 **US-18.1** As the owner, I record any expense (BR-133) and see all expenses with filters for period, category, method and "entered by" (S-17).
+- AC1 (D-63): the screen shows `Ukupno: <iznos>` for the listed expenses, voided ones excluded, and the total follows every change of period or filter.
 
 **US-18.2** As the owner, I manage categories (BR-131) with [Kategorije troškova].
 

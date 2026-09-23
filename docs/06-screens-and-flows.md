@@ -209,6 +209,7 @@ An `admin` sees everything an owner sees (D-58).
 
 ## S-17 Expenses — `/finance/expenses` (owner)
 - **Controls:** filters and [Novi trošak] (the BR-133 form).
+- **Total (D-63):** `Ukupno: <iznos>` above the table, for the listed expenses without the voided ones; when voided rows are listed, the note `Poništeni troškovi nisu uračunati.`
 - **Table:** Datum, Kategorija, Opis, Dobavljač, Račun, Način, Iz kase, Iznos, Unio/la, and actions.
 - **Button:** [Kategorije troškova] opens a dialog listing categories with inline rename, active toggle and [Dodaj].
 

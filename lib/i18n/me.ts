@@ -694,6 +694,9 @@ export const me = {
     allStaff: "Svi korisnici",
     expenseSaved: "Trošak je sačuvan.",
     expensesEmpty: "Nema troškova u izabranom periodu.",
+    // D-63: the total of the listed expenses.
+    expensesTotal: "Ukupno: {amount}",
+    expensesTotalVoided: "Poništeni troškovi nisu uračunati.",
     // S-18 Treneri (F-19).
     trainersTitle: "Treneri",
     clients: "Klijenti",

@@ -2241,7 +2241,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** lista se sužava, ukupan iznos se mijenja, izbor ostaje u adresi.
   Prazan rezultat: „Nema troškova u izabranom periodu.“
 - **Gdje provjeriti:** UI
-- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO uz napomenu.** `test-plan-extra.spec.ts`: tri troška; kategorija → 2 reda, + „Van kase“ → 1, + „Platna kartica“ → „Nema troškova u izabranom periodu.“; „Unio/la“ = menadžer → 1 red; izbor ostaje u adresi (`categoryId`, `method`, `createdBy`) i preživljava promjenu perioda. **„Ukupan iznos se mijenja“ nije provjerljivo:** S-17 nema zbir, a doc 06 ga i ne traži — očekivanje u planu je netačno (vidi §9.5).
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-extra.spec.ts`: tri troška i jedan poništen; kategorija → 2 reda, + „Van kase“ → 1, + „Platna kartica“ → „Nema troškova u izabranom periodu.“; „Unio/la“ = menadžer → 1 red; izbor ostaje u adresi (`categoryId`, `method`, `createdBy`) i preživljava promjenu perioda. Zbir „Ukupno“ (dodat po odluci **D-63**) prati svaki filter: 60,00 → 40,00 → 30,00 → 0,00 → 30,00 €; poništeni trošak se prikazuje, ali se ne sabira, uz napomenu „Poništeni troškovi nisu uračunati.“
 
 ### [FIN-10] Poništavanje troška vlasnika
 - **Prioritet:** Visoko
@@ -3256,8 +3256,9 @@ ponovo dok se poruka ne pojavi (`toPass`); 8/8 ponavljanja prošlo. Aplikacija n
 **Zapažanja bez izmjene koda (prijedlozi za vlasnika, SG):**
 - MEM-12: `?tab=dolasci&strana=999` prikazuje praznu tabelu **bez** navigacije stranama; ne
   ruši se, ali bi bilo prirodnije prikazati posljednju stranu.
-- FIN-09: plan očekuje da se „ukupan iznos“ mijenja, ali S-17 nema zbir i doc 06 ga ne traži.
-  Očekivanje u planu je netačno; zbir troškova po filteru bio bi nova funkcija (SG).
+- FIN-09: S-17 nije imao zbir troškova. **Vlasnik ga je zatražio 23.09.2026 (D-63)**: iznad tabele
+  stoji „Ukupno: <iznos>“ za prikazane troškove bez poništenih; bez filtera je jednak kartici
+  „Troškovi“ na S-16. Zbir se računa u centima (`sumMoney`, `tests/unit/format.test.ts`).
 - SET-15: [Produži] na članarini neaktivnog plana otvara prodaju bez preselekcije i nudi samo
   aktivne planove — ponašanje je u skladu sa F-21 AC2, samo zabilježeno.
 

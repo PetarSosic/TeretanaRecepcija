@@ -7,6 +7,7 @@ import {
   formatDuration,
   formatMoney,
   parseMoneyInput,
+  sumMoney,
 } from "@/lib/format";
 
 describe("BR-001/002 dates and durations", () => {
@@ -63,4 +64,20 @@ describe("BR-003 exact decimal money", () => {
       expect(() => parseMoneyInput(input)).toThrow();
     },
   );
+});
+
+describe("D-63 sumMoney", () => {
+  it("adds in whole cents, so 0.1 + 0.2 is exactly 0.30", () => {
+    expect(sumMoney(["0.1", "0.2"])).toBe("0.30");
+    expect(sumMoney([0.1, 0.2])).toBe("0.30");
+  });
+  it("accepts the numbers and strings the RPCs return", () => {
+    expect(sumMoney([10, "20.50", 123.45])).toBe("153.95");
+  });
+  it("is 0.00 for an empty list", () => {
+    expect(sumMoney([])).toBe("0.00");
+  });
+  it("keeps totals beyond one numeric(10,2) value", () => {
+    expect(sumMoney(["99999999.99", "0.01"])).toBe("100000000.00");
+  });
 });

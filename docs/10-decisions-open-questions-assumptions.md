@@ -87,6 +87,7 @@ These are decisions made by Mihajlo (M) or the gym owner (O) during specificatio
 | D-39 | The owner's expense form includes supplier, invoice and VAT. | M |
 | D-40 | The visit statistics page is available to owner and manager. | M |
 | D-F4 | Stock-in asks "Iz kase / Van kase". | M |
+| D-63 | S-17 shows **Ukupno**: the sum of the expenses the current period and filters list, voided expenses excluded (BR-095). With no filter it equals the "Troškovi" card on S-16 for the same period. Requested by the gym owner after the 23.09.2026 test pass (FIN-09). | O |
 | D-55 | Free stock deliveries are not allowed. A stock-in purchase price must be at least €0.01, so its automatic expense is positive. Confirmed 18.09.2026. | M |
 
 ### Jobs, email and technical choices

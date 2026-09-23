@@ -14,6 +14,16 @@ function toCents(value: string): bigint {
   return sign === "-" ? -rounded : rounded;
 }
 
+/** BR-003: the sum of decimal amounts, added in whole cents, as decimal text. */
+export function sumMoney(values: readonly (string | number)[]): string {
+  const cents = values.reduce<bigint>(
+    (total, value) => total + toCents(String(value)),
+    0n,
+  );
+  const absolute = cents < 0n ? -cents : cents;
+  return `${cents < 0n ? "-" : ""}${absolute / 100n}.${String(absolute % 100n).padStart(2, "0")}`;
+}
+
 /** Decimal string suitable for a numeric(10,2) RPC argument. */
 export function parseMoneyInput(value: string): string {
   const cents = toCents(value);
