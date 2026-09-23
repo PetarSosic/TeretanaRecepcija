@@ -15,6 +15,10 @@ sekciju **7. Otvorena pitanja**.
 
 ---
 
+> **Dopuna 23.09.2026:** izvršeno 18 od 19 slučajeva koji su bili NIJE IZVRŠENO (ostaje samo
+> AUTH-14, stvarni link iz sandučeta). Svih 18 PROŠLO; dva tek nakon popravki **N-06** i **N-07**.
+> Novo stanje: **70 prošlo · 0 palo · 146 djelimično · 1 nije izvršeno.** Detalji u **§9.5**.
+
 > **Izvršavanje 22.09.2026:** rezultati ovog prolaza upisani su uz svih 217 slučajeva u §3–4.
 > **48 prošlo · 2 palo · 148 djelimično · 19 nije izvršeno.**
 > Djelimična provjera nije kompletan prolaz: napomena navodi dokaz i preostale korake.
@@ -514,7 +518,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   Vlasnik/Administrator: + Finansije i Podešavanja (Korisnici, Treneri, Kartice, Planovi,
   Proizvodi, Podešavanja teretane); nema „Zaključi smjenu“.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — NIJE IZVRŠENO.** Nije pokriveno izvršenim testovima ovog prolaza; nije označeno kao prolaz. Potrebno je zasebno izvršiti navedene korake.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `tests/e2e/test-plan-extra.spec.ts`: glavni meni i podmeni „Podešavanja“ upoređeni za recepcionera, menadžera, vlasnika i administratora (1366 px). Tačno očekivane stavke i redoslijed; vlasnik/administrator nemaju „Zaključi smjenu“. Mobilni meni nije posebno prepisan.
 
 ### [PERM-05] Menadžer ne smije da mijenja vlasnika ni administratora (AS-5, P-03)
 - **Prioritet:** Kritično
@@ -673,7 +677,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Test podaci:** —
 - **Očekivani rezultat:** ste na `/login`; smjena recepcionera A je i dalje otvorena i pripada njemu.
 - **Gdje provjeriti:** UI; prijava kao A vodi pravo na recepciju
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — NIJE IZVRŠENO.** Nije pokriveno izvršenim testovima ovog prolaza; nije označeno kao prolaz. Potrebno je zasebno izvršiti navedene korake.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-extra.spec.ts`: B na S-02 → [Odjavi se] → `/login`; u bazi je i dalje otvorena samo smjena A; prijava kao A vodi pravo na `/reception`.
 
 ### [SHIFT-06] Značka smjene u zaglavlju za sve uloge
 - **Prioritet:** Srednje
@@ -720,7 +724,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Test podaci:** —
 - **Očekivani rezultat:** B ne dobija grešku — otvara mu se nova smjena i prelazi na `/reception`.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — NIJE IZVRŠENO.** Nije pokriveno izvršenim testovima ovog prolaza; nije označeno kao prolaz. Potrebno je zasebno izvršiti navedene korake.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-extra.spec.ts`: B stoji na S-02, vlasnik u drugom kontekstu zaključi smjenu na `/finance/shifts` („Smjena je zaključena.“), B klikne [Preuzmi smjenu] bez greške i dolazi na `/reception`; otvorena je tačno jedna smjena, B-ova.
 
 ### [SHIFT-10] Ostale uloge nemaju S-02 ni S-14
 - **Prioritet:** Visoko
@@ -739,7 +743,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** jasna poruka o neispravnom iznosu; **ne** smije se pojaviti opšte
   „Došlo je do greške. Pokušajte ponovo.“ niti 500. Ako se pojavi opšta greška, zabilježite kao bug.
 - **Gdje provjeriti:** UI; serverska konzola (`npm run dev`)
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — NIJE IZVRŠENO.** Nije pokriveno izvršenim testovima ovog prolaza; nije označeno kao prolaz. Potrebno je zasebno izvršiti navedene korake.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-extra.spec.ts`: `999999999999` → ispod polja „Unesite iznos ili ostavite prazno.“, bez opšte greške i bez greške na stranici; ostaje se na S-02, smjena A netaknuta. (Provjera je `^d{1,8}(.d{1,2})?$`, vidi SUSPECT-05.)
 
 ---
 
@@ -857,7 +861,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Test podaci:** `0`, zatim vratite na `120`
 - **Očekivani rezultat:** sa 0 nema pitanja — drugo skeniranje odmah odjavljuje člana.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — NIJE IZVRŠENO.** Nije pokriveno izvršenim testovima ovog prolaza; nije označeno kao prolaz. Potrebno je zasebno izvršiti navedene korake.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-extra.spec.ts`: vlasnik kroz `/settings/gym` postavi 0 (u bazi `double_scan_seconds = 0`); dva skeniranja iste kartice: prvo zeleno, drugo odmah „Odjavljen/a: … – 0h 0min“, bez pitanja „Odjaviti?“. Vrijednost vraćena na 120.
 
 ### [REC-11] Nepoznata, poništena i neispravna kartica
 - **Prioritet:** Kritično
@@ -965,7 +969,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** prolazi isti tok kao skeniranje (zeleni/žuti/crveni dijalog), a dolazak je
   u bazi označen kao ručni.
 - **Gdje provjeriti:** UI; profil → „Dolasci“
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — NIJE IZVRŠENO.** Nije pokriveno izvršenim testovima ovog prolaza; nije označeno kao prolaz. Potrebno je zasebno izvršiti navedene korake.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-extra.spec.ts`: recepcioner na profilu člana sa važećom članarinom → [Ručna prijava] → zeleni rezultat (`data-result=covered`); u bazi jedan otvoren dolazak sa `is_manual = true`. Žuti/crveni tok iz profila nije posebno ponovljen (isti RPC kao skeniranje, pokriven u REC-06/07).
 
 ### [REC-21] Dva pulta prijavljuju istog člana (trka)
 - **Prioritet:** Srednje
@@ -1150,7 +1154,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Test podaci:** —
 - **Očekivani rezultat:** po 20 dolazaka po strani; nevažeći broj strane ne ruši stranicu.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — NIJE IZVRŠENO.** Nije pokriveno izvršenim testovima ovog prolaza; nije označeno kao prolaz. Potrebno je zasebno izvršiti navedene korake.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-extra.spec.ts`: 45 dolazaka → „Strana 1 od 3“ sa 20 redova, [Sljedeća] → 2 od 3 (20), 3 od 3 (5), [Prethodna] → 2 od 3. `strana=abc` i `strana=-4` → strana 1; `strana=999` → HTTP 200, profil se prikazuje, tabela je prazna i **nema navigacije stranama** (vrati se klikom na karticu „Dolasci“). Nije pad; vidi SG u §9.5.
 
 ### [MEM-13] Izmjena podataka o članu
 - **Prioritet:** Visoko
@@ -1220,7 +1224,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** tekst se svuda prikazuje **doslovno**, kao običan tekst. Nema iskačućeg
   prozora, nema greške u konzoli, PDF se pravi normalno. Apostrof u prezimenu se uredno čuva.
 - **Gdje provjeriti:** UI, konzola browsera, PDF
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — NIJE IZVRŠENO.** Nije pokriveno izvršenim testovima ovog prolaza; nije označeno kao prolaz. Potrebno je zasebno izvršiti navedene korake.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-extra.spec.ts`: član `<script>alert(1)</script>` / `O'Brien";--` registrovan skeniranjem prazne kartice uz gotovinsku uplatu. Tekst doslovno na recepciji, profilu, `/members` i `/payments/today`; nema `alert` dijaloga ni grešaka u konzoli; apostrof sačuvan u bazi. Nakon zaključenja smjene `/api/pdf/shift/<id>` vraća 200 `application/pdf` koji počinje sa `%PDF-`. Sadržaj PDF-a nije vizuelno pregledan.
 
 ---
 
@@ -1458,7 +1462,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** „Dnevna karta nije podešena. Vlasnik je dodaje u planovima.“
   Vratite plan u aktivno stanje poslije testa.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — NIJE IZVRŠENO.** Nije pokriveno izvršenim testovima ovog prolaza; nije označeno kao prolaz. Potrebno je zasebno izvršiti navedene korake.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO (nakon popravke N-06).** Prvi pokušaj: deaktivacija „Dnevne karte“ kroz `/settings/plans` nije bila moguća — vidi **N-06**. Nakon popravke: plan deaktiviran kroz UI, [Dnevna karta] na recepciji prikazuje „Dnevna karta nije podešena. Vlasnik je dodaje u planovima.“ Plan vraćen u aktivno stanje.
 
 ### [PAY-05] Trošak sa pulta (happy path)
 - **Prioritet:** Kritično
@@ -1595,7 +1599,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** evidentira se **tačno jedna** uplata. Dugme se onemogućava dok traje
   čuvanje i prikazuje indikator učitavanja.
 - **Gdje provjeriti:** UI; `/payments/today` (broj stavki)
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — NIJE IZVRŠENO.** Nije pokriveno izvršenim testovima ovog prolaza; nije označeno kao prolaz. Potrebno je zasebno izvršiti navedene korake.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-extra.spec.ts`: `dblclick` na [Naplati] u dnevnoj karti → tačno jedna nova uplata `day_pass`; `dblclick` na [Naplati i sačuvaj] u prodaji članarine → tačno jedna članarina. Onemogućeno dugme i indikator provjereni u UX-02.
 
 ---
 
@@ -1720,7 +1724,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** „Nema proizvoda. Vlasnik dodaje proizvode u Podešavanjima.“
   Vratite proizvod u aktivno stanje.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — NIJE IZVRŠENO.** Nije pokriveno izvršenim testovima ovog prolaza; nije označeno kao prolaz. Potrebno je zasebno izvršiti navedene korake.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-extra.spec.ts`: jedini proizvod deaktiviran kroz `/settings/products` → `/storage` prikazuje „Nema proizvoda. Vlasnik dodaje proizvode u Podešavanjima.“ Proizvod vraćen u aktivno stanje.
 
 ---
 
@@ -1880,7 +1884,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** mijenja se samo ime i prezime; korisničko ime i uloga su nepromjenjivi.
   Poruka „Podaci su sačuvani.“
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — NIJE IZVRŠENO.** Nije pokriveno izvršenim testovima ovog prolaza; nije označeno kao prolaz. Potrebno je zasebno izvršiti navedene korake.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-extra.spec.ts`: dijalog „Uredi korisnika“ ima samo polje „Ime i prezime“ (nema polja za korisničko ime ni izbora uloge). `Marija Marić-Popović` → „Podaci su sačuvani.“; u bazi se promijenilo samo `full_name`, `username` i `role` isti.
 
 ### [SET-06] Postavljanje nove lozinke zaposlenom
 - **Prioritet:** Visoko
@@ -1892,7 +1896,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   postavi svoju lozinku pri sljedećoj prijavi.“ Pri prijavi zaista slijedi ekran S-01b.
   Kod administratora se u koloni „Lozinka“ odmah vidi nova vrijednost.
 - **Gdje provjeriti:** UI; prijava
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — NIJE IZVRŠENO.** Nije pokriveno izvršenim testovima ovog prolaza; nije označeno kao prolaz. Potrebno je zasebno izvršiti navedene korake.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-extra.spec.ts`: vlasnik → [Nova lozinka] → dijalog sa „Korisnik će morati da postavi svoju lozinku pri sljedećoj prijavi.“ → `NovaLoz123` → „Nova lozinka je postavljena.“ Administrator odmah vidi `NovaLoz123` u koloni „Lozinka“. Prijava tim nalogom vodi na `/change-password` sa tekstom S-01b.
 
 ### [SET-07] Deaktivacija i ponovna aktivacija
 - **Prioritet:** Visoko
@@ -2001,7 +2005,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** plan i dalje stoji u tabeli planova (sa oznakom da je neaktivan), ali se
   **ne nudi** pri prodaji. Ranije prodate članarine tog plana ostaju netaknute.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — NIJE IZVRŠENO.** Nije pokriveno izvršenim testovima ovog prolaza; nije označeno kao prolaz. Potrebno je zasebno izvršiti navedene korake.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-extra.spec.ts`: `Studentska` deaktivirana kroz UI → u tabeli ostaje sa „Aktivan: Ne“; u prodaji članarine ne nudi se (ni neaktivna dnevna karta); postojeća članarina tog plana nepromijenjena u bazi i vidljiva na profilu. [Produži] na toj članarini otvara prodaju bez preselekcije (nudi samo aktivne planove).
 
 ### [SET-16] Proizvodi
 - **Prioritet:** Visoko
@@ -2148,7 +2152,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Test podaci:** kao gore
 - **Očekivani rezultat:** stranica se ne ruši; vraća se na podrazumijevani period „Ovaj mjesec“.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — NIJE IZVRŠENO.** Nije pokriveno izvršenim testovima ovog prolaza; nije označeno kao prolaz. Potrebno je zasebno izvršiti navedene korake.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO (nakon popravke N-07).** Tri adrese iz plana (obrnut period, `abc/xyz`, `izmisljeno`) daju HTTP 200 i „Ovaj mjesec“, bez greške. Dodatna provjera `from=2026-02-31` je prihvaćena kao proizvoljan period sa nepostojećim datumom — vidi **N-07**; nakon popravke i ona vraća „Ovaj mjesec“. Regresija: `tests/unit/period.test.ts`.
 
 ### [FIN-03] Raščlanjenja i liste na pregledu
 - **Prioritet:** Visoko
@@ -2237,7 +2241,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** lista se sužava, ukupan iznos se mijenja, izbor ostaje u adresi.
   Prazan rezultat: „Nema troškova u izabranom periodu.“
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — NIJE IZVRŠENO.** Nije pokriveno izvršenim testovima ovog prolaza; nije označeno kao prolaz. Potrebno je zasebno izvršiti navedene korake.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO uz napomenu.** `test-plan-extra.spec.ts`: tri troška; kategorija → 2 reda, + „Van kase“ → 1, + „Platna kartica“ → „Nema troškova u izabranom periodu.“; „Unio/la“ = menadžer → 1 red; izbor ostaje u adresi (`categoryId`, `method`, `createdBy`) i preživljava promjenu perioda. **„Ukupan iznos se mijenja“ nije provjerljivo:** S-17 nema zbir, a doc 06 ga i ne traži — očekivanje u planu je netačno (vidi §9.5).
 
 ### [FIN-10] Poništavanje troška vlasnika
 - **Prioritet:** Visoko
@@ -2336,7 +2340,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Test podaci:** —
 - **Očekivani rezultat:** „Izaberite člana.“
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — NIJE IZVRŠENO.** Nije pokriveno izvršenim testovima ovog prolaza; nije označeno kao prolaz. Potrebno je zasebno izvršiti navedene korake.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-extra.spec.ts`: kartica „Dolazak“, vremena 10:00–11:00, bez člana → „Izaberite člana.“; ništa nije upisano u bazu.
 
 ---
 
@@ -2621,7 +2625,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** vidi se skelet ekrana dok se učitava; dugme za čuvanje pokazuje
   indikator i ne može se kliknuti dvaput; ništa se ne duplira.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — NIJE IZVRŠENO.** Nije pokriveno izvršenim testovima ovog prolaza; nije označeno kao prolaz. Potrebno je zasebno izvršiti navedene korake.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO (dev server, emulacija u Chrome-u).** `test-plan-extra.spec.ts` uz CDP „Slow 3G“ (2 s latencija, 500 kbit/s), uključen samo oko koraka koji se provjerava: prelaz na „Članovi“ prikazuje skelet (`aria-busy`); pri prodaji članarine [Naplati i sačuvaj] je odmah onemogućeno i ima indikator, drugi klik ne prolazi, u bazi je tačno jedna članarina. Stvarna spora mreža/uređaj nisu korišćeni.
 
 ### [UX-03] Greška na ekranu se prikazuje na našem jeziku
 - **Prioritet:** Visoko
@@ -3213,6 +3217,56 @@ stvarni Supabase Auth reset link iz sandučeta, fizički skener/štampa/zvuk, Fi
 pravi mobilni uređaj sa tastaturom i dodirom, sve kombinacije obrazaca i svi cjeloviti tokovi
 iz §4 kao jedna povezana istorija podataka. Postojeći automatizovani testovi ne dokazuju te
 tvrdnje samo time što su prošli. Otvorena poslovna pitanja iz §7 ostaju odluke vlasnika.
+
+### 9.5 Dopuna — 23.09.2026
+
+Izvršeni su slučajevi koji su 22.09. ostali NIJE IZVRŠENO, kao ciljani Playwright testovi u
+`tests/e2e/test-plan-extra.spec.ts` (17 testova, samo desktop 1366×768, dev server na portu
+3100, sintetička `E2E` teretana koja se na kraju briše; naknadni upit potvrdio je da nijedna
+`E2E` teretana nije ostala). Rezultat: **17/17 prošlo**. AUTH-14 i dalje nije izvršen (treba
+stvarni recovery link iz sandučeta).
+
+**N-06 — dnevna karta se ne može izmijeniti u `/settings/plans` (PAY-04, BR-010).**
+Plan „Dnevna karta“ nema trajanje (`duration_unit = null`), ali je padajući izbor jedinice u
+dijalogu „Uredi plan“ imao podrazumijevanu vrijednost „mjeseci“ (`plan?.duration_unit ?? "month"`).
+Svako čuvanje dnevne karte — promjena cijene ili deaktivacija — vraćalo je
+„Dnevna karta nema trajanje; svi ostali planovi ga moraju imati.“, a forma se pritom resetovala.
+Vlasnik je mogao da prođe samo ako sam primijeti i izabere „—“. Isto je važilo za novi plan
+vrste „Dnevna karta“.
+
+> **Riješeno 23.09.2026.** `features/settings/components/plans-screen.tsx`: pri izmjeni se
+> prikazuje sačuvana jedinica (prazno za dnevnu kartu), a pri kreiranju je jedinica prazna kad je
+> izabrana dnevna karta. Regresija: test „PAY-04 and SET-15“ deaktivira dnevnu kartu kroz UI i
+> pada na starom kodu.
+
+**N-07 — nepostojeći datum u proizvoljnom periodu (FIN-02, US-17.1).**
+`isDate` u `features/finance/period.ts` provjeravao je samo oblik `gggg-mm-dd` i da `Date` nije
+`NaN`; JavaScript pretvara `2026-02-31` u 03.03. umjesto da ga odbije. Zato je
+`?period=custom&from=2026-02-31&to=2026-03-01` prihvaćen kao period sa datumom koji ne postoji
+i proslijeđen bazi, umjesto povratka na „Ovaj mjesec“. Stranica se nije srušila.
+
+> **Riješeno 23.09.2026.** Datum važi samo ako se nepromijenjen vrati iz `Date`. Regresija:
+> `tests/unit/period.test.ts` (7 tvrdnji; tri padaju na starom kodu).
+
+**N-08 — nestabilan regresioni test za N-01 (samo test).**
+`settings.spec.ts` „a logo over 1 MB…“ padao je otprilike jednom u tri pokretanja na mobilnom
+projektu: fajl je izabran prije hidratacije, pa `onChange` nije postojao. Test sada bira fajl
+ponovo dok se poruka ne pojavi (`toPass`); 8/8 ponavljanja prošlo. Aplikacija nije mijenjana.
+
+**Zapažanja bez izmjene koda (prijedlozi za vlasnika, SG):**
+- MEM-12: `?tab=dolasci&strana=999` prikazuje praznu tabelu **bez** navigacije stranama; ne
+  ruši se, ali bi bilo prirodnije prikazati posljednju stranu.
+- FIN-09: plan očekuje da se „ukupan iznos“ mijenja, ali S-17 nema zbir i doc 06 ga ne traži.
+  Očekivanje u planu je netačno; zbir troškova po filteru bio bi nova funkcija (SG).
+- SET-15: [Produži] na članarini neaktivnog plana otvara prodaju bez preselekcije i nudi samo
+  aktivne planove — ponašanje je u skladu sa F-21 AC2, samo zabilježeno.
+
+| Provjera 23.09.2026 | Rezultat |
+|---|---|
+| `test-plan-extra.spec.ts`, desktop | **17/17 PROŠLO** |
+| `settings`, `finance`, `payments` E2E, oba projekta | 29/30, jedini pad je N-08; nakon popravke testa 8/8 |
+| `npm run test` | **PROŠLO: 134/134**, 16 fajlova |
+| `npm run lint`, `npm run typecheck` | **PROŠLO** |
 
 *Kraj plana. Novi rezultati upisani su uz slučajeve; neoznačeni kvadratići nisu automatski prolaz.*
 

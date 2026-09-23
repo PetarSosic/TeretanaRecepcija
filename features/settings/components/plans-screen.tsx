@@ -203,10 +203,19 @@ function PlanFields({
         </div>
         <div className="grid gap-1.5">
           <Label htmlFor="plan-unit">&nbsp;</Label>
+          {/* N-06: a day pass has no unit (BR-010), so "mjeseci" is only the default
+              for other kinds; the key resets the choice when the kind changes. */}
           <Select
+            key={kind === "day_pass" ? "none" : "unit"}
             id="plan-unit"
             name="durationUnit"
-            defaultValue={plan?.duration_unit ?? "month"}
+            defaultValue={
+              plan
+                ? (plan.duration_unit ?? "")
+                : kind === "day_pass"
+                  ? ""
+                  : "month"
+            }
           >
             <option value="">—</option>
             <option value="day">{me.settings.durationUnitDay}</option>

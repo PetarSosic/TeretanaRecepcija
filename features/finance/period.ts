@@ -49,7 +49,14 @@ export function isPreset(value: string): value is PeriodPreset {
 }
 
 export function isDate(value: string | undefined): value is string {
-  return !!value && /^\d{4}-\d{2}-\d{2}$/.test(value) && !isNaN(utc(value).getTime());
+  // N-07: Date rolls 2026-02-31 over to 03.03 instead of refusing it, and Postgres then
+  // rejects the date, so a real calendar day is one that survives the round trip.
+  return (
+    !!value &&
+    /^\d{4}-\d{2}-\d{2}$/.test(value) &&
+    !isNaN(utc(value).getTime()) &&
+    iso(utc(value)) === value
+  );
 }
 
 /** The range a preset covers, as of the gym's today. */

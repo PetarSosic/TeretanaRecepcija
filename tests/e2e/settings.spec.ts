@@ -219,15 +219,18 @@ test("US-21.1: a logo over 1 MB is refused with the field message, not an error 
     Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]),
     Buffer.alloc(5 * 1024 * 1024, 0),
   ]);
-  await page.locator("#logo").setInputFiles({
-    name: "veliki-logo.png",
-    mimeType: "image/png",
-    buffer: png,
-  });
-
-  await expect(
-    page.getByText("Dozvoljeni su PNG i JPG do 1 MB."),
-  ).toBeVisible();
+  // A file chosen before hydration fires `change` before React has attached onChange,
+  // which made this test fail about one run in three; choose again until it is seen.
+  await expect(async () => {
+    await page.locator("#logo").setInputFiles({
+      name: "veliki-logo.png",
+      mimeType: "image/png",
+      buffer: png,
+    });
+    await expect(
+      page.getByText("Dozvoljeni su PNG i JPG do 1 MB."),
+    ).toBeVisible({ timeout: 1_000 });
+  }).toPass();
   // The file input is also exposed as a button with the label's name, so the submit
   // button is addressed by its type.
   await expect(
