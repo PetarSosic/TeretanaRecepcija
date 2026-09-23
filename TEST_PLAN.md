@@ -19,6 +19,11 @@ sekciju **7. Otvorena pitanja**.
 > AUTH-14, stvarni link iz sandučeta). Svih 18 PROŠLO; dva tek nakon popravki **N-06** i **N-07**.
 > Novo stanje: **70 prošlo · 0 palo · 146 djelimično · 1 nije izvršeno.** Detalji u **§9.5**.
 
+> **Dopuna 23.09.2026 (5):** izvršeni svi djelimični slučajevi prioriteta **Visoko** (88 PROŠLO),
+> uz popravke **N-17 do N-20**; otvoreni su nalazi **N-16** (emoji u PDF-u, MEM-07 PALO) i **N-21**
+> (dnevnik izmjena prikazuje nazive kolona iz baze). Od visokih nije izvršen samo AUTH-14.
+> Novo stanje: **192 prošlo · 1 palo · 23 djelimično · 1 nije izvršeno.** Detalji u **§9.9**.
+
 > **Dopuna 23.09.2026 (4):** migracija 0027 primijenjena; još 15 kritičnih slučajeva PROŠLO
 > (E2E-01 do 03, SEC-01/03/09, JOB-01, …). Od kritičnih je djelimičan ostao samo AUTH-13.
 > Novo stanje: **125 prošlo · 0 palo · 91 djelimično · 1 nije izvršeno.** Detalji u **§9.8**.
@@ -2263,7 +2268,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** prvo „Unesite razlog (3–200 znakova).“, zatim „Poništeno“ — stavka ostaje
   precrtana i izlazi iz ukupnih troškova.
 - **Gdje provjeriti:** UI; `/finance` kartica „Troškovi“
-- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO (nakon popravke N-19).** `test-plan-high-f.spec.ts`: [Poništi] sa `ab` → „Unesite razlog (3–200 znakova).“; sa `Duplirana faktura` dijalog se zatvara, red ostaje uz „Poništeno: Duplirana faktura“, bez dugmeta [Poništi]; „Ukupno“ pada sa 20,00 na 0,00 € uz „Poništeni troškovi nisu uračunati.“, kartica „Troškovi“ na `/finance` 0,00 €, a očekivana gotovina smjene se vraća na 179,00 €. Prvi pokušaj: red je bio samo prigušen (`opacity-60`), a ne precrtan kako traži BR-095 — **N-19**; popravljeno i na troškovima i na ulazima robe (S-20). Poslije poništavanja nema poruke (toast), samo se zatvori dijalog — vidi §9.9. Raniji dokaz (22.09.): DB 0008 i 0012 pokrivaju prava troškova i obračun; kompletan vlasnikov UI tok poništavanja nije izvršen.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO (nakon popravke N-19).** `test-plan-high-f.spec.ts`: [Poništi] sa `ab` → „Unesite razlog (3–200 znakova).“; sa `Duplirana faktura` dijalog se zatvara, red ostaje uz „Poništeno: Duplirana faktura“, bez dugmeta [Poništi]; „Ukupno“ pada sa 20,00 na 0,00 € uz „Poništeni troškovi nisu uračunati.“, kartica „Troškovi“ na `/finance` 0,00 €, a očekivana gotovina smjene se vraća na 179,00 €. Prvi pokušaj: red je bio samo prigušen (`opacity-60`), a ne precrtan kako traži BR-095 — **N-19**; popravljeno i na troškovima i na ulazima robe (S-20). Raniji dokaz (22.09.): DB 0008 i 0012 pokrivaju prava troškova i obračun; kompletan vlasnikov UI tok poništavanja nije izvršen.
 
 ### [FIN-11] Ekran „Treneri“ (S-18)
 - **Prioritet:** Visoko
@@ -2407,7 +2412,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** njegovi dolasci se broje u ukupnom broju, ali ga **nema** u listi
   „Najčešći članovi“.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** DB 0013: automatski odjavljeni dolazak ne ulazi u prosjek, anonimizovan član ne ulazi u top listu. Nije ponovljeno kroz UI sa tim podacima.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-high-g.spec.ts`: član sa 6 dolazaka anonimiziran kroz UI („Član je anonimiziran.“); `/stats/visits` za posljednjih 10 dana pokazuje „Ukupno dolazaka“ 10 — tačno koliko teretana ima dolazaka, uključujući njegovih 6 — a „Najčešći članovi“ su samo #6 (2), #4 (1) i #7 (1), bez njega iako ima najviše dolazaka. Raniji dokaz (22.09.): DB 0013: automatski odjavljeni dolazak ne ulazi u prosjek, anonimizovan član ne ulazi u top listu. Nije ponovljeno kroz UI sa tim podacima.
 
 ---
 
@@ -2460,7 +2465,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** stiže email „Vaša članarina ističe dd.mm.gggg“ sa imenom člana, nazivom
   plana i nazivom teretane. Drugi poziv **ne šalje isti podsjetnik ponovo**.
 - **Gdje provjeriti:** izlaz komande; email
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** Stvarni runMorning sa testnim izborom samo jedne test teretane: 1 poslat, drugi poziv 0; Resend delivered. Raspored jobs_due nije pušten globalno; pokriva ga DB 0011. Lokalni default pošiljalac zahtijeva ispravku N-04.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO (izolovano).** `test-plan-jobs.spec.ts` + `tests/integration/test-plan-job.test.ts`: pravi jutarnji posao (`runJob("morning")`) nad **samo jednom** testnom teretanom — `jobs_due` vraća tu teretanu, sve ostalo (Postgres, Resend) je stvarno. Članarina koja ističe za 3 dana, email člana je Resendov testni sandučić `delivered@resend.dev`: poslat 1 email, naslov „Vaša članarina ističe 26.09.2026“, tekst sa imenom člana, nazivom plana i nazivom teretane; Resend javlja `delivered`, red u `expiry_notifications` je `sent`. Drugi poziv: `ran: false`, 0 poslatih. Pošiljalac `noreply@stamenkovicc.com` (N-04). Stvarno ljudsko sanduče nije gledano. Spec je opt-in (`TEST_PLAN_LIVE_EMAIL=1`) jer šalje pravi email. Raniji dokaz (22.09.): Stvarni runMorning sa testnim izborom samo jedne test teretane: 1 poslat, drugi poziv 0; Resend delivered. Raspored jobs_due nije pušten globalno; pokriva ga DB 0011. Lokalni default pošiljalac zahtijeva ispravku N-04.
 
 ### [JOB-04] Jutarnji posao bez podešenog emaila
 - **Prioritet:** Srednje
@@ -2483,7 +2488,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   „Posljednja rezervna kopija: … – uspješno“. Email ima ZIP u prilogu (ili poruku da je kopija
   prevelika i da je sačuvana u Storage). U emailu **nema lozinke ZIP-a**.
 - **Gdje provjeriti:** izlaz komande; UI; email; Supabase Storage → `backups`
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** Integracioni backup: 28 tabela, AES ZIP, loša lozinka odbijena, Storage i zadržavanje 8 kopija; dodatni stvarni test šalje ZIP, Resend delivered. Nedjeljni globalni scheduler nije pokrenut, pravila su DB-testirana.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO (izolovano, van nedjelje).** Isti izolovani pokretač, posao `weekly-backup`: `status: success`, 28 tabela, 35 redova, ZIP 11 KB sačuvan u `backups/<gym>`; email „Sedmična rezervna kopija – <teretana> – 23.09.2026“ sa prilogom `kpfitness-backup-2026-09-23.zip` i tekstom „Lozinka nije u ovom emailu.“ — lozinka ZIP-a se u tekstu ne pojavljuje; Resend `delivered`. S-27 zatim prikazuje „Posljednja rezervna kopija: … – uspješno“. Uslov „nedjelja poslije 03:00“ je u `jobs_due` i dokazan je u DB 0011; ovdje je zaobiđen namjerno, jer je danas srijeda. Raniji dokaz (22.09.): Integracioni backup: 28 tabela, AES ZIP, loša lozinka odbijena, Storage i zadržavanje 8 kopija; dodatni stvarni test šalje ZIP, Resend delivered. Nedjeljni globalni scheduler nije pokrenut, pravila su DB-testirana.
 
 ### [JOB-06] Provjera oporavka iz rezervne kopije
 - **Prioritet:** Visoko
@@ -2648,7 +2653,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** „Došlo je do greške. Pokušajte ponovo.“ sa dugmetom [Pokušaj ponovo] i
   šifrom greške — **nikada** engleska Next.js poruka i nikada tekst baze.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** Unit errors.test.ts skriva sirove DB greške, dodatni UI auth/statistika daju lokalizovane poruke. Nisu namjerno izazvane sve greške svih ekrana.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO uz napomenu.** `test-plan-high-g.spec.ts`: (1) server ne odgovara na radnju (prekinuta veza usred čuvanja troška) → „Došlo je do greške. Pokušajte ponovo.“ i [Pokušaj ponovo], koji vraća ekran; (2) radnja koju server ne poznaje (nova verzija dok je tab otvoren) → ista poruka; (3) prekinuta prijava na `/login` → ista poruka na ekranu prijave. Nijednom se ne pojavljuje engleski tekst („Application error“, „Server Action“, „Failed to fetch“…) niti tekst baze, i ništa se ne sačuva. **Šifra greške** se prikazuje samo kada greška nastane na serveru (Next daje `digest`); kod ovih mrežnih grešaka šifre nema jer server nije ni zabilježio grešku. Serversku grešku pri iscrtavanju ekrana nije bilo moguće izazvati iz browsera bez kvarenja okruženja. Raniji dokaz (22.09.): Unit errors.test.ts skriva sirove DB greške, dodatni UI auth/statistika daju lokalizovane poruke. Nisu namjerno izazvane sve greške svih ekrana.
 
 ### [UX-04] Tastatura i fokus (pristupačnost)
 - **Prioritet:** Srednje
@@ -2744,7 +2749,7 @@ Ovo su cjeloviti tokovi kroz više modula i uloga, onako kako će ih koristiti t
 - **Očekivani rezultat:** korak 2 ne preskače promjenu lozinke i **obavezno** otvara smjenu
   (ranije je ovdje bila greška); korak 6 izbacuje zaposlenog na sljedećem kliku, a njegova smjena
   ostaje otvorena dok je neko ne preuzme ili dok je noćni posao ne zaključi.
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** auth/admin E2E pokrivaju kreiranje, prvu lozinku i deaktivaciju, ali ne kao jedan isti nalog kroz sve korake scenarija.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-high-g.spec.ts`, jedan isti nalog kroz sve korake: vlasnik kreira recepcionera sa privremenom lozinkom; prva prijava vodi na `/change-password` (ni `/reception` ne može da se preskoči), zatim na S-02 jer je smjena Ane otvorena, [Preuzmi smjenu] → `/reception` i otvorena smjena je **njegova**. Naplati dnevnu kartu. Administrator na `/settings/users` [Prikaži] vidi baš lozinku koju je on izabrao. Vlasnik mu postavi novu („Nova lozinka je postavljena.“) → sljedeća prijava opet traži promjenu. Vlasnik ga deaktivira dok je prijavljen u drugom browseru → na sljedeći klik je na `/login`, a njegova smjena ostaje otvorena. Raniji dokaz (22.09.): auth/admin E2E pokrivaju kreiranje, prvu lozinku i deaktivaciju, ali ne kao jedan isti nalog kroz sve korake scenarija.
 
 ### [E2E-05] Vlasnikov mjesečni pregled
 - **Prioritet:** Visoko · **Uloge:** Vlasnik
@@ -2757,7 +2762,7 @@ Ovo su cjeloviti tokovi kroz više modula i uloga, onako kako će ih koristiti t
 7. Ponovo `/finance` — prihod je porastao za taj iznos.
 - **Očekivani rezultat:** brojke se slažu na euro; naknadni unos se vidi u finansijama sa oznakom
   „Naknadno“, ali ne ulazi ni u jednu smjenu.
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** finance E2E i DB 0012 pokrivaju izvještaje, troškove/trenere i naknadne unose. Nije izvršen cijeli mjesečni tok sa svim promjenama u UI-ju.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-high-g.spec.ts`: „Ovaj mjesec“ prije: prihod 148,00, troškovi 0,00, profit 148,00 €. Unijete Kirija 300 i Struja 45,50, a sa S-18 isplata Tamari (iznos razlike 48,30 unaprijed popunjen; poslije isplate razlika 0,00). Troškovi su porasli, a profit pao za tačno 393,80 €, prihod nepromijenjen. Dnevnik izmjena (Troškovi, danas) ima tačno ta tri unosa sa imenom vlasnika. Naknadna Mjesečna od prije 3 dana podiže prihod perioda za tačno 79,00 €; uplata je `is_backdated`, bez smjene, na datum od prije 3 dana, a u profilu člana označena „Naknadno“. Raniji dokaz (22.09.): finance E2E i DB 0012 pokrivaju izvještaje, troškove/trenere i naknadne unose. Nije izvršen cijeli mjesečni tok sa svim promjenama u UI-ju.
 
 ### [E2E-06] Izgubljena kartica
 - **Prioritet:** Visoko · **Uloge:** Recepcioner
@@ -2769,7 +2774,7 @@ Ovo su cjeloviti tokovi kroz više modula i uloga, onako kako će ih koristiti t
 5. Provjeri `/payments/today`.
 - **Očekivani rezultat:** stara kartica daje „Kartica je poništena. Pronađite člana pretragom.“;
   nova radi normalno; uplata „Zamjenska kartica – <ime>“ je u današnjim uplatama i u smjeni.
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** members E2E + DB 0006/0007 provjeravaju zamjenu, naplatu i poništenu karticu; cjelovit UI tok sa oba naknadna skeniranja nije ponovljen.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-high-g.spec.ts`: recepcionerka nađe člana pretragom („Gubitnik“), otvori profil, [Izgubljena kartica] → „Naknada za novu karticu: 5,00 €“, Gotovina, skenira novu praznu karticu → „Nova kartica dodijeljena. Stara kartica je poništena.“ Na recepciji stara kartica → „Kartica je poništena. Pronađite člana pretragom.“, nova → zeleni ekran sa članom. `/payments/today` ima „Zamjenska kartica – #4 E2E Kartica Gubitnik“; zaključenje smjene: gotovina 84,00 € (79 + 5), „Uplate: 3“, a u [Pregledaj stavke] „Zamjenska kartica · #4 E2E Kartica Gubitnik · Gotovina 5,00 €“. Raniji dokaz (22.09.): members E2E + DB 0006/0007 provjeravaju zamjenu, naplatu i poništenu karticu; cjelovit UI tok sa oba naknadna skeniranja nije ponovljen.
 
 ### [E2E-07] Noć i jutro
 - **Prioritet:** Visoko · **Uloge:** Recepcioner, Vlasnik, terminal
@@ -2782,7 +2787,7 @@ Ovo su cjeloviti tokovi kroz više modula i uloga, onako kako će ih koristiti t
 - **Očekivani rezultat:** oba dolaska su automatski odjavljena u vrijeme zaključenja; smjena je
   zaključena kao „Automatski“ bez prebrojane gotovine; izvještaj je poslat; podsjetnik je stigao
   jednom; rezervna kopija je uspješna i vidi se na S-27.
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** DB 0011, E2E jobs i stvarni ciljano izolovani email testovi prolaze. Globalni noćni/jutarnji posao nije pokretan nad drugim teretanama.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO (izolovano).** `test-plan-jobs.spec.ts`: recepcionerka prijavi dva člana karticom i ode bez zaključenja; vrijeme automatskog zaključenja testne teretane pomjereno na tekući minut, pa pravi noćni posao samo za nju: `visits_closed: 2`, oba dolaska `auto_checkout` sa odjavom tačno u to vrijeme (vidi se u profilima), smjena zaključena kao `auto`, bez prebrojane gotovine i bez zaključioca; na `/finance/shifts` „Automatski“, „nije prebrojano“, „poslato“; izvještaj (PDF) poslat na `delivered@resend.dev` i isporučen. Jutarnji posao: jedan podsjetnik, drugi poziv ne šalje ništa (JOB-03). Rezervna kopija uspješna i vidljiva na S-27 (JOB-05). Globalni `npm run jobs:run` nije pokretan. Raniji dokaz (22.09.): DB 0011, E2E jobs i stvarni ciljano izolovani email testovi prolaze. Globalni noćni/jutarnji posao nije pokretan nad drugim teretanama.
 
 ### [E2E-08] Promjena cjenovnika
 - **Prioritet:** Srednje · **Uloge:** Vlasnik, Recepcioner
@@ -3407,6 +3412,89 @@ ostao samo **AUTH-13** (traži stvarni link iz sandučeta administratora).
 | Cijeli E2E, oba projekta | **221 prošlo, 0 palo**, 67 preskočeno (mobilne varijante testova plana koji rade samo na desktopu) |
 | `npm run test` | **145/145** |
 | `npm run test:db` | **14/14 fajlova** (0003 sa 24 tvrdnje, nakon migracije 0027) |
+| `npm run lint`, `npm run typecheck` | PROŠLO |
+| Zaostale `E2E` teretane u bazi | 0 |
+
+### 9.9 Dopuna — slučajevi prioriteta Visoko, 23.09.2026
+
+Izvršeni su svi djelimični slučajevi prioriteta **Visoko**, po grupama u
+`test-plan-high-a.spec.ts` do `test-plan-high-g.spec.ts` (sesija i recepcija, članovi,
+članarine i novac na pultu, magacin i kartice, podešavanja, finansije, završni tokovi) i u
+`test-plan-jobs.spec.ts` (zakazani poslovi). Od 90 visokih slučajeva **88 je PROŠLO**, MEM-07 je
+**PALO** (N-16), a AUTH-14 i dalje nije izvršen (traži stvarni link iz sandučeta, kao AUTH-13).
+
+**Zakazani poslovi bez diranja prave teretane.** `npm run jobs:run` nije pokretan: jedan server
+služi sve teretane, pa bi noćni posao zaključio smjenu teretane koja radi, a jutarnji potrošio
+podsjetnike njenih članova. `tests/integration/test-plan-job.test.ts` zato poziva pravi
+handler (`runJob`) tako da `jobs_due` vrati **samo** testnu teretanu; sve ostalo — Postgres,
+izvještaj smjene, rezervna kopija, Resend — je stvarno. Svi emailovi testne teretane idu na
+Resendov testni sandučić `delivered@resend.dev`, a isporuka se čita nazad iz Resend API-ja.
+Pokreće ga `test-plan-jobs.spec.ts`, samo uz `TEST_PLAN_LIVE_EMAIL=1`; bez toga se preskače, pa
+ostatak testova i dalje ne šalje nijedan pravi email (N-05).
+
+**Nalazi i popravke:**
+
+**N-16 — emoji nestaje u PDF-u (MEM-07) — otvoreno.** Ime `Ana😀` se prihvata i prikazuje na
+ekranima i u pretrazi, ali u PDF izvještaju smjene emoji nestaje (ostaje prazno mjesto, bez
+kvadratića), jer ugrađeni font nema emoji. Odluka je vlasnikova: odbiti emoji pri unosu imena,
+ili ga u PDF-u zamijeniti znakom, ili prihvatiti prazno mjesto (§7, pitanje 1).
+
+**N-17 — engleske poruke validacije (SET-18) — popravljeno.** „Podsjetnik prije isteka (dana)“ i
+„Zaštita od duplog skeniranja (s)“ van granica vraćali su Zodovu englesku poruku („Too small:
+expected number to be >=1“). Sada: „Unesite broj dana od 1 do 14.“ i „Unesite broj sekundi od 0
+do 600.“ Isto je ispravljeno za broj termina u naknadnoj članarini i količinu dnevnih karata.
+Regresija: `tests/unit/schema-bounds.test.ts`.
+
+**N-18 — dnevnik izmjena zimi pomjeren za sat (FIN-14, BR-001) — popravljeno.** Granice perioda
+na S-21 bile su fiksno `+02:00` (ljetno vrijeme). Za dan u zimskom računanju (CET, `+01:00`)
+lista je prikazivala izmjene od 23:00 do 24:00 prethodnog dana, a gubila izmjene od 23:00 do
+24:00 posljednjeg dana. Sada `periodInstants()` uzima pomak zone Europe/Podgorica za svaki datum
+posebno i poredi do ponoći narednog dana. Regresija: unit testovi za oba prelaska sata i E2E
+sa izmjenama 14.01. u 23:30, 15.01. u 00:30 i 15.01. u 23:30.
+
+**N-19 — poništen trošak i ulaz robe nisu bili precrtani (FIN-10, BR-095) — popravljeno.** BR-095
+traži da poništene stavke ostanu u listi precrtane; na S-17 i S-20 red je bio samo prigušen.
+Sada je precrtan, kao na svim ostalim listama, a razlog poništavanja ostaje čitljiv.
+
+**N-20 — isplata treneru upisivala iznos sa tačkom (FIN-11) — popravljeno.** [Evidentiraj
+isplatu] je otvarala formu troška sa iznosom `107.30`; sada `107,30`, kao ostatak aplikacije.
+
+**N-21 — dnevnik izmjena prikazuje nazive kolona iz baze (FIN-14, S-21) — otvoreno.** Prikaz
+izmjene je „polje: staro → novo“, ali „polje“ je naziv kolone i vrijednost je sirova, npr.
+`date_of_birth: 01.01.1990 → 15.03.1995`, `gym_id: <uuid>`, `method: cash`,
+`created_by: <uuid>`, `voided_by: <uuid>`; u filteru „Stavka“ uplate se zovu „Uplate danas“
+(naslov ekrana S-12). To je protiv pravila da je sav tekst na ekranu crnogorski. Predlog:
+nazivi polja iz `me.ts` (Datum rođenja, Način, Unio/la…), imena umjesto identifikatora za
+zaposlene, članove, planove i trenere, prevedene vrijednosti (Gotovina, Platna kartica…),
+skrivena tehnička polja (`id`, `gym_id`, `user_id`) i „Uplate“ u filteru. Nije popravljeno
+bez odobrenja, jer traži izbor naziva za oko stotinu polja.
+
+**Zapažanja (bez izmjene koda):**
+- SHIFT (S-02): nakon poruke „Unesite iznos ili ostavite prazno.“ forma briše upisanu vrijednost.
+- MEM pretraga: `069` ne nalazi nikoga po telefonu — potrebne su 3 cifre nakon vodeće nule
+  (BR-044); rezultati stižu ~0,85 s nakon posljednjeg znaka na dev serveru (250 ms + upit).
+- MEM lista: ako se filter promijeni u roku od 250 ms nakon brisanja pretrage, odložena
+  pretraga ga poništi; isto tako klik na člana prije nego što pretraga uđe u adresu.
+- REC panel: brojač trajanja otkucava od učitavanja stranice, pa trajanje kasni do minut.
+- Polja za količinu i vrijeme su `type=number` i `type=time`, pa se slova i `25:00` ne mogu ni
+  upisati; forma logoa bez fajla zaustavlja se browserovim oblačićem „obavezno polje“, bez
+  poruke aplikacije.
+- MSHIP-13: primjer iz plana (31.01.2027 → 27.02.2027) je pogrešan; BR-051 i E14 daju
+  28.02.2027, i to aplikacija prikazuje.
+- FIN-16: naknadna članarina bez početka počinje na izabrani datum uplate sa razlogom
+  „Počinje danas“ — tekst BR-052, koraka 3, iako taj dan nije danas.
+- FIN-11: kod trenera sa nedefinisanom naknadom red prikazuje „Za trenera 0,00 €“ uz
+  „nije definisano: 1“ ispod imena; detalj trenera piše „nije definisano“.
+- E2E-07: profil člana ne označava automatsku odjavu; vidi se samo vrijeme zaključenja.
+- UX-03: šifra greške se prikazuje samo za greške nastale na serveru; kod prekida veze šifre
+  nema jer server grešku nije ni zabilježio.
+
+| Provjera 23.09.2026 (visoki slučajevi) | Rezultat |
+|---|---|
+| Cijeli E2E, oba projekta | **262 prošlo**, 2 pala, 8 nije pokrenuto, 124 preskočeno (mobilne varijante i opt-in poslovi). Oba pada su bila u testu, ne u aplikaciji: STO-11 je pod punim opterećenjem čitao zaglavlja tabele prije nego što su stigla, a FIN-10 je tražio poruku u tuđem formatu (aplikacija ima svoj toast, nije sonner). Poslije ispravke `test-plan-high-d` i `test-plan-high-f` ponovo: **17/17** (uključujući 8 nepokrenutih). |
+| `test-plan-jobs.spec.ts` uz `TEST_PLAN_LIVE_EMAIL=1` | **3/3**, tri emaila isporučena na `delivered@resend.dev` |
+| `npm run test` | **161/161** (+1 preskočen: izolovani pokretač poslova bez svojih varijabli) |
+| `npm run test:db` | **14/14 fajlova** |
 | `npm run lint`, `npm run typecheck` | PROŠLO |
 | Zaostale `E2E` teretane u bazi | 0 |
 

@@ -284,6 +284,8 @@ test("STO-11: the desk sees no stock value or profit; the owner's report does", 
   const desk = await signedIn(browser, staff.ana);
   await desk.goto("/storage");
   await expect(stock(desk)).toHaveText("36");
+  // Under a full-suite load the table can still be streaming in after the first cell.
+  await expect(desk.getByRole("columnheader", { name: "Proizvod" })).toBeVisible();
   const headers = (await desk.getByRole("columnheader").allInnerTexts()).map(
     (h) => h.trim(),
   );

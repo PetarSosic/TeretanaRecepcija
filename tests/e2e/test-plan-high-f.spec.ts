@@ -462,7 +462,7 @@ test("FIN-08 and FIN-07: the trainer field only for salaries; a till expense wit
     form.appendChild(input);
   }, trainer.tamara);
   await dialog.getByRole("button", { name: "Sačuvaj" }).click();
-  const messages = page.locator("[data-sonner-toast], .text-danger");
+  const messages = page.locator("[aria-live=polite] > *, .text-danger");
   await expect.poll(async () => (await messages.allInnerTexts()).join(" / ")).not.toBe("");
   const refused = (await messages.allInnerTexts()).join(" / ");
   console.log(`[note] FIN-08 forged trainer with Kirija → ${refused}`);
@@ -548,8 +548,9 @@ test("FIN-10: voiding the owner's expense needs a reason and leaves the totals",
   await dialog.getByLabel("Razlog").fill("Duplirana faktura");
   await dialog.getByRole("button", { name: "Poništi" }).click();
   await expect(dialog).toBeHidden();
-  const toast = await page.locator("[data-sonner-toast]").allInnerTexts();
-  console.log(`[note] FIN-10 after the void: toast ${JSON.stringify(toast)}`);
+  await expect(
+    page.locator("[aria-live=polite] > *", { hasText: "Poništeno" }),
+  ).toBeVisible();
   await expect(row).toContainText("Poništeno: Duplirana faktura");
   // BR-095 (N-19): struck through, like every other voided record.
   await expect(row).toHaveClass(/line-through/);
@@ -850,14 +851,14 @@ async function outcome(page: Page): Promise<string> {
       async () =>
         (await saved.count()) > 0 ||
         (await main.locator(".text-danger").count()) > 0 ||
-        (await page.locator("[data-sonner-toast]").count()) > 0,
+        (await page.locator("[aria-live=polite] > *").count()) > 0,
       { timeout: 15_000 },
     )
     .toBe(true);
   if ((await saved.count()) > 0) return "saved";
   return [
     ...(await main.locator(".text-danger").allInnerTexts()),
-    ...(await page.locator("[data-sonner-toast]").allInnerTexts()),
+    ...(await page.locator("[aria-live=polite] > *").allInnerTexts()),
   ].join(" / ");
 }
 
