@@ -25,6 +25,7 @@ import {
 } from "@/features/settings/components/categories-section";
 import { formatDate, formatMoney, sumMoney } from "@/lib/format";
 import { me } from "@/lib/i18n/me";
+import { cn } from "@/lib/utils";
 import { saveExpense, voidExpense } from "../actions";
 import type { Period } from "../period";
 
@@ -159,7 +160,13 @@ export function ExpensesScreen({
             </thead>
             <tbody>
               {rows.map((row) => (
-                <tr key={row.id} className={row.voided_at ? "opacity-60" : ""}>
+                <tr
+                  key={row.id}
+                  className={cn(
+                    // BR-095 (N-19): a voided expense stays listed, struck through.
+                    row.voided_at && "text-muted-foreground line-through",
+                  )}
+                >
                   <Td className="whitespace-nowrap">
                     {formatDate(row.spent_on)}
                   </Td>
@@ -173,8 +180,9 @@ export function ExpensesScreen({
                   </Td>
                   <Td>
                     {row.description}
+                    {/* An inline-block is not struck by the row's line-through. */}
                     {row.voided_at ? (
-                      <span className="block text-xs text-danger">
+                      <span className="inline-block w-full text-xs text-danger">
                         {me.report.voided}: {row.void_reason}
                       </span>
                     ) : null}

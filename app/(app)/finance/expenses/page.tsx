@@ -78,7 +78,8 @@ export default async function ExpensesPage({
       ? {
           categoryId: salary.id,
           trainerId: params.payoutTrainer,
-          amount: params.payoutAmount,
+          // N-20: the field shows a decimal comma, as the rest of the UI (doc 02).
+          amount: params.payoutAmount.replace(".", ","),
           description: me.finance.recordPayout,
         }
       : undefined;

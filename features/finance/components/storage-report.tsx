@@ -20,6 +20,7 @@ import { Label } from "@/components/ui/label";
 import { Table, TableWrapper, Td, Th } from "@/components/ui/table";
 import { formatDate, formatDateTime, formatMoney } from "@/lib/format";
 import { me } from "@/lib/i18n/me";
+import { cn } from "@/lib/utils";
 import { voidSale } from "@/features/storage/actions";
 import { RankedBars } from "./ranked-bars";
 
@@ -179,15 +180,19 @@ export function StorageReport({
                 {stockIns.map((row) => (
                   <tr
                     key={row.id}
-                    className={row.voided_at ? "opacity-60" : ""}
+                    className={cn(
+                      // BR-095 (N-19): a voided stock-in stays listed, struck through.
+                      row.voided_at && "text-muted-foreground line-through",
+                    )}
                   >
                     <Td className="whitespace-nowrap">
                       {formatDateTime(row.created_at)}
                     </Td>
                     <Td>
                       {row.name}
+                      {/* An inline-block is not struck by the row's line-through. */}
                       {row.voided_at ? (
-                        <span className="block text-xs text-danger">
+                        <span className="inline-block w-full text-xs text-danger">
                           {me.report.voided}: {row.void_reason}
                         </span>
                       ) : null}

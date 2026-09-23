@@ -5,6 +5,8 @@
  * browser's or the server's own date. All arithmetic runs on the `yyyy-mm-dd` text at
  * UTC noon, so a daylight-saving change can never move a boundary by a day.
  */
+import { GYM_TIME_ZONE } from "@/lib/format";
+
 export const PERIOD_PRESETS = [
   "today",
   "week",
@@ -90,6 +92,32 @@ export function resolvePeriod(
     default:
       return { preset: "month", from: startOfMonth(today), to: endOfMonth(today) };
   }
+}
+
+/** A local date's midnight in the gym's zone, as an ISO instant with that day's offset. */
+function midnight(date: string, timeZone: string): string {
+  // EU clocks change at 01:00 UTC, after every local midnight, so the offset in force at
+  // 00:00 UTC of a date is the one its local midnight had.
+  const name =
+    new Intl.DateTimeFormat("en-US", { timeZone, timeZoneName: "longOffset" })
+      .formatToParts(new Date(`${date}T00:00:00Z`))
+      .find((part) => part.type === "timeZoneName")?.value ?? "GMT";
+  return `${date}T00:00:00${name === "GMT" ? "+00:00" : name.slice(3)}`;
+}
+
+/**
+ * N-18: the instants a period of local dates covers, for filtering a timestamp column:
+ * from the first day's midnight up to, not including, the midnight after the last day.
+ * Each end takes its own offset, so a winter (CET) day is not read as a summer one.
+ */
+export function periodInstants(
+  period: Pick<Period, "from" | "to">,
+  timeZone: string = GYM_TIME_ZONE,
+): { start: string; end: string } {
+  return {
+    start: midnight(period.from, timeZone),
+    end: midnight(shiftDays(period.to, 1), timeZone),
+  };
 }
 
 /** The period a screen's search parameters ask for, falling back to Ovaj mjesec. */

@@ -8,7 +8,7 @@ import {
   type AuditRow,
 } from "@/features/finance/components/audit-diff";
 import { PeriodPicker } from "@/features/finance/components/period-picker";
-import { periodFromParams } from "@/features/finance/period";
+import { periodFromParams, periodInstants } from "@/features/finance/period";
 import { requireStaff } from "@/lib/auth";
 import { formatDateTime } from "@/lib/format";
 import { gymToday } from "@/lib/gym-date";
@@ -62,16 +62,18 @@ export default async function AuditPage({
   const params = await searchParams;
   const period = periodFromParams(params, await gymToday(staff.gym_id));
 
+  // The period is a range of local dates and the column a timestamp: N-18 takes each
+  // end's own offset, where a fixed +02:00 misread every winter (CET) day by an hour.
+  const { start, end } = periodInstants(period);
+
   const supabase = await createClient();
   let query = supabase
     .from("audit_log")
     .select(
       "id, table_name, row_id, action, old_data, new_data, changed_by, changed_at",
     )
-    // The period is a range of local dates; the column is a timestamp, so the end of
-    // the last day is included by comparing against the next day's start.
-    .gte("changed_at", `${period.from}T00:00:00+02:00`)
-    .lt("changed_at", `${period.to}T23:59:59.999+02:00`)
+    .gte("changed_at", start)
+    .lt("changed_at", end)
     .order("changed_at", { ascending: false })
     .limit(LIMIT);
   if (params.user) query = query.eq("changed_by", params.user);

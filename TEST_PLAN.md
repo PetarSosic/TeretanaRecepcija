@@ -2154,7 +2154,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   „Aktivni članovi“ se mijenjaju sa periodom, i period je vidljiv u adresi (`?period=…`).
   „Ova sedmica“ ide od ponedjeljka do nedjelje.
 - **Gdje provjeriti:** UI, adresna linija
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E finance.spec.ts + DB 0012: zbirni prihodi/troškovi, podjele i grafikon za 12 mjeseci. Svi periodi i svaki detalj iz plana nisu provjereni.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-high-f.spec.ts`: recepcija proda Mjesečnu (79, gotovina), Grupni i G+T sa trenerom (69 i 99, kartica), Personalni (100, gotovina) i jednu dnevnu kartu koju poništi. Na `/finance` svaki izbor („Danas“, „Ova sedmica“, „Ovaj mjesec“, „Prošli mjesec“, „Ova godina“, „Proizvoljno“ juče–danas + [Prikaži]) upisuje `?period=…` (i `from`/`to`) u adresu i preživljava osvježavanje; „Prihod“ je 347,00 € u svim periodima koji sadrže danas, a 0,00 € za „Prošli mjesec“; kartice „Troškovi“, „Profit“, „Zarada na magacinu“, „Aktivni članovi“ su prisutne. Da „Ova sedmica“ ide od ponedjeljka do nedjelje provjereno je unit testom (`tests/unit/period.test.ts`: ponedjeljak, srijeda, nedjelja i sedmica preko dva mjeseca). Raniji dokaz (22.09.): E2E finance.spec.ts + DB 0012: zbirni prihodi/troškovi, podjele i grafikon za 12 mjeseci. Svi periodi i svaki detalj iz plana nisu provjereni.
 
 ### [FIN-02] Proizvoljan period — neispravne vrijednosti
 - **Prioritet:** Srednje
@@ -2176,7 +2176,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   broje. Prazna stanja: „Nema podataka za izabrani period.“, „Nijedna članarina ne ističe u
   narednih 7 dana.“, „Nema članova sa neplaćenim dolascima.“ Imena u listama vode na profil člana.
 - **Gdje provjeriti:** UI; ručna kontrola zbira
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E finance.spec.ts + DB 0012: zbirni prihodi/troškovi, podjele i grafikon za 12 mjeseci. Svi periodi i svaki detalj iz plana nisu provjereni.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-high-f.spec.ts`: za danas „Prihod po vrsti članarine“ = 100 + 99 + 79 + 69 = 347,00 € (poklapa se sa karticom „Prihod“), „Prihod po načinu plaćanja“ = Gotovina 179,00 € + Platna kartica 168,00 €; poništena dnevna karta se nigdje ne broji. „Troškovi po kategoriji“ bez troškova → „Nema podataka za izabrani period.“, isto i za oba raščlanjenja u „Prošlom mjesecu“. „Ističe u narednih 7 dana“ prikazuje člana čija članarina ističe za 3 dana (sa datumom), „Članovi sa neplaćenim dolascima“ člana sa neplaćenim dolaskom; oba imena vode na profil člana. Raniji dokaz (22.09.): E2E finance.spec.ts + DB 0012: zbirni prihodi/troškovi, podjele i grafikon za 12 mjeseci. Svi periodi i svaki detalj iz plana nisu provjereni.
 
 ### [FIN-04] Grafikon prihoda i troškova po mjesecima
 - **Prioritet:** Srednje
@@ -2231,7 +2231,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   „Nema otvorene smjene. Recepcioner mora biti prijavljen.“ Sa smjenom: trošak umanjuje očekivanu
   gotovinu u zaključenju smjene.
 - **Gdje provjeriti:** UI; `/shift/close`
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** Unit schema-bounds: on/true/false/null i niska false; DB 0012 finansijski obračun. Checkbox i sve kombinacije plaćanja nisu ponovljeni kroz UI.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-high-f.spec.ts`: uz kvačicu „Iz kase“ stoji „Datum se postavlja na danas, način na gotovinu, i traži otvorenu smjenu.“; polje datuma postaje nepromjenjivo sa današnjim datumom, a „Način“ nepromjenjiv na „Gotovina“. Sa otvorenom smjenom recepcionerke trošak od 20 se čuva (`cash`, `paid_from_till`, današnji datum, vezan za smjenu) i očekivana gotovina otvorene smjene pada sa 179,00 na 159,00 €. Kada smjena više nije otvorena: „Nema otvorene smjene. Recepcioner mora biti prijavljen.“; bez kvačice se isti trošak čuva kao običan (nije iz kase, bez smjene). Raniji dokaz (22.09.): Unit schema-bounds: on/true/false/null i niska false; DB 0012 finansijski obračun. Checkbox i sve kombinacije plaćanja nisu ponovljeni kroz UI.
 
 ### [FIN-08] Trener se bira samo uz kategoriju „Plate“
 - **Prioritet:** Visoko
@@ -2242,7 +2242,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** polje „Trener“ se pojavljuje samo za `Plate`. Trošak sa trenerom u
   nesalarijskoj kategoriji mora biti odbijen („Provjerite unesene podatke.“).
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** DB 0012 provjerava vlasnikov trošak/isplatu treneru; prikaz/skrivanje trenera po kategoriji nije zasebno izvršen.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-high-f.spec.ts`: polje „Trener“ se pojavljuje uz kategoriju sa oznakom plate i nestaje uz „Kirija“. Krivotvorena forma koja ipak šalje trenera uz „Kirija“ → „Provjerite unesene podatke.“ i trošak nije sačuvan. Raniji dokaz (22.09.): DB 0012 provjerava vlasnikov trošak/isplatu treneru; prikaz/skrivanje trenera po kategoriji nije zasebno izvršen.
 
 ### [FIN-09] Filteri na ekranu troškova
 - **Prioritet:** Srednje
@@ -2263,7 +2263,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** prvo „Unesite razlog (3–200 znakova).“, zatim „Poništeno“ — stavka ostaje
   precrtana i izlazi iz ukupnih troškova.
 - **Gdje provjeriti:** UI; `/finance` kartica „Troškovi“
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** DB 0008 i 0012 pokrivaju prava troškova i obračun; kompletan vlasnikov UI tok poništavanja nije izvršen.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO (nakon popravke N-19).** `test-plan-high-f.spec.ts`: [Poništi] sa `ab` → „Unesite razlog (3–200 znakova).“; sa `Duplirana faktura` dijalog se zatvara, red ostaje uz „Poništeno: Duplirana faktura“, bez dugmeta [Poništi]; „Ukupno“ pada sa 20,00 na 0,00 € uz „Poništeni troškovi nisu uračunati.“, kartica „Troškovi“ na `/finance` 0,00 €, a očekivana gotovina smjene se vraća na 179,00 €. Prvi pokušaj: red je bio samo prigušen (`opacity-60`), a ne precrtan kako traži BR-095 — **N-19**; popravljeno i na troškovima i na ulazima robe (S-20). Poslije poništavanja nema poruke (toast), samo se zatvori dijalog — vidi §9.9. Raniji dokaz (22.09.): DB 0008 i 0012 pokrivaju prava troškova i obračun; kompletan vlasnikov UI tok poništavanja nije izvršen.
 
 ### [FIN-11] Ekran „Treneri“ (S-18)
 - **Prioritet:** Visoko
@@ -2276,7 +2276,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   nije definisana) stoji „nije definisano“. [Evidentiraj isplatu] otvara formu troška kategorije
   „Plate“ sa unaprijed izabranim trenerom. Prazan mjesec: „Nema uplata za izabrani mjesec.“
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E finance.spec.ts + DB 0012: E9–E12 obračun po treneru i nepoznata naknada. Sve isplate/filteri nisu provjereni kroz UI.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO (uz popravku N-20).** `test-plan-high-f.spec.ts`: sve kolone iz plana su tu. Tamara (Grupni 69 uz 70 % + G+T 99 uz 40 € teretani i 100 %): Klijenti 2, Prihod 168,00, Za trenera 107,30, Za teretanu 60,70, Razlika 107,30 €. Julija (personalna, naknada nije definisana): ispod imena „nije definisano: 1“, u detalju „nije definisano“. Detalj trenera („Uplate trenera — …“) navodi člana i plan. [Evidentiraj isplatu] otvara formu troška sa kategorijom plata, izabranim trenerom, opisom „Evidentiraj isplatu“ i iznosom razlike — iznos je bio upisan kao `107.30` (tačka), sada `107,30` (**N-20**). Mjesec bez prometa → „Nema uplata za izabrani mjesec.“ u detalju. Raniji dokaz (22.09.): E2E finance.spec.ts + DB 0012: E9–E12 obračun po treneru i nepoznata naknada. Sve isplate/filteri nisu provjereni kroz UI.
 
 ### [FIN-12] Ekran „Smjene“ (S-19)
 - **Prioritet:** Visoko
@@ -2289,7 +2289,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   Zaključenje daje „Smjena je zaključena.“, a vlasnikova sesija se **ne** prekida.
   Prazno: „Nema smjena u izabranom periodu.“
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E screens.spec.ts: ekran, kontrole i bez overflowa; DB 0010/0009/0001/0012 pokrivaju obračun i audit. Svi filteri/akcije/detalji nisu izvršeni.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-high-f.spec.ts`: otvorena smjena je posebno prikazana na vrhu („Otvorena smjena“, ime, početak, „Očekivano“). [Zaključi smjenu] (polje „Prebrojana gotovina (€)“ uz „Ostavite prazno ako niste brojali.“) → „Smjena je zaključena.“, a vlasnik ostaje prijavljen. Kolone: Recepcioner, Početak, Kraj, Način zaključenja („Zaključio/la E2E Vlasnik F“), Gotovina, Kartica, Očekivano, Prebrojano („nije prebrojano“), Razlika, Email („neuspješno 1×“, jer test server ima neispravan Resend ključ). [PDF] vraća `application/pdf`; [Pošalji ponovo] → „Slanje nije uspjelo. Pokušajte ponovo.“ „Prošli mjesec“ → „Nema smjena u izabranom periodu.“ Raniji dokaz (22.09.): E2E screens.spec.ts: ekran, kontrole i bez overflowa; DB 0010/0009/0001/0012 pokrivaju obračun i audit. Svi filteri/akcije/detalji nisu izvršeni.
 
 ### [FIN-13] Ekran „Magacin“ za vlasnika (S-20)
 - **Prioritet:** Srednje
@@ -2313,7 +2313,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   Kada ima više od 200 zapisa, stoji „Prikazano je prvih 200 izmjena. Suzite period da vidite ostale.“
   Prazno: „Nema izmjena u izabranom periodu.“
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E screens.spec.ts: ekran, kontrole i bez overflowa; DB 0010/0009/0001/0012 pokrivaju obračun i audit. Svi filteri/akcije/detalji nisu izvršeni.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO (uz popravku N-18; nalaz N-21 otvoren).** `test-plan-high-f.spec.ts`: dnevnik za danas ima „Unos“, „Izmjena“ (datum rođenja člana `01.01.1990 → 15.03.1995`) i „Poništeno“ (trošak), sa vremenom, korisnikom i stavkom; filter „Korisnik“ ostavlja samo njegove zapise, filter „Stavka“ = Troškovi samo troškove, oba ostaju u adresi. 205 zapisa u jednom danu → prikazano 200 uz „Prikazano je prvih 200 izmjena. Suzite period da vidite ostale.“; „Prošli mjesec“ → „Nema izmjena u izabranom periodu.“ **N-18:** granice perioda su bile fiksno `+02:00`, pa je zimi (CET) dan 15.01. prikazivao zapis od 14.01. u 23:30, a gubio onaj od 15.01. u 23:30; sada se uzima pomak zone za svaki datum. **N-21 (otvoreno):** prikaz izmjene koristi nazive kolona iz baze i sirove vrijednosti (`date_of_birth`, `gym_id: <uuid>`, `method: cash`, `created_by: <uuid>`), a vrsta stavke „Uplate“ piše kao „Uplate danas“ — vidi §9.9. Raniji dokaz (22.09.): E2E screens.spec.ts: ekran, kontrole i bez overflowa; DB 0010/0009/0001/0012 pokrivaju obračun i audit. Svi filteri/akcije/detalji nisu izvršeni.
 
 ### [FIN-15] Naknadni unos — dolazak (S-22, BR-120)
 - **Prioritet:** Visoko
@@ -2327,7 +2327,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   Budući datum: odbijeno („Unesite datum koji nije u budućnosti.“ ili „Provjerite unesene podatke.“ —
   zabilježite koja poruka stigne, vidi SUSPECT-08).
 - **Gdje provjeriti:** UI; profil člana → „Dolasci“; `/shift/close` (ne smije se pojaviti)
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** DB 0012: naknadni unos ulazi u finansije, ne u smjenu; E2E screens otvara ekran. Cijeli tok četiri forme i negativni datumi nisu izvršeni kroz UI.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-high-f.spec.ts`: traka „Naknadni unos – ne ulazi u smjenu.“ je na vrhu. Juče 18:00–19:30, Teretana → „Naknadni unos je sačuvan.“; dolazak je `is_backdated`, bez smjene, i vidi se u profilu → „Dolasci“. Izlazak 17:00 → „Vrijeme izlaska mora biti poslije vremena ulaska.“ Sutrašnji datum → „Unesite datum koji nije u budućnosti.“ (SUSPECT-08: stiže konkretna poruka, ne opšta). Raniji dokaz (22.09.): DB 0012: naknadni unos ulazi u finansije, ne u smjenu; E2E screens otvara ekran. Cijeli tok četiri forme i negativni datumi nisu izvršeni kroz UI.
 
 ### [FIN-16] Naknadni unos — članarina, dnevne karte, zamjenska kartica
 - **Prioritet:** Visoko
@@ -2343,7 +2343,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   pravilima (BR-052).“). Količina `0` i `21` daju „Unesite broj između 1 i 20.“
 - **Gdje provjeriti:** UI; `/payments/today` (ne smiju se pojaviti — to su samo današnje, neknadne
   stavke su isključene); profil člana
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** DB 0012: naknadni unos ulazi u finansije, ne u smjenu; E2E screens otvara ekran. Cijeli tok četiri forme i negativni datumi nisu izvršeni kroz UI.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-high-f.spec.ts`: uz početak članarine stoji „Ostavite prazno da se izračuna po pravilima (BR-052).“; Mjesečna plaćena 15.08. bez početka → sačuvano, početak 15.08. (razlog „Počinje danas“, BR-052 korak 3 u odnosu na izabrani datum), kraj 15.09. Dnevne karte `0` i `21` → „Unesite broj između 1 i 20.“, `2` (juče) → 20,00 €. Zamjenska kartica gotovinom, juče → 5,00 €. Sve tri uplate su `is_backdated` i bez smjene, nema ih na `/payments/today`; članarina se vidi u finansijama na svoj datum (Prihod 79,00 € za 15.08.), a u profilu člana su uplate i članarina označene „Naknadno“. Raniji dokaz (22.09.): DB 0012: naknadni unos ulazi u finansije, ne u smjenu; E2E screens otvara ekran. Cijeli tok četiri forme i negativni datumi nisu izvršeni kroz UI.
 
 ### [FIN-17] Naknadni unos bez izabranog člana
 - **Prioritet:** Srednje
