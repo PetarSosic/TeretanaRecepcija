@@ -1034,7 +1034,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Test podaci:** kartica člana Ana Anić
 - **Očekivani rezultat:** „Ova kartica nije prazna.“ i dugme za čuvanje ostaje onemogućeno.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** DB 0006 provjerava karticu pri registraciji; kompletne UI varijante zauzete/poništene kartice nisu izvršene.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-high-b.spec.ts`: u dijalogu „Novi član“ kôd kartice koja pripada drugom članu → „Ova kartica nije prazna.“, [Sačuvaj] onemogućeno. Raniji dokaz (22.09.): DB 0006 provjerava karticu pri registraciji; kompletne UI varijante zauzete/poništene kartice nisu izvršene.
 
 ### [MEM-04] Validacija polja — prazna i predugačka
 - **Prioritet:** Kritično
@@ -1107,7 +1107,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   pretraga, PDF). Razmaci ispred i iza se uklanjaju prije čuvanja. Emoji: ako se prihvata, mora se
   ispravno prikazati svuda uključujući PDF; ako PDF prikazuje kvadratiće, zabilježite kao bug.
 - **Gdje provjeriti:** UI; PDF izvještaja smjene; PDF kartica
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E registracija i pretraga Ćosić, unit normalizacija razmaka i PDF testovi čćšžđ prolaze. Ćirilica i emoji nisu provjereni.
+- [ ] Prošlo  [x] Palo  Napomena: **23.09.2026 — PALO (N-16, emoji u PDF-u).** `test-plan-high-b.spec.ts`: `Ćira Ćirić Šušnjić-Žižić`, `Ђорђе Петровић` i `  Ana  ` (sačuvano kao `Ana`) ispravno se prikazuju u listi, profilu, pretrazi (`ciric susnjic`, `петров`) i u PDF izvještaju smjene. `Ana😀` se prihvata i prikazuje na ekranima i u pretrazi, ali **u PDF-u emoji nestaje** (ostaje prazno mjesto, bez kvadratića) — font izvještaja nema emoji. Po kriterijumu plana to je nalaz; odluka je vlasnikova (§9.9, §7 pitanje 1). Raniji dokaz (22.09.): E2E registracija i pretraga Ćosić, unit normalizacija razmaka i PDF testovi čćšžđ prolaze. Ćirilica i emoji nisu provjereni.
 
 ### [MEM-08] Upozorenje o duplikatu (BR-043)
 - **Prioritet:** Visoko
@@ -1118,7 +1118,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   brojem i imenom postojećeg člana, dugmetom [Otvori postojećeg] i dugmetom [Ipak sačuvaj].
   Ovo je **upozorenje, ne zabrana** — [Ipak sačuvaj] pravi drugog člana.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** DB 0006 provjerava duplikate BR-043; dijalog upozorenja i potvrda u UI-ju nisu provjereni.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-high-b.spec.ts`: `069123456` pa Tab → „Već postoji član sa istim telefonom ili emailom:“ sa „#1 E2E Zauzeta Kartica“, [Otvori postojećeg] i [Ipak sačuvaj]; [Ipak sačuvaj] pravi drugog člana sa istim telefonom (upozorenje, ne zabrana). Raniji dokaz (22.09.): DB 0006 provjerava duplikate BR-043; dijalog upozorenja i potvrda u UI-ju nisu provjereni.
 
 ### [MEM-09] Lista članova: pretraga, filter i straničenje
 - **Prioritet:** Visoko
@@ -1135,7 +1135,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   `page=999` daje praznu listu, `page=-1` i `page=abc` se ponašaju kao prva strana,
   nepoznat `status` se ponaša kao „Svi“. Prazna pretraga: „Nema članova koji odgovaraju pretrazi.“
 - **Gdje provjeriti:** UI, adresna linija
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E members.spec.ts pretraga cosic nalazi Ćosić. Statusni filteri i straničenje preko 25 članova nisu potpuno izvršeni.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO uz napomenu.** `test-plan-high-b.spec.ts`: kolone Broj, Ime i prezime, Telefon, Status, Posljednji dolazak; 35 članova → 25 + 10, „Strana 1 od 2“ ↔ „Strana 2 od 2“; pretraga po imenu, broju i telefonu; `zzzz` → „Nema članova…“; filter „Status“ mijenja adresu i listu (aktivnih 6); `page=-1`, `page=abc`, `status=izmisljeno` → prva strana, `page=999` prazna lista bez pada. Napomena (§9.9): ako se filter promijeni u roku od 250 ms nakon brisanja pretrage, odložena pretraga ga poništi. Raniji dokaz (22.09.): E2E members.spec.ts pretraga cosic nalazi Ćosić. Statusni filteri i straničenje preko 25 članova nisu potpuno izvršeni.
 
 ### [MEM-10] Prazno stanje kad nema nijednog člana
 - **Prioritet:** Srednje
@@ -1157,7 +1157,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   ista nakon osvježavanja. Prazna stanja: „Član još nema članarinu.“, „Nema uplata za prikaz.“,
   „Nema dolazaka.“
 - **Gdje provjeriti:** UI, adresna linija
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E members/payments provjeravaju profil, prodaju/produženje i povezane zapise. Sve tri kartice i sva polja nisu pojedinačno provjereni.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-high-b.spec.ts`: zaglavlje ima ime, „#1“ i „Aktivna kartica <kôd>“; kartice mijenjaju `?tab=` u adresi, osvježavanje ostaje na „Dolasci“; prazna stanja „Član još nema članarinu.“, „Nema uplata za prikaz.“, „Nema dolazaka.“; dugme nazad vraća prethodnu karticu. Raniji dokaz (22.09.): E2E members/payments provjeravaju profil, prodaju/produženje i povezane zapise. Sve tri kartice i sva polja nisu pojedinačno provjereni.
 
 ### [MEM-12] Straničenje dolazaka u profilu
 - **Prioritet:** Nisko
@@ -1176,7 +1176,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** „Podaci su sačuvani.“, novi podaci se odmah vide u profilu i u listi.
   Ista validacija kao pri unosu (probajte prazno ime — mora pasti).
 - **Gdje provjeriti:** UI; vlasnik: `/finance/audit` mora imati zapis izmjene
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** DB 0006 provjerava izmjenu člana i audit; forma nije zasebno izvršena.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-high-b.spec.ts`: prazno ime → „Unesite ime (1–50 znakova).“; prezime `Anić-Marković` i telefon `068999111` → „Podaci su sačuvani.“, odmah na profilu (`+38268999111`) i u listi; vlasnik u `/finance/audit` vidi „last_name: Profil → Anić-Marković“. Raniji dokaz (22.09.): DB 0006 provjerava izmjenu člana i audit; forma nije zasebno izvršena.
 
 ### [MEM-14] Anonimizacija smije samo vlasnik/administrator (BR-046)
 - **Prioritet:** Kritično
@@ -1215,7 +1215,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   Na `/payments/today` je uplata „Zamjenska kartica – <ime>“. Skeniranje **stare** kartice daje
   „Kartica je poništena. Pronađite člana pretragom.“
 - **Gdje provjeriti:** UI; `/payments/today`
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E members.spec.ts + DB 0006: zamjena praznom karticom, naknada i statusi kartica. Sve navedene negativne kombinacije nisu izvedene u UI-ju.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-high-b.spec.ts`: „Naknada za novu karticu: 5,00 €“ → Gotovina → [Nastavi] → nova prazna kartica → „Nova kartica dodijeljena. Stara kartica je poništena.“; profil pokazuje novi kôd; S-12 ima „Zamjenska kartica – #1 E2E Zauzeta Kartica“ 5,00 €; stara kartica na recepciji → „Kartica je poništena. Pronađite člana pretragom.“ Raniji dokaz (22.09.): E2E members.spec.ts + DB 0006: zamjena praznom karticom, naknada i statusi kartica. Sve navedene negativne kombinacije nisu izvedene u UI-ju.
 
 ### [MEM-17] Zamjena kartice bez otvorene smjene
 - **Prioritet:** Visoko
@@ -1225,7 +1225,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** radnja je onemogućena ili odbijena porukom „Nema otvorene smjene.
   Recepcioner mora biti prijavljen.“
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** DB i unit zaštita novčanih radnji bez smjene prolaze; konkretan dijalog zamjene nije otvoren bez smjene.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-high-b.spec.ts`: bez otvorene smjene [Izgubljena kartica] je onemogućena sa razlogom „Nema otvorene smjene. Recepcioner mora biti prijavljen.“ Raniji dokaz (22.09.): DB i unit zaštita novčanih radnji bez smjene prolaze; konkretan dijalog zamjene nije otvoren bez smjene.
 
 ### [MEM-18] HTML i SQL znakovi u podacima člana
 - **Prioritet:** Kritično (bezbjednost)
