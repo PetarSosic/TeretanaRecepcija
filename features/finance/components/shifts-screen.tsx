@@ -142,7 +142,9 @@ export function ShiftsScreen({ rows }: { rows: ShiftRow[] }) {
                       : formatMoney(row.counted_cash)}
                   </Td>
                   <Td className="text-right tabular-nums">
-                    {row.difference === null ? "—" : formatMoney(row.difference)}
+                    {row.difference === null
+                      ? "—"
+                      : formatMoney(row.difference)}
                   </Td>
                   <Td>
                     {EMAIL_STATUS[row.email_status]}
@@ -173,7 +175,10 @@ export function ShiftsScreen({ rows }: { rows: ShiftRow[] }) {
         </TableWrapper>
       )}
 
-      <CloseDialog shift={closing} onDone={() => setClosing(null)} />
+      {/* N-12: mounted only while open, so each opening starts without old messages. */}
+      {closing ? (
+        <CloseDialog shift={closing} onDone={() => setClosing(null)} />
+      ) : null}
     </div>
   );
 }

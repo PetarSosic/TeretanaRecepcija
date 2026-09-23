@@ -64,8 +64,8 @@ export const expenseSchema = z
     // SUSPECT-08: z.coerce.boolean() turns every non-empty string into true, "false"
     // included. Only the checkbox's own values are accepted instead.
     fromTill: checkbox,
-    supplier: z.string().trim().max(100, me.errors.E_VALIDATION),
-    invoice: z.string().trim().max(50, me.errors.E_VALIDATION),
+    supplier: z.string().trim().max(100, me.finance.supplierInvalid),
+    invoice: z.string().trim().max(50, me.finance.invoiceInvalid),
     vat: z.enum(["yes", "no", "unset"]),
     trainerId: optionalUuid,
   })

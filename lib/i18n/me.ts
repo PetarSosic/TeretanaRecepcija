@@ -693,6 +693,9 @@ export const me = {
     allMethods: "Svi načini",
     allStaff: "Svi korisnici",
     expenseSaved: "Trošak je sačuvan.",
+    // N-11: the two optional texts of BR-133, which had no message of their own.
+    supplierInvalid: "Dobavljač može imati najviše 100 znakova.",
+    invoiceInvalid: "Račun može imati najviše 50 znakova.",
     expensesEmpty: "Nema troškova u izabranom periodu.",
     // D-63: the total of the listed expenses.
     expensesTotal: "Ukupno: {amount}",

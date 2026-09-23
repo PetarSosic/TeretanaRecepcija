@@ -97,6 +97,25 @@ export async function proxy(request: NextRequest) {
       } else if (staff.must_change_password && path !== PASSWORD_ROUTE) {
         if (!isPublic)
           return redirect(request, PASSWORD_ROUTE, policy, response);
+      } else if (
+        staff.role === "receptionist" &&
+        !isPublic &&
+        // A first login opens the shift only after S-01b (AS-18).
+        path !== PASSWORD_ROUTE &&
+        request.method === "GET"
+      ) {
+        // BR-116 and BR-119 (N-09): once the owner or the nightly job has closed the
+        // shift, the receptionist's next request ends the session. The app layout
+        // checks this too, but a click in the menu is a client navigation that keeps
+        // the shared layout and never re-runs it; this proxy sees every navigation.
+        // Server actions (POST) are left alone: the RPC answers them with BR-092's
+        // message instead of a redirect the action cannot follow.
+        const { data: shift, error: shiftError } =
+          await supabase.rpc("open_shift_info");
+        if (!shiftError && !shift) {
+          await supabase.auth.signOut();
+          return redirect(request, "/login", policy, response, "auto=1");
+        }
       } else if (path === "/login") {
         const home = staff.must_change_password
           ? PASSWORD_ROUTE
@@ -118,10 +137,11 @@ function redirect(
   path: string,
   policy: string,
   carry?: NextResponse,
+  search = "",
 ) {
   const target = request.nextUrl.clone();
   target.pathname = path;
-  target.search = "";
+  target.search = search;
   const response = NextResponse.redirect(target);
   // Refreshed or cleared session cookies must reach the browser with the redirect.
   carry?.cookies.getAll().forEach((cookie) => response.cookies.set(cookie));

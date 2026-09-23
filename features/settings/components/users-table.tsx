@@ -196,11 +196,6 @@ function CreateDialog({
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }) {
-  const [state, action, pending] = useActionState(createStaffUser, idleState);
-  const [role, setRole] = useState<AppRole>("receptionist");
-  const close = useCallback(() => onOpenChange(false), [onOpenChange]);
-  useActionToast(state, close);
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       {/* S-23: the title says everything; Radix wants the absence stated. */}
@@ -208,85 +203,104 @@ function CreateDialog({
         <DialogHeader>
           <DialogTitle>{me.users.createTitle}</DialogTitle>
         </DialogHeader>
-        <form action={action} className="grid gap-4" noValidate>
-          <FormError>{state.error}</FormError>
-          <div className="grid gap-1.5">
-            <Label htmlFor="role">{me.users.role}</Label>
-            <Select
-              id="role"
-              name="role"
-              value={role}
-              onChange={(event) => setRole(event.target.value as AppRole)}
-            >
-              <option value="receptionist">{me.roles.receptionist}</option>
-              <option value="manager">{me.roles.manager}</option>
-              {/* P-03 (D-58): only an admin creates owners and admins. */}
-              {callerRole === "admin" ? (
-                <>
-                  <option value="owner">{me.roles.owner}</option>
-                  <option value="admin">{me.roles.admin}</option>
-                </>
-              ) : null}
-            </Select>
-          </div>
-          <div className="grid gap-1.5">
-            <Label htmlFor="fullName">{me.users.fullName}</Label>
-            <Input id="fullName" name="fullName" required />
-            <FieldError id="fullName-error">
-              {state.fieldErrors?.fullName}
-            </FieldError>
-          </div>
-          {/* D-57: usernames for every role, an email for the admin. */}
-          {role !== "admin" ? (
-            <div className="grid gap-1.5">
-              <Label htmlFor="username">{me.users.username}</Label>
-              <Input id="username" name="username" required />
-              <p className="text-xs text-muted-foreground">
-                {me.users.usernameHint}
-              </p>
-              <FieldError id="username-error">
-                {state.fieldErrors?.username}
-              </FieldError>
-            </div>
-          ) : (
-            <div className="grid gap-1.5">
-              <Label htmlFor="email">{me.users.email}</Label>
-              <Input id="email" name="email" type="email" required />
-              <FieldError id="email-error">
-                {state.fieldErrors?.email}
-              </FieldError>
-            </div>
-          )}
-          <div className="grid gap-1.5">
-            <Label htmlFor="password">{me.users.temporaryPassword}</Label>
-            <Input
-              id="password"
-              name="password"
-              type="password"
-              minLength={8}
-              required
-              autoComplete="new-password"
-            />
-            <FieldError id="password-error">
-              {state.fieldErrors?.password}
-            </FieldError>
-          </div>
-          <DialogFooter>
-            <DialogClose asChild>
-              <Button type="button" variant="outline">
-                {me.common.cancel}
-              </Button>
-            </DialogClose>
-            <Button type="submit" disabled={pending}>
-              {pending ? (
-                <Loader2 aria-hidden="true" className="animate-spin" />
-              ) : null}
-              {me.common.save}
-            </Button>
-          </DialogFooter>
-        </form>
+        {/* N-12: the form and its action state exist only while the dialog is open,
+            so a reopened dialog never shows the previous attempt's messages. */}
+        {open ? (
+          <CreateForm callerRole={callerRole} onOpenChange={onOpenChange} />
+        ) : null}
       </DialogContent>
     </Dialog>
+  );
+}
+
+function CreateForm({
+  callerRole,
+  onOpenChange,
+}: {
+  callerRole: AppRole;
+  onOpenChange: (open: boolean) => void;
+}) {
+  const [state, action, pending] = useActionState(createStaffUser, idleState);
+  const [role, setRole] = useState<AppRole>("receptionist");
+  const close = useCallback(() => onOpenChange(false), [onOpenChange]);
+  useActionToast(state, close);
+
+  return (
+    <form action={action} className="grid gap-4" noValidate>
+      <FormError>{state.error}</FormError>
+      <div className="grid gap-1.5">
+        <Label htmlFor="role">{me.users.role}</Label>
+        <Select
+          id="role"
+          name="role"
+          value={role}
+          onChange={(event) => setRole(event.target.value as AppRole)}
+        >
+          <option value="receptionist">{me.roles.receptionist}</option>
+          <option value="manager">{me.roles.manager}</option>
+          {/* P-03 (D-58): only an admin creates owners and admins. */}
+          {callerRole === "admin" ? (
+            <>
+              <option value="owner">{me.roles.owner}</option>
+              <option value="admin">{me.roles.admin}</option>
+            </>
+          ) : null}
+        </Select>
+      </div>
+      <div className="grid gap-1.5">
+        <Label htmlFor="fullName">{me.users.fullName}</Label>
+        <Input id="fullName" name="fullName" required />
+        <FieldError id="fullName-error">
+          {state.fieldErrors?.fullName}
+        </FieldError>
+      </div>
+      {/* D-57: usernames for every role, an email for the admin. */}
+      {role !== "admin" ? (
+        <div className="grid gap-1.5">
+          <Label htmlFor="username">{me.users.username}</Label>
+          <Input id="username" name="username" required />
+          <p className="text-xs text-muted-foreground">
+            {me.users.usernameHint}
+          </p>
+          <FieldError id="username-error">
+            {state.fieldErrors?.username}
+          </FieldError>
+        </div>
+      ) : (
+        <div className="grid gap-1.5">
+          <Label htmlFor="email">{me.users.email}</Label>
+          <Input id="email" name="email" type="email" required />
+          <FieldError id="email-error">{state.fieldErrors?.email}</FieldError>
+        </div>
+      )}
+      <div className="grid gap-1.5">
+        <Label htmlFor="password">{me.users.temporaryPassword}</Label>
+        <Input
+          id="password"
+          name="password"
+          type="password"
+          minLength={8}
+          required
+          autoComplete="new-password"
+        />
+        <FieldError id="password-error">
+          {state.fieldErrors?.password}
+        </FieldError>
+      </div>
+      <DialogFooter>
+        <DialogClose asChild>
+          <Button type="button" variant="outline">
+            {me.common.cancel}
+          </Button>
+        </DialogClose>
+        <Button type="submit" disabled={pending}>
+          {pending ? (
+            <Loader2 aria-hidden="true" className="animate-spin" />
+          ) : null}
+          {me.common.save}
+        </Button>
+      </DialogFooter>
+    </form>
   );
 }
 
@@ -297,48 +311,53 @@ function EditDialog({
   row: StaffRow | null;
   onClose: () => void;
 }) {
-  const [state, action, pending] = useActionState(updateStaffUser, idleState);
-  useActionToast(state, onClose);
-
   return (
     <Dialog open={Boolean(row)} onOpenChange={(open) => !open && onClose()}>
       <DialogContent aria-describedby={undefined}>
         <DialogHeader>
           <DialogTitle>{me.users.editTitle}</DialogTitle>
         </DialogHeader>
-        {row ? (
-          <form action={action} className="grid gap-4" noValidate>
-            <FormError>{state.error}</FormError>
-            <input type="hidden" name="staffId" value={row.id} />
-            <div className="grid gap-1.5">
-              <Label htmlFor="edit-fullName">{me.users.fullName}</Label>
-              <Input
-                id="edit-fullName"
-                name="fullName"
-                defaultValue={row.full_name}
-                required
-              />
-              <FieldError id="edit-fullName-error">
-                {state.fieldErrors?.fullName}
-              </FieldError>
-            </div>
-            <DialogFooter>
-              <DialogClose asChild>
-                <Button type="button" variant="outline">
-                  {me.common.cancel}
-                </Button>
-              </DialogClose>
-              <Button type="submit" disabled={pending}>
-                {pending ? (
-                  <Loader2 aria-hidden="true" className="animate-spin" />
-                ) : null}
-                {me.common.save}
-              </Button>
-            </DialogFooter>
-          </form>
-        ) : null}
+        {/* N-12: fresh action state for every opening. */}
+        {row ? <EditForm row={row} onClose={onClose} /> : null}
       </DialogContent>
     </Dialog>
+  );
+}
+
+function EditForm({ row, onClose }: { row: StaffRow; onClose: () => void }) {
+  const [state, action, pending] = useActionState(updateStaffUser, idleState);
+  useActionToast(state, onClose);
+
+  return (
+    <form action={action} className="grid gap-4" noValidate>
+      <FormError>{state.error}</FormError>
+      <input type="hidden" name="staffId" value={row.id} />
+      <div className="grid gap-1.5">
+        <Label htmlFor="edit-fullName">{me.users.fullName}</Label>
+        <Input
+          id="edit-fullName"
+          name="fullName"
+          defaultValue={row.full_name}
+          required
+        />
+        <FieldError id="edit-fullName-error">
+          {state.fieldErrors?.fullName}
+        </FieldError>
+      </div>
+      <DialogFooter>
+        <DialogClose asChild>
+          <Button type="button" variant="outline">
+            {me.common.cancel}
+          </Button>
+        </DialogClose>
+        <Button type="submit" disabled={pending}>
+          {pending ? (
+            <Loader2 aria-hidden="true" className="animate-spin" />
+          ) : null}
+          {me.common.save}
+        </Button>
+      </DialogFooter>
+    </form>
   );
 }
 
@@ -349,53 +368,62 @@ function PasswordDialog({
   row: StaffRow | null;
   onClose: () => void;
 }) {
-  const [state, action, pending] = useActionState(setStaffPassword, idleState);
-  useActionToast(state, onClose);
-
   return (
     <Dialog open={Boolean(row)} onOpenChange={(open) => !open && onClose()}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>{me.users.passwordTitle}</DialogTitle>
-          <DialogDescription>
-            {me.users.passwordDescription}
-          </DialogDescription>
+          <DialogDescription>{me.users.passwordDescription}</DialogDescription>
         </DialogHeader>
-        {row ? (
-          <form action={action} className="grid gap-4" noValidate>
-            <FormError>{state.error}</FormError>
-            <input type="hidden" name="staffId" value={row.id} />
-            <div className="grid gap-1.5">
-              <Label htmlFor="new-password">{me.users.temporaryPassword}</Label>
-              <Input
-                id="new-password"
-                name="password"
-                type="password"
-                minLength={8}
-                required
-                autoComplete="new-password"
-              />
-              <FieldError id="new-password-error">
-                {state.fieldErrors?.password}
-              </FieldError>
-            </div>
-            <DialogFooter>
-              <DialogClose asChild>
-                <Button type="button" variant="outline">
-                  {me.common.cancel}
-                </Button>
-              </DialogClose>
-              <Button type="submit" disabled={pending}>
-                {pending ? (
-                  <Loader2 aria-hidden="true" className="animate-spin" />
-                ) : null}
-                {me.common.save}
-              </Button>
-            </DialogFooter>
-          </form>
-        ) : null}
+        {/* N-12: fresh action state for every opening. */}
+        {row ? <PasswordForm row={row} onClose={onClose} /> : null}
       </DialogContent>
     </Dialog>
+  );
+}
+
+function PasswordForm({
+  row,
+  onClose,
+}: {
+  row: StaffRow;
+  onClose: () => void;
+}) {
+  const [state, action, pending] = useActionState(setStaffPassword, idleState);
+  useActionToast(state, onClose);
+
+  return (
+    <form action={action} className="grid gap-4" noValidate>
+      <FormError>{state.error}</FormError>
+      <input type="hidden" name="staffId" value={row.id} />
+      <div className="grid gap-1.5">
+        <Label htmlFor="new-password">{me.users.temporaryPassword}</Label>
+        <Input
+          id="new-password"
+          name="password"
+          type="password"
+          minLength={8}
+          required
+          autoComplete="new-password"
+        />
+        <FieldError id="new-password-error">
+          {state.fieldErrors?.password}
+        </FieldError>
+      </div>
+      <DialogFooter>
+        <DialogClose asChild>
+          <Button type="button" variant="outline">
+            {me.common.cancel}
+          </Button>
+        </DialogClose>
+        <Button type="submit" disabled={pending}>
+          {pending ? (
+            <Loader2 aria-hidden="true" className="animate-spin" />
+          ) : null}
+          {me.common.save}
+        </Button>
+      </DialogFooter>
+    </form>
   );
 }
 

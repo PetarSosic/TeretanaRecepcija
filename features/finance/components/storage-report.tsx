@@ -75,7 +75,9 @@ export function StorageReport({
       />
 
       <section>
-        <h2 className="mb-3 text-lg font-semibold">{me.finance.storageTitle}</h2>
+        <h2 className="mb-3 text-lg font-semibold">
+          {me.finance.storageTitle}
+        </h2>
         <TableWrapper>
           <Table>
             <thead>
@@ -175,7 +177,10 @@ export function StorageReport({
               </thead>
               <tbody>
                 {stockIns.map((row) => (
-                  <tr key={row.id} className={row.voided_at ? "opacity-60" : ""}>
+                  <tr
+                    key={row.id}
+                    className={row.voided_at ? "opacity-60" : ""}
+                  >
                     <Td className="whitespace-nowrap">
                       {formatDateTime(row.created_at)}
                     </Td>
@@ -215,7 +220,10 @@ export function StorageReport({
         )}
       </section>
 
-      <VoidStockIn movement={voiding} onDone={() => setVoiding(null)} />
+      {/* N-12: mounted only while open, so each opening starts without old messages. */}
+      {voiding ? (
+        <VoidStockIn movement={voiding} onDone={() => setVoiding(null)} />
+      ) : null}
     </div>
   );
 }

@@ -49,6 +49,9 @@ export function CloseShiftScreen({
     idleState,
   );
   const [counted, setCounted] = useState("");
+  // N-10: [Zaključi] stays disabled until the amount is money; once something has been
+  // typed, the field says why instead of leaving a silent disabled button.
+  const [touched, setTouched] = useState(false);
   const [reviewing, setReviewing] = useState(false);
   const [confirming, setConfirming] = useState(false);
   const form = useRef<HTMLFormElement>(null);
@@ -132,13 +135,22 @@ export function CloseShiftScreen({
           inputMode="decimal"
           autoComplete="off"
           value={counted}
-          onChange={(event) => setCounted(event.target.value)}
-          aria-invalid={Boolean(state.fieldErrors?.countedCash)}
+          onChange={(event) => {
+            setCounted(event.target.value);
+            setTouched(true);
+          }}
+          aria-invalid={
+            Boolean(state.fieldErrors?.countedCash) ||
+            (touched && difference === null)
+          }
           aria-describedby="counted-cash-error counted-cash-difference"
           disabled={pending}
         />
         <FieldError id="counted-cash-error">
-          {state.fieldErrors?.countedCash}
+          {state.fieldErrors?.countedCash ??
+            (touched && difference === null
+              ? me.closeShift.countedInvalid
+              : undefined)}
         </FieldError>
         {/* BR-115: negative is Manjak, positive is Višak; text and icon, not colour. */}
         <p
@@ -206,9 +218,7 @@ export function CloseShiftScreen({
         <DialogContent>
           <DialogHeader>
             <DialogTitle>{me.closeShift.confirmTitle}</DialogTitle>
-            <DialogDescription>
-              {me.closeShift.confirm}
-            </DialogDescription>
+            <DialogDescription>{me.closeShift.confirm}</DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <DialogClose asChild>

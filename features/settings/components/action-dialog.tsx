@@ -37,43 +37,65 @@ export function ActionDialog({
   action: (state: ActionState, formData: FormData) => Promise<ActionState>;
   children: (state: ActionState) => ReactNode;
 }) {
-  const [state, formAction, pending] = useActionState(action, idleState);
-  const close = useCallback(() => onOpenChange(false), [onOpenChange]);
-  useActionToast(state, close);
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       {/* Radix links its own DialogDescription; the escape hatch is only needed by a
           dialog that has none, and naming the id by hand left Radix's generated one
           unused, which is what its "Missing `Description`" warning reports. */}
-      <DialogContent {...(description ? {} : { "aria-describedby": undefined })}>
+      <DialogContent
+        {...(description ? {} : { "aria-describedby": undefined })}
+      >
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
           {description ? (
             <DialogDescription>{description}</DialogDescription>
           ) : null}
         </DialogHeader>
-        <form action={formAction} className="grid gap-4" noValidate>
-          <FormError>{state.error}</FormError>
-          <div className="grid max-h-[60vh] gap-4 overflow-y-auto">
-            {children(state)}
-          </div>
-          <DialogFooter>
-            <DialogClose asChild>
-              <Button type="button" variant="outline">
-                {me.common.cancel}
-              </Button>
-            </DialogClose>
-            <Button type="submit" disabled={pending}>
-              {pending ? (
-                <Loader2 aria-hidden="true" className="animate-spin" />
-              ) : null}
-              {me.common.save}
-            </Button>
-          </DialogFooter>
-        </form>
+        {/* N-12: the form and its action state live only while the dialog is open, so
+            a reopened dialog never shows the previous attempt's messages. */}
+        {open ? (
+          <ActionForm action={action} onOpenChange={onOpenChange}>
+            {children}
+          </ActionForm>
+        ) : null}
       </DialogContent>
     </Dialog>
+  );
+}
+
+function ActionForm({
+  action,
+  onOpenChange,
+  children,
+}: {
+  action: (state: ActionState, formData: FormData) => Promise<ActionState>;
+  onOpenChange: (open: boolean) => void;
+  children: (state: ActionState) => ReactNode;
+}) {
+  const [state, formAction, pending] = useActionState(action, idleState);
+  const close = useCallback(() => onOpenChange(false), [onOpenChange]);
+  useActionToast(state, close);
+
+  return (
+    <form action={formAction} className="grid gap-4" noValidate>
+      <FormError>{state.error}</FormError>
+      <div className="grid max-h-[60vh] gap-4 overflow-y-auto">
+        {children(state)}
+      </div>
+      <DialogFooter>
+        <DialogClose asChild>
+          <Button type="button" variant="outline">
+            {me.common.cancel}
+          </Button>
+        </DialogClose>
+        <Button type="submit" disabled={pending}>
+          {pending ? (
+            <Loader2 aria-hidden="true" className="animate-spin" />
+          ) : null}
+          {me.common.save}
+        </Button>
+      </DialogFooter>
+    </form>
   );
 }
 

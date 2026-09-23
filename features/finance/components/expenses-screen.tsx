@@ -326,6 +326,47 @@ function ExpenseDialog({
     description: string;
   };
 }) {
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>{me.finance.newExpense}</DialogTitle>
+          <DialogDescription>{me.finance.expensesTitle}</DialogDescription>
+        </DialogHeader>
+        {/* N-12: the form and its action state exist only while the dialog is open,
+            so a reopened dialog never shows the previous attempt's messages. */}
+        {open ? (
+          <ExpenseForm
+            onOpenChange={onOpenChange}
+            categories={categories}
+            trainers={trainers}
+            today={today}
+            prefill={prefill}
+          />
+        ) : null}
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function ExpenseForm({
+  onOpenChange,
+  categories,
+  trainers,
+  today,
+  prefill,
+}: {
+  onOpenChange: (open: boolean) => void;
+  categories: Category[];
+  trainers: Trainer[];
+  today: string;
+  prefill?: {
+    categoryId: string;
+    trainerId: string;
+    amount: string;
+    description: string;
+  };
+}) {
   const [state, onSubmit, pending] = useFormAction(saveExpense);
   useActionToast(state, () => onOpenChange(false));
   const [categoryId, setCategoryId] = useState(prefill?.categoryId ?? "");
@@ -337,180 +378,181 @@ function ExpenseDialog({
   );
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>{me.finance.newExpense}</DialogTitle>
-          <DialogDescription>{me.finance.expensesTitle}</DialogDescription>
-        </DialogHeader>
-        <form onSubmit={onSubmit} className="grid gap-4" noValidate>
-          <FormError>{state.error}</FormError>
+    <form onSubmit={onSubmit} className="grid gap-4" noValidate>
+      <FormError>{state.error}</FormError>
 
-          <div className="grid gap-1.5">
-            <Label htmlFor="expense-category">{me.finance.category}</Label>
-            <Select
-              id="expense-category"
-              name="categoryId"
-              required
-              value={categoryId}
-              onChange={(event) => setCategoryId(event.target.value)}
-            >
-              <option value="">—</option>
-              {active.map((category) => (
-                <option key={category.id} value={category.id}>
-                  {category.name}
-                </option>
-              ))}
-            </Select>
-            <FieldError id="categoryId-error">
-              {state.fieldErrors?.categoryId}
-            </FieldError>
-          </div>
+      <div className="grid gap-1.5">
+        <Label htmlFor="expense-category">{me.finance.category}</Label>
+        <Select
+          id="expense-category"
+          name="categoryId"
+          required
+          value={categoryId}
+          onChange={(event) => setCategoryId(event.target.value)}
+        >
+          <option value="">—</option>
+          {active.map((category) => (
+            <option key={category.id} value={category.id}>
+              {category.name}
+            </option>
+          ))}
+        </Select>
+        <FieldError id="categoryId-error">
+          {state.fieldErrors?.categoryId}
+        </FieldError>
+      </div>
 
-          {/* BR-133: a trainer belongs to a salary category and marks a payout. */}
-          {salary ? (
-            <div className="grid gap-1.5">
-              <Label htmlFor="expense-trainer">{me.finance.trainer}</Label>
-              <Select
-                id="expense-trainer"
-                name="trainerId"
-                defaultValue={prefill?.trainerId ?? ""}
-              >
-                <option value="">—</option>
-                {trainers.map((trainer) => (
-                  <option key={trainer.id} value={trainer.id}>
-                    {trainer.full_name}
-                  </option>
-                ))}
-              </Select>
-            </div>
+      {/* BR-133: a trainer belongs to a salary category and marks a payout. */}
+      {salary ? (
+        <div className="grid gap-1.5">
+          <Label htmlFor="expense-trainer">{me.finance.trainer}</Label>
+          <Select
+            id="expense-trainer"
+            name="trainerId"
+            defaultValue={prefill?.trainerId ?? ""}
+          >
+            <option value="">—</option>
+            {trainers.map((trainer) => (
+              <option key={trainer.id} value={trainer.id}>
+                {trainer.full_name}
+              </option>
+            ))}
+          </Select>
+        </div>
+      ) : null}
+
+      <div className="grid gap-1.5">
+        <Label htmlFor="expense-description">{me.finance.description}</Label>
+        <Input
+          id="expense-description"
+          name="description"
+          defaultValue={prefill?.description ?? ""}
+          required
+        />
+        <FieldError id="description-error">
+          {state.fieldErrors?.description}
+        </FieldError>
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-1.5">
+          <Label htmlFor="expense-amount">{me.finance.amount} (€)</Label>
+          <Input
+            id="expense-amount"
+            name="amount"
+            inputMode="decimal"
+            defaultValue={prefill?.amount ?? ""}
+            required
+          />
+          <FieldError id="amount-error">{state.fieldErrors?.amount}</FieldError>
+        </div>
+        <div className="grid gap-1.5">
+          <Label htmlFor="expense-date">{me.finance.date}</Label>
+          <Input
+            id="expense-date"
+            name="spentOn"
+            type="date"
+            max={today}
+            defaultValue={today}
+            disabled={fromTill}
+            required
+          />
+          {/* A disabled input sends nothing, so the forced value goes with it. */}
+          {fromTill ? (
+            <input type="hidden" name="spentOn" value={today} />
           ) : null}
+          <FieldError id="spentOn-error">
+            {state.fieldErrors?.spentOn}
+          </FieldError>
+        </div>
+      </div>
 
-          <div className="grid gap-1.5">
-            <Label htmlFor="expense-description">
-              {me.finance.description}
-            </Label>
-            <Input
-              id="expense-description"
-              name="description"
-              defaultValue={prefill?.description ?? ""}
-              required
-            />
-            <FieldError id="description-error">
-              {state.fieldErrors?.description}
-            </FieldError>
-          </div>
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-1.5">
+          <Label htmlFor="expense-method">{me.finance.method}</Label>
+          <Select
+            id="expense-method"
+            name="method"
+            value={fromTill ? "cash" : undefined}
+            defaultValue={fromTill ? undefined : "cash"}
+            disabled={fromTill}
+            onChange={() => {}}
+          >
+            <option value="cash">{me.finance.methodCash}</option>
+            <option value="card">{me.finance.methodCard}</option>
+            <option value="none">{me.finance.methodNone}</option>
+          </Select>
+          {fromTill ? <input type="hidden" name="method" value="cash" /> : null}
+          <FieldError id="method-error">{state.fieldErrors?.method}</FieldError>
+        </div>
+        <div className="grid gap-1.5">
+          <Label htmlFor="expense-vat">{me.finance.vat}</Label>
+          <Select id="expense-vat" name="vat" defaultValue="unset">
+            <option value="unset">{me.finance.vatUnset}</option>
+            <option value="yes">{me.finance.vatYes}</option>
+            <option value="no">{me.finance.vatNo}</option>
+          </Select>
+        </div>
+      </div>
 
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="grid gap-1.5">
-              <Label htmlFor="expense-amount">{me.finance.amount} (€)</Label>
-              <Input
-                id="expense-amount"
-                name="amount"
-                inputMode="decimal"
-                defaultValue={prefill?.amount ?? ""}
-                required
-              />
-              <FieldError id="amount-error">
-                {state.fieldErrors?.amount}
-              </FieldError>
-            </div>
-            <div className="grid gap-1.5">
-              <Label htmlFor="expense-date">{me.finance.date}</Label>
-              <Input
-                id="expense-date"
-                name="spentOn"
-                type="date"
-                max={today}
-                defaultValue={today}
-                disabled={fromTill}
-                required
-              />
-              {/* A disabled input sends nothing, so the forced value goes with it. */}
-              {fromTill ? (
-                <input type="hidden" name="spentOn" value={today} />
-              ) : null}
-              <FieldError id="spentOn-error">
-                {state.fieldErrors?.spentOn}
-              </FieldError>
-            </div>
-          </div>
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-1.5">
+          <Label htmlFor="expense-supplier">{me.finance.supplier}</Label>
+          {/* N-11: a refused supplier or invoice used to leave no message at all. */}
+          <Input
+            id="expense-supplier"
+            name="supplier"
+            aria-invalid={Boolean(state.fieldErrors?.supplier)}
+            aria-describedby="supplier-error"
+          />
+          <FieldError id="supplier-error">
+            {state.fieldErrors?.supplier}
+          </FieldError>
+        </div>
+        <div className="grid gap-1.5">
+          <Label htmlFor="expense-invoice">{me.finance.invoice}</Label>
+          <Input
+            id="expense-invoice"
+            name="invoice"
+            aria-invalid={Boolean(state.fieldErrors?.invoice)}
+            aria-describedby="invoice-error"
+          />
+          <FieldError id="invoice-error">
+            {state.fieldErrors?.invoice}
+          </FieldError>
+        </div>
+      </div>
 
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="grid gap-1.5">
-              <Label htmlFor="expense-method">{me.finance.method}</Label>
-              <Select
-                id="expense-method"
-                name="method"
-                value={fromTill ? "cash" : undefined}
-                defaultValue={fromTill ? undefined : "cash"}
-                disabled={fromTill}
-                onChange={() => {}}
-              >
-                <option value="cash">{me.finance.methodCash}</option>
-                <option value="card">{me.finance.methodCard}</option>
-                <option value="none">{me.finance.methodNone}</option>
-              </Select>
-              {fromTill ? (
-                <input type="hidden" name="method" value="cash" />
-              ) : null}
-              <FieldError id="method-error">
-                {state.fieldErrors?.method}
-              </FieldError>
-            </div>
-            <div className="grid gap-1.5">
-              <Label htmlFor="expense-vat">{me.finance.vat}</Label>
-              <Select id="expense-vat" name="vat" defaultValue="unset">
-                <option value="unset">{me.finance.vatUnset}</option>
-                <option value="yes">{me.finance.vatYes}</option>
-                <option value="no">{me.finance.vatNo}</option>
-              </Select>
-            </div>
-          </div>
+      <label className="flex items-start gap-2 text-sm">
+        <input
+          type="checkbox"
+          name="fromTill"
+          checked={fromTill}
+          onChange={(event) => setFromTill(event.target.checked)}
+          className="mt-0.5 size-4"
+        />
+        <span>
+          {me.finance.fromTill}
+          <span className="block text-xs text-muted-foreground">
+            {me.finance.fromTillHint}
+          </span>
+        </span>
+      </label>
 
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="grid gap-1.5">
-              <Label htmlFor="expense-supplier">{me.finance.supplier}</Label>
-              <Input id="expense-supplier" name="supplier" />
-            </div>
-            <div className="grid gap-1.5">
-              <Label htmlFor="expense-invoice">{me.finance.invoice}</Label>
-              <Input id="expense-invoice" name="invoice" />
-            </div>
-          </div>
-
-          <label className="flex items-start gap-2 text-sm">
-            <input
-              type="checkbox"
-              name="fromTill"
-              checked={fromTill}
-              onChange={(event) => setFromTill(event.target.checked)}
-              className="mt-0.5 size-4"
-            />
-            <span>
-              {me.finance.fromTill}
-              <span className="block text-xs text-muted-foreground">
-                {me.finance.fromTillHint}
-              </span>
-            </span>
-          </label>
-
-          <DialogFooter>
-            <DialogClose asChild>
-              <Button type="button" variant="outline">
-                {me.common.cancel}
-              </Button>
-            </DialogClose>
-            <Button type="submit" disabled={pending}>
-              {pending ? (
-                <Loader2 aria-hidden="true" className="animate-spin" />
-              ) : null}
-              {me.common.save}
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+      <DialogFooter>
+        <DialogClose asChild>
+          <Button type="button" variant="outline">
+            {me.common.cancel}
+          </Button>
+        </DialogClose>
+        <Button type="submit" disabled={pending}>
+          {pending ? (
+            <Loader2 aria-hidden="true" className="animate-spin" />
+          ) : null}
+          {me.common.save}
+        </Button>
+      </DialogFooter>
+    </form>
   );
 }
 
@@ -522,9 +564,6 @@ function VoidDialog({
   expense: ExpenseRow | null;
   onDone: () => void;
 }) {
-  const [state, onSubmit, pending] = useFormAction(voidExpense);
-  useActionToast(state, onDone);
-
   return (
     <Dialog open={Boolean(expense)} onOpenChange={(open) => !open && onDone()}>
       <DialogContent>
@@ -536,31 +575,45 @@ function VoidDialog({
               : ""}
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={onSubmit} className="grid gap-4" noValidate>
-          <input type="hidden" name="expenseId" value={expense?.id ?? ""} />
-          <FormError>{state.error}</FormError>
-          <div className="grid gap-1.5">
-            <Label htmlFor="void-reason">{me.payments.reason}</Label>
-            <Input id="void-reason" name="reason" required />
-            <FieldError id="reason-error">
-              {state.fieldErrors?.reason}
-            </FieldError>
-          </div>
-          <DialogFooter>
-            <DialogClose asChild>
-              <Button type="button" variant="outline">
-                {me.common.cancel}
-              </Button>
-            </DialogClose>
-            <Button type="submit" variant="destructive" disabled={pending}>
-              {pending ? (
-                <Loader2 aria-hidden="true" className="animate-spin" />
-              ) : null}
-              {me.payments.void}
-            </Button>
-          </DialogFooter>
-        </form>
+        {/* N-12: fresh action state for every opening. */}
+        {expense ? <VoidForm expense={expense} onDone={onDone} /> : null}
       </DialogContent>
     </Dialog>
+  );
+}
+
+function VoidForm({
+  expense,
+  onDone,
+}: {
+  expense: ExpenseRow;
+  onDone: () => void;
+}) {
+  const [state, onSubmit, pending] = useFormAction(voidExpense);
+  useActionToast(state, onDone);
+
+  return (
+    <form onSubmit={onSubmit} className="grid gap-4" noValidate>
+      <input type="hidden" name="expenseId" value={expense.id} />
+      <FormError>{state.error}</FormError>
+      <div className="grid gap-1.5">
+        <Label htmlFor="void-reason">{me.payments.reason}</Label>
+        <Input id="void-reason" name="reason" required />
+        <FieldError id="reason-error">{state.fieldErrors?.reason}</FieldError>
+      </div>
+      <DialogFooter>
+        <DialogClose asChild>
+          <Button type="button" variant="outline">
+            {me.common.cancel}
+          </Button>
+        </DialogClose>
+        <Button type="submit" variant="destructive" disabled={pending}>
+          {pending ? (
+            <Loader2 aria-hidden="true" className="animate-spin" />
+          ) : null}
+          {me.payments.void}
+        </Button>
+      </DialogFooter>
+    </form>
   );
 }

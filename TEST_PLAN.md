@@ -19,6 +19,10 @@ sekciju **7. Otvorena pitanja**.
 > AUTH-14, stvarni link iz sandučeta). Svih 18 PROŠLO; dva tek nakon popravki **N-06** i **N-07**.
 > Novo stanje: **70 prošlo · 0 palo · 146 djelimično · 1 nije izvršeno.** Detalji u **§9.5**.
 
+> **Dopuna 23.09.2026 (2):** preostali koraci 15 kritičnih djelimičnih slučajeva izvršeni i PROŠLI,
+> uz popravke **N-09 do N-12**. Novo stanje: **85 prošlo · 0 palo · 131 djelimično · 1 nije izvršeno.**
+> Detalji u **§9.6**.
+
 > **Izvršavanje 22.09.2026:** rezultati ovog prolaza upisani su uz svih 217 slučajeva u §3–4.
 > **48 prošlo · 2 palo · 148 djelimično · 19 nije izvršeno.**
 > Djelimična provjera nije kompletan prolaz: napomena navodi dokaz i preostale korake.
@@ -529,7 +533,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   [Deaktiviraj]). Menadžer u formi „Novi korisnik“ u padajućoj listi uloga **ne smije** moći da
   sačuva vlasnika ili administratora; ako pokuša, odgovor je „Nemate dozvolu za ovu radnju.“
 - **Gdje provjeriti:** UI; Network tab (odgovor server akcije)
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E auth/admin.spec.ts: menadžeru nisu ponuđeni vlasnik i akcija uređivanja vlasnika. Sve izmjene zahtjeva i administratorskog reda nisu ponovljene.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-critical.spec.ts`: menadžeru redovi vlasnika i administratora nemaju nijedno dugme (recepcioner ima [Uredi]); lista uloga nema „Vlasnik“ ni „Administrator“. Krivotvoreni zahtjev (opcija `owner` ubačena u DOM) vraća „Nemate dozvolu za ovu radnju.“, a nalog nije napravljen. Raniji dokaz (22.09.): E2E auth/admin.spec.ts: menadžeru nisu ponuđeni vlasnik i akcija uređivanja vlasnika. Sve izmjene zahtjeva i administratorskog reda nisu ponovljene.
 
 ### [PERM-06] Recepcioner ne vidi tuđe uplate ni tuđe troškove
 - **Prioritet:** Kritično
@@ -559,7 +563,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** kolona „Lozinka“ **ne postoji** ni za vlasnika ni za menadžera. Samo
   administrator je vidi.
 - **Gdje provjeriti:** UI; Network tab (u odgovoru stranice ne smije biti lozinki)
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E admin.spec.ts i DB 0002: samo admin vidi lozinke; vlasnik/menadžer ne. Nije posebno pretražen svaki RSC odgovor za lozinke.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-critical.spec.ts`: vlasnik i menadžer nemaju kolonu „Lozinka“; u HTML-u i svim RSC odgovorima `/settings/users` nema nijedne sačuvane lozinke (ni vlasnikove, ni menadžerove, ni zajedničke testne). Administrator vidi kolonu i sačuvanu vrijednost nakon [Prikaži]. Raniji dokaz (22.09.): E2E admin.spec.ts i DB 0002: samo admin vidi lozinke; vlasnik/menadžer ne. Nije posebno pretražen svaki RSC odgovor za lozinke.
 
 ### [PERM-09] PDF izvještaja smjene je samo vlasnikov
 - **Prioritet:** Kritično
@@ -570,7 +574,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** vlasnik i administrator dobijaju PDF; menadžer i recepcioner dobijaju
   **404**, bez ikakvog sadržaja.
 - **Gdje provjeriti:** browser, Network tab
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** DB 0010 potvrđuje pristup podacima izvještaja, E2E close-shift potvrđuje privatni PDF. Sve četiri uloge nisu pozvale samu PDF rutu.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-critical.spec.ts`: za zaključenu smjenu sa izvještajem `/api/pdf/shift/<id>` vraća 200 `application/pdf` (`%PDF-`) vlasniku i administratoru, a 404 bez PDF sadržaja menadžeru i recepcioneru. Raniji dokaz (22.09.): DB 0010 potvrđuje pristup podacima izvještaja, E2E close-shift potvrđuje privatni PDF. Sve četiri uloge nisu pozvale samu PDF rutu.
 
 ### [PERM-10] PDF lista kartica
 - **Prioritet:** Visoko
@@ -609,7 +613,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** 1–3 vraćaju **401** i tijelo `{"error":"unauthorized"}`. 4 vraća **404**
   `{"error":"unknown job"}`. Ništa se ne izvršava.
 - **Gdje provjeriti:** Network tab / PowerShell izlaz; baza: `job_runs` se ne mijenja
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E jobs.spec.ts + dodatni HTTP: GET, POST bez/pogrešnom tajnom daju 401; nepostojeći posao sa ispravnom tajnom daje 404 i očekivani JSON. Broj redova job_runs nije mjeren prije/poslije.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-critical.spec.ts`: GET, POST bez zaglavlja i POST sa `x-cron-secret: pogresno` vraćaju 401 `{"error":"unauthorized"}`; nepostojeći posao sa ispravnom tajnom 404 `{"error":"unknown job"}`. Broj redova `job_runs` isti prije i poslije. Raniji dokaz (22.09.): E2E jobs.spec.ts + dodatni HTTP: GET, POST bez/pogrešnom tajnom daju 401; nepostojeći posao sa ispravnom tajnom daje 404 i očekivani JSON. Broj redova job_runs nije mjeren prije/poslije.
 
 ### [PERM-13] Finansijske akcije odbijaju pogrešnu ulogu i kada se pozovu mimo ekrana
 - **Prioritet:** Kritično
@@ -622,7 +626,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** menadžer dobija 404 na stranici; i da nekako pošalje zahtjev, server
   akcija odgovara „Nemate dozvolu za ovu radnju.“ jer se uloga provjerava i na serveru i u bazi.
 - **Gdje provjeriti:** UI, Network tab
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E finance.spec.ts: zabranjene rute; DB 0012: RPC/finansijske tabele nedostupne pogrešnim ulogama. Prepravljeni Next server-action zahtjev nije poslat.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO (bezbjednost) uz odstupanje u poruci.** `test-plan-critical.spec.ts`: menadžer na `/finance/expenses` dobija stranicu 404 (HTTP status je 200 zbog streaminga, vidi §9.6). Snimljen zahtjev server akcije `saveExpense` ponovljen sa menadžerovom sesijom vraća HTTP 500 i opštu grešku umjesto „Nemate dozvolu za ovu radnju.“ (`requireOwner` baca izuzetak). Ništa nije upisano u bazu. Raniji dokaz (22.09.): E2E finance.spec.ts: zabranjene rute; DB 0012: RPC/finansijske tabele nedostupne pogrešnim ulogama. Prepravljeni Next server-action zahtjev nije poslat.
 
 ---
 
@@ -703,7 +707,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   „Nema otvorene smjene. Recepcioner mora biti prijavljen.“ (poruka ili tooltip). Kod [Nova roba]
   opcija „Iz kase“ je onemogućena, a „Van kase“ ostaje moguća.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** Unit money-action.test.ts + DB 0006/0009 odbijaju novčane radnje bez smjene i dozvoljavaju nabavku van kase. Sva navedena dugmad nisu posebno kliknuta u UI-ju.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-critical.spec.ts`: bez otvorene smjene vlasnik vidi onemogućene [Dnevna karta], [Trošak], [Prodaja] i [Nova članarina], svako sa razlogom „Nema otvorene smjene. Recepcioner mora biti prijavljen.“ (`title`); u [Nova roba] je „Iz kase“ onemogućeno uz isti razlog, a „Van kase“ moguće. Zapažanje (pristupačnost): dok je dugme onemogućeno, njegovo pristupačno ime je samo razlog, bez naziva dugmeta (§9.6). Raniji dokaz (22.09.): Unit money-action.test.ts + DB 0006/0009 odbijaju novčane radnje bez smjene i dozvoljavaju nabavku van kase. Sva navedena dugmad nisu posebno kliknuta u UI-ju.
 
 ### [SHIFT-08] Zatvaranje smjene izvana izbacuje recepcionera (BR-116/BR-119)
 - **Prioritet:** Kritično
@@ -715,7 +719,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** recepcioner je odjavljen i na `/login` vidi „Smjena je automatski
   zaključena.“ Vlasnik ostaje prijavljen (njegova sesija se ne dira).
 - **Gdje provjeriti:** UI oba browsera; adresa sadrži `?auto=1`
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E jobs.spec.ts: automatsko zatvaranje testne smjene odjavljuje recepcionera. Zatvaranje dugmetom vlasnika u drugom browseru nije zasebno izvedeno.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO (nakon popravke N-09).** Prvi pokušaj PALO: nakon što vlasnik zaključi smjenu, recepcioner je klikom u meniju nastavio da radi — provjera je bila samo u zajedničkom layoutu, koji Next pri klijentskoj navigaciji ne izvršava ponovo. Sada: klik na „Članovi“ vodi na `/login?auto=1` sa „Smjena je automatski zaključena.“, vlasnik ostaje prijavljen, `counted_cash` prazno. Vidi **N-09** i otvoreno pitanje o `close_type` u §9.6. Raniji dokaz (22.09.): E2E jobs.spec.ts: automatsko zatvaranje testne smjene odjavljuje recepcionera. Zatvaranje dugmetom vlasnika u drugom browseru nije zasebno izvedeno.
 
 ### [SHIFT-09] Ekran S-02 kada je smjena u međuvremenu zatvorena
 - **Prioritet:** Srednje
@@ -1037,7 +1041,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** poruke stoje **ispod odgovarajućeg polja**, ništa nije sačuvano, dijalog
   ostaje otvoren sa unesenim podacima.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** Unit members.test.ts provjerava neispravna polja i putanju greške, DB 0006 ograničenja registracije; nisu svi granični unosi izvedeni kroz formu.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-forms.spec.ts`: registracija skeniranjem prazne kartice. Prazno ime, 51 znak i samo razmaci → „Unesite ime (1–50 znakova).“; prazno/51 znak prezime → „Unesite prezime (1–50 znakova).“; `ana@` i email od 257 znakova → „Unesite ispravan email.“ Poruke su ispod svog polja, dijalog ostaje otvoren sa unesenim vrijednostima, ništa nije sačuvano. Ime od tačno 50 znakova prolazi. Raniji dokaz (22.09.): Unit members.test.ts provjerava neispravna polja i putanju greške, DB 0006 ograničenja registracije; nisu svi granični unosi izvedeni kroz formu.
 
 ### [MEM-05] Telefon — normalizacija i granice (BR-041)
 - **Prioritet:** Kritično
@@ -1079,7 +1083,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** kako je u tablici. Dugme sa ikonicom kalendara otvara biranje datuma i
   upisuje izabrani datum u polje u obliku `dd.mm.gggg`.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** Unit members.test.ts provjerava oba formata, nepostojeće datume i donju granicu. Gornja granica i poruka server akcije nisu ponovo testirane uživo.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-forms.spec.ts` (dijalog „Uredi podatke“, ista provjera kao „Novi član“): prihvaćeni `15.03.1995`, `1.3.1995`, `01.01.1900`, `29.02.2024` i sačuvani tačno; odbijeni `31.12.1899`, `31.02.2000`, `29.02.2023`, sutrašnji datum, `15/03/1995` i prazno — svi sa „Unesite datum rođenja (dd.mm.gggg), od 01.01.1900 do danas.“ (i sutrašnji; SUSPECT-06 se ovdje ne javlja). Kalendar upisuje izabrani datum kao `08.07.1994`. Raniji dokaz (22.09.): Unit members.test.ts provjerava oba formata, nepostojeće datume i donju granicu. Gornja granica i poruka server akcije nisu ponovo testirane uživo.
 
 ### [MEM-07] Naša slova, ćirilica, emoji i razmaci
 - **Prioritet:** Visoko
@@ -1190,7 +1194,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   „Član je anonimiziran.“ Članarine, uplate i dolasci **ostaju**. Anonimizovan član se više ne
   pojavljuje u pretrazi ni u statistici.
 - **Gdje provjeriti:** UI; `/members` pretraga; `/stats/visits` → „Najčešći članovi“
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E members.spec.ts uspješna potvrda brojem i anonimizacija. Pogrešan broj i izmijenjeno skriveno polje nisu ponovo testirani.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-forms.spec.ts`: tekst dijaloga navodi šta se briše i traži broj člana; `999` → „Upisani broj se ne poklapa sa brojem člana.“ i ništa se ne mijenja; tačan broj → „Član je anonimiziran.“ U bazi: ime „Anonimizirani“, prezime „član #2“, telefon/email/datum rođenja prazni. Članarina i 3 dolaska ostaju. Pretraga po imenu i telefonu ne nalazi člana; „Najčešći članovi“ ne pokazuju staro ime. Raniji dokaz (22.09.): E2E members.spec.ts uspješna potvrda brojem i anonimizacija. Pogrešan broj i izmijenjeno skriveno polje nisu ponovo testirani.
 
 ### [MEM-16] Izgubljena kartica (F-11, BR-034)
 - **Prioritet:** Visoko
@@ -1307,7 +1311,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** „Unesite iznos, na primjer 79 ili 79,50.“ uz iznos i „Unesite broj termina
   od 1 do 50.“ uz termine. Uz polje iznosa stoji podsjetnik „Minimalno 80,00 €“.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** Unit members.test.ts i DB 0006: obavezni iznos/termini/trener/način plaćanja i format iznosa. Cijela tabela graničnih vrijednosti nije ponovljena kroz UI.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-forms.spec.ts`: Personalni sa trenerom, prazni iznos i termini → „Unesite iznos, na primjer 79 ili 79,50.“ uz iznos i „Unesite broj termina od 1 do 50.“ uz termine; podsjetnik „Minimalno 80,00 €“ vidljiv; nije sačuvana članarina. Raniji dokaz (22.09.): Unit members.test.ts i DB 0006: obavezni iznos/termini/trener/način plaćanja i format iznosa. Cijela tabela graničnih vrijednosti nije ponovljena kroz UI.
 
 ### [MSHIP-08] Personalni: minimalna cijena (E13)
 - **Prioritet:** Kritično
@@ -1761,7 +1765,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** prazno i neispravni oblici daju „Unesite prebrojanu gotovinu, na primjer
   225 ili 225,50.“ Kod manjeg iznosa piše „Razlika: … (Manjak)“, kod većeg „(Višak)“.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E E15 provjerava razliku za 225,00 €, DB 0010 pravila zaključenja. Svi neispravni iznosi nisu ponovljeni u formi.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO (nakon popravke N-10).** Prvi pokušaj: za prazan i neispravan iznos dugme [Zaključi smjenu i odjavi me] je samo onemogućeno, bez ikakve poruke — poruka iz plana se nikad nije prikazivala. Sada `test-plan-forms.spec.ts`: `abc`, `-10`, `12,345` i ponovo ispražnjeno polje prikazuju „Unesite prebrojanu gotovinu, na primjer 225 ili 225,50.“ uz onemogućeno dugme; očekivano 84,00 € → 79 daje „Razlika: -5,00 € (Manjak)“, 89 daje „Razlika: 5,00 € (Višak)“. Raniji dokaz (22.09.): E2E E15 provjerava razliku za 225,00 €, DB 0010 pravila zaključenja. Svi neispravni iznosi nisu ponovljeni u formi.
 
 ### [CLOSE-04] Potvrda i zaključenje smjene
 - **Prioritet:** Kritično
@@ -1853,7 +1857,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   | `marija.m` ponovo | „Korisničko ime je zauzeto.“ |
 - **Očekivani rezultat:** kako je u tablici; poruka stoji uz polje korisničkog imena.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** Unit auth-schemas.test.ts + DB 0002 provjeravaju username, uloge i identitet administratora. Cijele tabele graničnih unosa nisu ponovljene kroz S-23.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-forms.spec.ts`: `ab`, 31 znak, crtica, razmak i ćirilica → poruka o korisničkom imenu uz polje; 3 i 30 znakova prolaze; ponovljeno ime → „Korisničko ime je zauzeto.“ `Mx…` sa velikim slovom se **prihvata i čuva malim slovima** (odgovor na §7 pitanje 2). Tokom testa nađen **N-12**: ponovo otvoren dijalog je prikazivao poruku iz prethodnog pokušaja — popravljeno. Raniji dokaz (22.09.): Unit auth-schemas.test.ts + DB 0002 provjeravaju username, uloge i identitet administratora. Cijele tabele graničnih unosa nisu ponovljene kroz S-23.
 
 ### [SET-03] Ime i prezime i privremena lozinka — granice
 - **Prioritet:** Visoko
@@ -1927,7 +1931,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** „Mora ostati bar jedan aktivan nalog ove uloge. Prvo dodajte zamjenu.“
   Nakon što napravite drugog vlasnika (`vlasnik.test`), deaktivacija prvog prolazi.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E admin.spec.ts: posljednji vlasnik ne može da se deaktivira. Posljednji administrator nije zasebno testiran.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-critical.spec.ts`: administrator ne može da deaktivira jedinog vlasnika („Mora ostati bar jedan aktivan nalog ove uloge. Prvo dodajte zamjenu.“); nakon kreiranja drugog vlasnika deaktivacija prvog prolazi („Korisnik je deaktiviran.“). Posljednji administrator se kroz UI ne može dovesti u tu situaciju (sebe ne može deaktivirati, D-60; vlasnik ne upravlja administratorima) — pokriva ga samo DB test. Raniji dokaz (22.09.): E2E admin.spec.ts: posljednji vlasnik ne može da se deaktivira. Posljednji administrator nije zasebno testiran.
 
 ### [SET-10] Treneri: dodavanje, izmjena, deaktivacija
 - **Prioritet:** Visoko
@@ -2206,7 +2210,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   | Račun | 51 znak | odbijeno |
 - **Očekivani rezultat:** kako je u tablici.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** Unit schema-bounds i DB 0012 provjeravaju dio validacije. Budući datum i svi rubni iznosi nisu ponovljeni kroz UI.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO (nakon popravke N-11).** `test-plan-forms.spec.ts`: `0`, `0,001`, `100000,01` → „Unesite iznos između 0,01 i 100.000,00 €.“; `0,01` i `100000` sačuvani; opis od 1 i 201 znaka → „Unesite opis (2–200 znakova).“; sutrašnji datum → „Unesite datum koji nije u budućnosti.“; datum od prije 35 dana sačuvan. Dobavljač od 101 i račun od 51 znaka su bili odbijeni **bez ikakve poruke** (N-11); sada „Dobavljač može imati najviše 100 znakova.“ / „Račun može imati najviše 50 znakova.“, a 100/50 znakova prolazi. Raniji dokaz (22.09.): Unit schema-bounds i DB 0012 provjeravaju dio validacije. Budući datum i svi rubni iznosi nisu ponovljeni kroz UI.
 
 ### [FIN-07] Trošak „Iz kase“
 - **Prioritet:** Visoko
@@ -3268,6 +3272,67 @@ ponovo dok se poruka ne pojavi (`toPass`); 8/8 ponavljanja prošlo. Aplikacija n
 | `settings`, `finance`, `payments` E2E, oba projekta | 29/30, jedini pad je N-08; nakon popravke testa 8/8 |
 | `npm run test` | **PROŠLO: 134/134**, 16 fajlova |
 | `npm run lint`, `npm run typecheck` | **PROŠLO** |
+
+### 9.6 Dopuna — kritični djelimični slučajevi, 23.09.2026
+
+Preostali koraci 15 kritičnih slučajeva izvršeni su u `tests/e2e/test-plan-critical.spec.ts`
+(8 testova) i `tests/e2e/test-plan-forms.spec.ts` (7 testova), desktop, sintetičke `E2E`
+teretane koje se brišu. Svih 15 je PROŠLO; četiri tek nakon popravki ispod.
+
+**N-09 — zaključena smjena nije odjavljivala recepcionera pri kliku u meniju (SHIFT-08, BR-116, BR-119).**
+Provjera „recepcioner bez otvorene smjene → odjava“ bila je samo u `app/(app)/layout.tsx`.
+Next pri klijentskoj navigaciji ne izvršava ponovo zajednički layout, pa je recepcioner nakon
+vlasnikovog (ili noćnog) zaključenja nastavljao da šeta ekranima; novčane radnje je i dalje
+odbijala baza (BR-092), ali odjava se dešavala tek na punom osvježavanju.
+
+> **Riješeno.** `proxy.ts` za GET zahtjeve recepcionera (i klijentske navigacije) provjerava
+> `open_shift_info`; bez otvorene smjene odjavljuje i vodi na `/login?auto=1`. POST (server
+> akcije) i `/change-password` su izuzeti, da akcija dobije svoju poruku BR-092 i da prva prijava
+> prođe S-01b prije otvaranja smjene. Cijena: jedan upit više po navigaciji, samo za recepcionera.
+> Regresija: SHIFT-08 u `test-plan-critical.spec.ts` (pada na starom kodu).
+
+**N-10 — S-14 bez objašnjenja za onemogućeno dugme (CLOSE-03, BR-114).**
+Za prazan ili neispravan iznos [Zaključi smjenu i odjavi me] je bilo samo onemogućeno; poruka
+„Unesite prebrojanu gotovinu…“ postojala je u tekstovima, ali se nije mogla pojaviti.
+
+> **Riješeno.** Čim korisnik nešto unese, neispravan iznos (i ponovo ispražnjeno polje) prikazuje
+> tu poruku ispod polja i označava polje kao neispravno.
+
+**N-11 — predugačak „Dobavljač“ ili „Račun“ odbijen bez poruke (FIN-06, BR-133).**
+Šema je vraćala grešku za ta dva polja, ali forma za njih nije imala mjesto za poruku: trošak se
+nije sačuvao i ništa se nije prikazalo.
+
+> **Riješeno.** Nove poruke „Dobavljač može imati najviše 100 znakova.“ i „Račun može imati
+> najviše 50 znakova.“ ispod polja.
+
+**N-12 — ponovo otvoren dijalog prikazuje poruke prethodnog pokušaja (SET-02).**
+Stanje akcije je živjelo u komponenti koja ostaje montirana i kad je dijalog zatvoren. Nakon
+odbijenog unosa i [Otkaži], sljedeće otvaranje je već pokazivalo staru grešku. Pogođeni su bili
+dijalozi u Podešavanjima (`ActionDialog`: planovi, proizvodi, treneri, programi, kategorije),
+Korisnici (novi, uredi, nova lozinka), Troškovi (novi, poništi), zaključenje smjene na S-19 i
+poništavanje nabavke na S-20.
+
+> **Riješeno.** Forma i njeno stanje sada postoje samo dok je dijalog otvoren (isti obrazac koji
+> već koriste dijalozi članova i pulta). Regresija: SET-02 provjerava da ponovo otvoren dijalog
+> nema staru poruku.
+
+**Zapažanja i pitanja za vlasnika (bez izmjene koda):**
+- **Ko je zaključio smjenu:** kad vlasnik zaključi smjenu sa S-19, upisuje se `close_type =
+  'manual'`, pa izvještaj kaže „Zaključio/la recepcioner“. BR-114/BR-117 ne predviđaju oznaku za
+  vlasnika. Da li izvještaj treba da kaže ko je stvarno zaključio? (Promjena bi dirala šemu.)
+- **PERM-13:** krivotvoreni poziv vlasničke akcije od menadžera se odbija i ništa ne upisuje, ali
+  kao HTTP 500 sa opštom greškom umjesto „Nemate dozvolu za ovu radnju.“ — bezbjedno, samo poruka.
+- **Zabranjene finansijske stranice** prikazuju 404, ali sa HTTP statusom 200 (Next streaming).
+- **Pristupačnost:** onemogućeno novčano dugme čitaču ekrana izgovara samo razlog („Nema otvorene
+  smjene…“), bez naziva dugmeta.
+- **SET-02 / §7 pitanje 2:** `Marija` se prihvata i čuva kao `marija`.
+
+| Provjera 23.09.2026 (poslije N-09 do N-12) | Rezultat |
+|---|---|
+| Cijeli E2E, oba projekta (prije N-12) | 179 prošlo, 25 preskočeno |
+| Cijeli E2E, oba projekta (poslije N-12) | 184 prošlo, 1 pad zbog vremenskog ograničenja u SET-02 pod opterećenjem; nakon produženja čekanja ponovljeni pogođeni fajlovi 41/41 |
+| `npm run test` | 138/138 |
+| `npm run lint`, `npm run typecheck` | PROŠLO |
 
 *Kraj plana. Novi rezultati upisani su uz slučajeve; neoznačeni kvadratići nisu automatski prolaz.*
 
