@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { expenseSchema, resendShiftSchema } from "@/features/finance/schemas";
-import { gymSettingsSchema } from "@/features/settings/catalog-schemas";
+import {
+  gymSettingsSchema,
+  planSchema,
+} from "@/features/settings/catalog-schemas";
 
 /**
  * TEST_PLAN §6: the input bounds that used to let a bad value reach the database and
@@ -79,6 +82,62 @@ describe("SUSPECT-10: the shift of a resend is a real UUID", () => {
     (value) => {
       expect(resendShiftSchema.safeParse({ shiftId: value }).success).toBe(
         false,
+      );
+    },
+  );
+});
+
+const plan = {
+  id: "",
+  name: "Mjesečna",
+  kind: "gym",
+  durationValue: "1",
+  durationUnit: "month",
+  price: "79",
+  // FormData.get gives null for an unticked checkbox.
+  coversGym: "on",
+  coversGroup: null,
+  coversPersonal: null,
+  requiresTrainer: null,
+  isActive: "on",
+  gymVisitLimit: "",
+  groupSessionLimit: "",
+  sortOrder: "1",
+  gymFixedAmount: "0",
+  trainerSharePct: "",
+};
+
+describe("N-14 and N-15: plan duration and order (SET-14)", () => {
+  it("accepts a gym plan with value and unit, and a day pass with neither", () => {
+    expect(planSchema.safeParse(plan).success).toBe(true);
+    expect(
+      planSchema.safeParse({
+        ...plan,
+        kind: "day_pass",
+        durationValue: "",
+        durationUnit: "",
+      }).success,
+    ).toBe(true);
+  });
+  it.each([
+    ["a gym plan with a unit but no number", { durationValue: "" }],
+    ["a gym plan with a number but no unit", { durationUnit: "" }],
+    ["a day pass with a duration", { kind: "day_pass", durationValue: "1" }],
+  ])("refuses %s under the duration field", (_label, change) => {
+    const result = planSchema.safeParse({ ...plan, ...change });
+    expect(result.success).toBe(false);
+    expect(result.error?.issues[0]?.path[0]).toBe("durationValue");
+    expect(result.error?.issues[0]?.message).toBe(
+      "Dnevna karta nema trajanje; svi ostali planovi ga moraju imati.",
+    );
+  });
+  it.each(["1000", "-1", "abc"])(
+    "refuses the order %s in Montenegrin",
+    (value) => {
+      const result = planSchema.safeParse({ ...plan, sortOrder: value });
+      expect(result.success).toBe(false);
+      expect(result.error?.issues[0]?.message).toBe(
+        "Unesite cijeli broj od 0 do 999.",
       );
     },
   );

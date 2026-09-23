@@ -19,6 +19,10 @@ sekciju **7. Otvorena pitanja**.
 > AUTH-14, stvarni link iz sandučeta). Svih 18 PROŠLO; dva tek nakon popravki **N-06** i **N-07**.
 > Novo stanje: **70 prošlo · 0 palo · 146 djelimično · 1 nije izvršeno.** Detalji u **§9.5**.
 
+> **Dopuna 23.09.2026 (3):** još 25 kritičnih slučajeva PROŠLO, uz popravke **N-13 do N-15** i
+> odluku D-64. Novo stanje: **110 prošlo · 0 palo · 106 djelimično · 1 nije izvršeno.**
+> Detalji u **§9.7**.
+
 > **Dopuna 23.09.2026 (2):** preostali koraci 15 kritičnih djelimičnih slučajeva izvršeni i PROŠLI,
 > uz popravke **N-09 do N-12**. Novo stanje: **85 prošlo · 0 palo · 131 djelimično · 1 nije izvršeno.**
 > Detalji u **§9.6**.
@@ -216,7 +220,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   „Vlasnik“. U navigaciji: Recepcija, Članovi, Uplate danas, Magacin, Statistika dolazaka,
   Finansije, Podešavanja. Nema stavke „Zaključi smjenu“.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E admin.spec.ts: vlasnik sa korisničkim imenom dolazi na /finance; foundation.spec.ts: odjavljeni / ide na /login. Seed vlasnik sa emailom i kompletan meni nisu provjereni ovim testom.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-access.spec.ts`: `/` vodi na `/login`; seed vlasnik (`matija.vojinovic@eurotehnikamn.me` + `SEED_OWNER_PASSWORD`) dolazi na `/finance`; zaglavlje „KP Fitness“, meni naloga „Vlasnik“; navigacija tačno Recepcija, Članovi, Uplate danas, Magacin, Statistika dolazaka, Finansije, Podešavanja (bez „Zaključi smjenu“). Samo čitanje; nalog odmah odjavljen. Raniji dokaz (22.09.): E2E admin.spec.ts: vlasnik sa korisničkim imenom dolazi na /finance; foundation.spec.ts: odjavljeni / ide na /login. Seed vlasnik sa emailom i kompletan meni nisu provjereni ovim testom.
 
 ### [AUTH-02] Prijava recepcionera korisničkim imenom otvara smjenu
 - **Prioritet:** Kritično
@@ -230,7 +234,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   „Smjena: <ime> od HH:MM“. U navigaciji postoji „Zaključi smjenu“, a nema „Finansije“ ni
   „Statistika dolazaka“.
 - **Gdje provjeriti:** UI; baza: novi red u `shifts` sa `closed_at = null`
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E shifts.spec.ts: prijava korisničkim imenom, /reception, značka i tačno jedna otvorena smjena provjereni. Kompletna navigacija nije posebno upoređena.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-access.spec.ts`: korisničko ime → `/reception`, značka „Smjena: <ime> od HH:MM“, meni ima „Zaključi smjenu“, a nema „Finansije“ ni „Statistika dolazaka“; u bazi tačno jedna otvorena smjena tog recepcionera. Raniji dokaz (22.09.): E2E shifts.spec.ts: prijava korisničkim imenom, /reception, značka i tačno jedna otvorena smjena provjereni. Kompletna navigacija nije posebno upoređena.
 
 ### [AUTH-03] Pogrešna lozinka
 - **Prioritet:** Kritično
@@ -488,7 +492,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** **sve** navedene rute daju 404. Dozvoljene su samo `/reception`,
   `/members`, `/members/<id>`, `/payments/today`, `/storage`, `/shift/close`, `/shift/gate`.
 - **Gdje provjeriti:** UI; Network tab (status 404)
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** Dodatna UI matrica otvorila je sve statičke rute za recepcionera, menadžera, vlasnika i admina: dozvoljene imaju naslov, zabranjene 404. Profil konkretnog člana i svi detalji menija nisu dio matrice; /shift/gate za recepcionera pokriva shifts.spec.ts.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-access.spec.ts`: recepcioner otvara `/reception`, `/members`, `/members/<id>`, `/payments/today`, `/storage`, `/shift/close`; svih 7 `/finance/...`, 6 `/settings/...` i `/stats/visits` daju stranicu 404. Sa svojom otvorenom smjenom `/shift/gate` se otvara (ostaje na toj adresi). Raniji dokaz (22.09.): Dodatna UI matrica otvorila je sve statičke rute za recepcionera, menadžera, vlasnika i admina: dozvoljene imaju naslov, zabranjene 404. Profil konkretnog člana i svi detalji menija nisu dio matrice; /shift/gate za recepcionera pokriva shifts.spec.ts.
 
 ### [PERM-02] Matrica pristupa — menadžer
 - **Prioritet:** Kritično
@@ -500,7 +504,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   Dozvoljeno: `/reception`, `/members`, `/payments/today`, `/storage`, `/stats/visits`,
   `/settings/users`, `/settings/trainers`, `/settings/cards`.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** Dodatna UI matrica otvorila je sve statičke rute za recepcionera, menadžera, vlasnika i admina: dozvoljene imaju naslov, zabranjene 404. Profil konkretnog člana i svi detalji menija nisu dio matrice; /shift/gate za recepcionera pokriva shifts.spec.ts.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-access.spec.ts`: menadžer otvara pultne ekrane, profil člana, `/stats/visits`, `/settings/users`, `/settings/trainers`, `/settings/cards`; 404 za svih 7 finansijskih ruta, `/settings/plans`, `/settings/products`, `/settings/gym`, `/shift/close` i `/shift/gate`. Raniji dokaz (22.09.): Dodatna UI matrica otvorila je sve statičke rute za recepcionera, menadžera, vlasnika i admina: dozvoljene imaju naslov, zabranjene 404. Profil konkretnog člana i svi detalji menija nisu dio matrice; /shift/gate za recepcionera pokriva shifts.spec.ts.
 
 ### [PERM-03] Matrica pristupa — vlasnik i administrator
 - **Prioritet:** Kritično
@@ -510,7 +514,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** obje uloge otvaraju sve osim `/shift/close` i `/shift/gate` (404, to je
   samo recepcionerovo). Administrator vidi isto što i vlasnik, plus kolonu „Lozinka“ na S-23.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** Dodatna UI matrica otvorila je sve statičke rute za recepcionera, menadžera, vlasnika i admina: dozvoljene imaju naslov, zabranjene 404. Profil konkretnog člana i svi detalji menija nisu dio matrice; /shift/gate za recepcionera pokriva shifts.spec.ts.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-access.spec.ts`: vlasnik i administrator otvaraju sve rute uključujući profil člana, a 404 dobijaju samo `/shift/close` i `/shift/gate`. Kolonu „Lozinka“ za administratora potvrđuje PERM-08. Raniji dokaz (22.09.): Dodatna UI matrica otvorila je sve statičke rute za recepcionera, menadžera, vlasnika i admina: dozvoljene imaju naslov, zabranjene 404. Profil konkretnog člana i svi detalji menija nisu dio matrice; /shift/gate za recepcionera pokriva shifts.spec.ts.
 
 ### [PERM-04] Meni prikazuje samo dozvoljeno
 - **Prioritet:** Visoko
@@ -543,7 +547,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** vidi **samo današnje** uplate koje nisu naknadni unos, i **samo svoje**
   troškove. Naslov sekcije troškova glasi „Moji troškovi danas“ (vlasnik vidi „Troškovi danas“).
 - **Gdje provjeriti:** UI; uporedite sa istim ekranom kao vlasnik
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** DB 0006_members i 0008_desk_money: RLS vidljivost uplata/troškova po ulogama prolazi. Nije u cijelosti upoređen svaki red i oznaka u UI-ju.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-access.spec.ts`: recepcioner na S-12 ima sekciju „Moji troškovi danas“ (ne „Troškovi danas“), vidi svoj trošak, a ne vidi vlasnikov trošak, jučerašnju uplatu ni današnju naknadno unesenu. Vlasnik vidi „Troškovi danas“ sa oba troška; ni vlasnikov S-12 ne prikazuje naknadne unose (to je S-22). Raniji dokaz (22.09.): DB 0006_members i 0008_desk_money: RLS vidljivost uplata/troškova po ulogama prolazi. Nije u cijelosti upoređen svaki red i oznaka u UI-ju.
 
 ### [PERM-07] Profil člana: istorija uplata po ulogama
 - **Prioritet:** Visoko
@@ -1837,7 +1841,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** „Korisnik je kreiran.“ Red se pojavljuje u tabeli sa kolonama
   Ime, Korisničko ime/Email, Uloga, Aktivan, Kreiran. Polje za email **nije** prikazano za ovu ulogu.
 - **Gdje provjeriti:** UI; prijava novim nalogom vodi na S-01b
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E auth.spec.ts: kreiranje recepcionera, prva prijava, nova lozinka, ulazak na recepciju. Sve druge uloge kreiranja nisu provjerene.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-access.spec.ts`: **menadžer** kreira recepcionera (vlasnika pokriva auth.spec.ts); polja „Email“ nema; „Korisnik je kreiran.“; tabela ima kolone Ime, Korisničko ime/Email, Uloga, Aktivan, Kreiran; prva prijava vodi na S-01b. Raniji dokaz (22.09.): E2E auth.spec.ts: kreiranje recepcionera, prva prijava, nova lozinka, ulazak na recepciju. Sve druge uloge kreiranja nisu provjerene.
 
 ### [SET-02] Korisničko ime — pravila (doc 07 §3)
 - **Prioritet:** Kritično
@@ -1954,7 +1958,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   prazna naknada znači „nije definisano“, prazan udio znači „sa plana“; `101` i `-5` daju
   „Udio mora biti između 0 i 100, ili prazno.“
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E settings.spec.ts: vlasnik vidi/mijenja naknadu, menadžer je ne vidi. DB 0003 provjerava D-62 udio; svi UI unosi nisu izvršeni.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO (nakon popravke N-13).** Prvi pokušaj PALO: polje naknade je prikazivalo „80,00 €“, pa je svako čuvanje u tom redu (npr. samo udjela 70) odbijano **bez ikakve poruke**. Sada `test-plan-access.spec.ts`: menadžer ne vidi polja; vlasnik čuva udio 70 uz nepromijenjenu naknadu 80; prazna polja → „nije definisano“ / „sa plana“; `101` i `-5` → „Udio mora biti između 0 i 100, ili prazno.“ i ništa se ne mijenja. Raniji dokaz (22.09.): E2E settings.spec.ts: vlasnik vidi/mijenja naknadu, menadžer je ne vidi. DB 0003 provjerava D-62 udio; svi UI unosi nisu izvršeni.
 
 ### [SET-12] Programi i dodjela trenera
 - **Prioritet:** Visoko
@@ -1999,7 +2003,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   | redoslijed `1000` | odbijeno (dozvoljeno 0–999) |
 - **Očekivani rezultat:** kako je u tablici.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** DB 0003 provjerava ograničenja plana, E2E settings izmjenu cijene i napomenu. Sve kombinacije trajanja nisu unesene kroz formu.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO (nakon popravki N-14 i N-15).** `test-plan-access.spec.ts`, 14 kombinacija: dnevna karta sa trajanjem i teretana bez trajanja → „Dnevna karta nema trajanje; …“; personalni sa cijenom i teretana bez cijene → „Personalni nema unaprijed određenu cijenu; …“; naziv `a`/51 znak → „Unesite naziv plana (2–50 znakova).“; `79,50` i `79.50` sačuvani kao 79,5; `-5`/`abc` → „Unesite iznos, …“; ograničenje `0`/`-1` → „Unesite cijeli broj veći od 0 ili ostavite prazno.“; udio `101` → „Udio mora biti između 0 i 100.“; redoslijed `1000` → „Unesite cijeli broj od 0 do 999.“ Prvi pokušaj: teretana bez trajanja se **sačuvala** (N-14), a ograničenje i redoslijed su odbijani bez poruke (N-15). Raniji dokaz (22.09.): DB 0003 provjerava ograničenja plana, E2E settings izmjenu cijene i napomenu. Sve kombinacije trajanja nisu unesene kroz formu.
 
 ### [SET-15] Deaktiviranje plana
 - **Prioritet:** Srednje
@@ -3334,6 +3338,46 @@ poništavanje nabavke na S-20.
 | Cijeli E2E, oba projekta (poslije N-12) | 184 prošlo, 1 pad zbog vremenskog ograničenja u SET-02 pod opterećenjem; nakon produženja čekanja ponovljeni pogođeni fajlovi 41/41 |
 | `npm run test` | 138/138 |
 | `npm run lint`, `npm run typecheck` | PROŠLO |
+
+### 9.7 Dopuna — kritični slučajevi, treći dio, 23.09.2026
+
+Još 25 kritičnih djelimičnih slučajeva izvršeno je u `test-plan-reception.spec.ts`,
+`test-plan-money.spec.ts` i `test-plan-access.spec.ts` (desktop, sintetičke teretane;
+AUTH-01 se jedini prijavljuje na pravi seed nalog vlasnika, samo čitanje, i odmah se odjavljuje).
+Pored toga, odlukom **D-64** izvještaj smjene sada piše ko je zaključio smjenu (§9.6).
+
+**N-13 — naknada trenera: polje prikazuje „80,00 €“, a čuvanje propada bez poruke (SET-11, BR-020, D-62).**
+Polje je popunjavano formatiranim iznosom sa znakom €, koji validacija ne prihvata. Svako
+čuvanje u tom redu — i kad se mijenja samo udio za grupne — bilo je odbijeno, a inline forma
+je prikazivala samo opšte greške, ne greške polja, pa korisnik nije vidio ništa.
+
+> **Riješeno.** Polje sada sadrži `80,00`, a `InlineForm` (naknada, dodjela programa, časovi)
+> prikazuje grešku polja kao obavještenje. Postojeći E2E koji je očekivao „80,00 €“ ažuriran.
+
+**N-14 — plan bez trajanja se mogao sačuvati (SET-14, doc 07 §3).**
+Provjera je poredila samo „oba polja trajanja prazna“ sa vrstom plana. Plan „Teretana“ sa
+praznim brojem, a jedinicom „mjeseci“, prolazio je i u aplikaciji i u bazi, i sačuvao se bez
+trajanja. Read-only upit nad bazom: **nijedan postojeći plan nije pogođen**.
+
+> **Riješeno u aplikaciji.** Dnevna karta mora imati oba polja prazna, svaki drugi plan oba
+> popunjena. Regresija: `tests/unit/schema-bounds.test.ts` (pada na starom kodu).
+> **Otvoreno:** ograničenje u bazi (`plans` check i `upsert_plan`) ima istu rupu. Zatvaranje
+> traži novu migraciju sa ograničenjem `(duration_value is null) = (duration_unit is null)` —
+> to je izmjena šeme, pa čeka odobrenje vlasnika.
+
+**N-15 — forma plana odbijala tri polja bez poruke (SET-14).**
+„Dolazaka u teretanu“, „Grupnih termina“ i „Redoslijed“ nisu imali mjesto za poruku, a
+redoslijed je imao samo Zodovu englesku poruku.
+
+> **Riješeno.** Poruke ispod sva tri polja; redoslijed: „Unesite cijeli broj od 0 do 999.“
+
+**Nedosljednosti plana (bez izmjene koda):**
+- REC-11 za `abcdefghij` očekuje „Neispravan kod kartice.“, a REC-16/SUSPECT-09 traže da se
+  slova ignorišu — aplikacija radi po REC-16.
+- MSHIP-03 očekuje da oznaka „Neplaćeno“ nestane nakon povezivanja; glosar (doc 02) kaže da
+  ostaje zauvijek radi istorije. Značka „Neplaćeni dolasci“ (samo nepovezani) nestaje.
+- PAY-10: recepcioner i menadžer vide stavke zaključene smjene sa onemogućenim dugmadima i
+  razlogom; poruku RPC-a za zaobiđen UI pokriva DB test.
 
 *Kraj plana. Novi rezultati upisani su uz slučajeve; neoznačeni kvadratići nisu automatski prolaz.*
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useCallback, type ReactNode } from "react";
+import { useActionState, useCallback, useMemo, type ReactNode } from "react";
 import { Loader2 } from "lucide-react";
 import { FormError } from "@/components/common/form-message";
 import { useActionToast } from "@/components/common/use-action-toast";
@@ -110,7 +110,14 @@ export function InlineForm({
   className?: string;
 }) {
   const [state, formAction, pending] = useActionState(action, idleState);
-  useActionToast(state);
+  // N-13: an inline form has no field to put a message under, so a refused field is
+  // reported as a toast instead of being dropped. Memoised on the state, because the
+  // toast effect fires on every new object it is given.
+  const reported = useMemo(() => {
+    const fieldError = Object.values(state.fieldErrors ?? {}).find(Boolean);
+    return !state.error && fieldError ? { ...state, error: fieldError } : state;
+  }, [state]);
+  useActionToast(reported);
   return (
     <form action={formAction} className={className}>
       {children(pending)}

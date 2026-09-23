@@ -237,6 +237,8 @@ export const me = {
     feeInvalid: "Unesite iznos ili ostavite prazno.",
     shareInvalid: "Udio mora biti između 0 i 100.",
     limitInvalid: "Unesite cijeli broj veći od 0 ili ostavite prazno.",
+    // N-15: the order field had only Zod's English default.
+    sortOrderInvalid: "Unesite cijeli broj od 0 do 999.",
     durationInvalid: "Unesite trajanje kao cijeli broj.",
     durationForKind:
       "Dnevna karta nema trajanje; svi ostali planovi ga moraju imati.",

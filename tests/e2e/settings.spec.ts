@@ -69,7 +69,8 @@ test("US-22.1 AC3: the owner sees the trainer fee column and can change it", asy
   const feeField = page.getByLabel(
     "Naknada teretani po personalnom klijentu (€)",
   );
-  await expect(feeField).toHaveValue("80,00 €");
+  // N-13: the field holds the value it accepts back, without the currency sign.
+  await expect(feeField).toHaveValue("80,00");
   await feeField.fill("90,50");
   await page
     .getByRole("row", { name: "E2E Trenerka" })

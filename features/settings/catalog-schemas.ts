@@ -130,9 +130,12 @@ export const planSchema = z
       .trim()
       .transform((value) => (value === "" ? null : value.replace(",", ".")))
       // SUSPECT-11: the same six-digit bound as money() above (numeric(10,2)).
-      .refine((value) => value === null || /^\d{1,6}(\.\d{1,2})?$/.test(value), {
-        message: me.settings.priceInvalid,
-      })
+      .refine(
+        (value) => value === null || /^\d{1,6}(\.\d{1,2})?$/.test(value),
+        {
+          message: me.settings.priceInvalid,
+        },
+      )
       .transform((value) => (value === null ? null : Number(value))),
     coversGym: checkbox,
     coversGroup: checkbox,
@@ -158,7 +161,11 @@ export const planSchema = z
         },
       ),
     requiresTrainer: checkbox,
-    sortOrder: z.coerce.number().int().min(0).max(999),
+    sortOrder: z.coerce
+      .number({ message: me.settings.sortOrderInvalid })
+      .int(me.settings.sortOrderInvalid)
+      .min(0, me.settings.sortOrderInvalid)
+      .max(999, me.settings.sortOrderInvalid),
     isActive: checkbox,
     gymFixedAmount: money(me.settings.priceInvalid),
     trainerSharePct: z
@@ -174,10 +181,14 @@ export const planSchema = z
       .transform((value) => (value === null ? null : Number(value))),
   })
   // Doc 07 §3: the two plan check constraints, reported on the field that is wrong.
+  // N-14: a day pass has neither a value nor a unit, every other kind has both. The
+  // old test only compared "both empty" with the kind, so a gym plan with a unit but
+  // no number passed and was saved without a duration.
   .refine(
     (value) =>
-      (value.kind === "day_pass") ===
-      (value.durationValue === null && value.durationUnit === null),
+      value.kind === "day_pass"
+        ? value.durationValue === null && value.durationUnit === null
+        : value.durationValue !== null && value.durationUnit !== null,
     { path: ["durationValue"], message: me.settings.durationForKind },
   )
   .refine((value) => (value.kind === "personal") === (value.price === null), {

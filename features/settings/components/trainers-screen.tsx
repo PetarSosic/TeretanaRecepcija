@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
 import { Table, TableWrapper, Td, Th } from "@/components/ui/table";
-import { formatClockTime, formatMoney } from "@/lib/format";
+import { formatClockTime } from "@/lib/format";
 import { me } from "@/lib/i18n/me";
 import {
   saveAssignment,
@@ -233,9 +233,11 @@ function TrainerFeeForm({ trainer }: { trainer: Trainer }) {
           <input type="hidden" name="trainerId" value={trainer.id} />
           <Input
             name="fee"
+            // N-13: the stored fee as the field accepts it ("80,00"), not formatted
+            // money ("80,00 €"), which the schema refused on every later save.
             defaultValue={
               trainer.personal_gym_fee
-                ? formatMoney(trainer.personal_gym_fee)
+                ? trainer.personal_gym_fee.replace(".", ",")
                 : ""
             }
             placeholder={me.settings.feeUndefined}

@@ -276,6 +276,10 @@ function PlanFields({
             inputMode="numeric"
             defaultValue={plan?.gym_visit_limit ?? ""}
           />
+          {/* N-15: these three fields were refused without a message. */}
+          <FieldError id="plan-gym-limit-error">
+            {state.fieldErrors?.gymVisitLimit}
+          </FieldError>
         </div>
         <div className="grid gap-1.5">
           <Label htmlFor="plan-group-limit">
@@ -287,6 +291,9 @@ function PlanFields({
             inputMode="numeric"
             defaultValue={plan?.group_session_limit ?? ""}
           />
+          <FieldError id="plan-group-limit-error">
+            {state.fieldErrors?.groupSessionLimit}
+          </FieldError>
         </div>
       </div>
 
@@ -325,6 +332,9 @@ function PlanFields({
           inputMode="numeric"
           defaultValue={plan?.sort_order ?? 0}
         />
+        <FieldError id="plan-sort-error">
+          {state.fieldErrors?.sortOrder}
+        </FieldError>
       </div>
       <label className="flex items-center gap-2 text-sm">
         <input
