@@ -1626,7 +1626,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** „Roba je evidentirana.“ Stanje postaje 24, nabavna cijena proizvoda
   postaje 0,35 €. Na `/payments/today` se pojavljuje trošak kategorije „Roba za prodaju“ od 8,40 €.
 - **Gdje provjeriti:** UI; `/payments/today`
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E storage.spec.ts + DB 0009: nabavka iz kase, prodaja, odbijanje viška, ispravka i poništavanje prolaze. Nisu svi filteri i prikazi sa svih ekrana upoređeni.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-high-d.spec.ts`: [Nova roba] 24 × 0,35 € „Iz kase“ → „Roba je evidentirana.“, stanje 24, nabavna cijena proizvoda 0,35 €; na S-12 trošak „Roba za prodaju“ 8,40 €; „Troškovi iz kase“ na S-14 8,40 €. Raniji dokaz (22.09.): E2E storage.spec.ts + DB 0009: nabavka iz kase, prodaja, odbijanje viška, ispravka i poništavanje prolaze. Nisu svi filteri i prikazi sa svih ekrana upoređeni.
 
 ### [STO-02] Unos robe van kase
 - **Prioritet:** Visoko
@@ -1636,7 +1636,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** stanje raste za 12; trošak je zabilježen bez načina plaćanja
   („Van kase“) i **ne** umanjuje očekivanu gotovinu u smjeni.
 - **Gdje provjeriti:** UI; `/shift/close` („Troškovi iz kase“ se ne mijenja)
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** DB 0009: nabavka van kase, negativna zaliha, poništavanje i vidljivost vrijednosti/zarade po ulogama. UI koraci nisu u cijelosti izvršeni.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-high-d.spec.ts`: 12 × 0,30 € „Van kase“ → stanje 36; trošak 3,60 € bez načina i nije iz kase; „Troškovi iz kase“ ostaju 8,40 €. Raniji dokaz (22.09.): DB 0009: nabavka van kase, negativna zaliha, poništavanje i vidljivost vrijednosti/zarade po ulogama. UI koraci nisu u cijelosti izvršeni.
 
 ### [STO-03] Nabavna cijena — granice (D-55)
 - **Prioritet:** Visoko
@@ -1646,7 +1646,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** samo `0,01` i više prolazi; ostalo daje
   „Nabavna cijena mora biti najmanje 0,01 €.“ Besplatna isporuka nije dozvoljena.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** Unit storage.test.ts + DB 0009: pozitivna nabavna cijena i količine; granice nisu sve ponovljene u browseru.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-high-d.spec.ts`: nabavna cijena `0`, `0,001`, `-1`, `abc` i prazno → „Nabavna cijena mora biti najmanje 0,01 €.“; ništa nije upisano (0,01 i više prolaze u STO-01/02/09). Raniji dokaz (22.09.): Unit storage.test.ts + DB 0009: pozitivna nabavna cijena i količine; granice nisu sve ponovljene u browseru.
 
 ### [STO-04] Količina — granice
 - **Prioritet:** Visoko
@@ -1656,7 +1656,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** `1` i `10000` prolaze; ostalo daje „Unesite količinu od 1 do 10000.“
   (za prodaju je gornja granica stanje na zalihi).
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** Unit storage.test.ts + DB 0009: pozitivna nabavna cijena i količine; granice nisu sve ponovljene u browseru.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO uz napomenu.** `test-plan-high-d.spec.ts`: nabavka `0`, `10001`, `-5`, `2.5` → „Unesite količinu od 1 do 10000.“; prodaja `0` i `-1` → ista poruka, `37` pri stanju 36 → „Nema dovoljno na stanju (stanje: 36).“ `abc` se ne može ni unijeti (polje je `type=number`). Raniji dokaz (22.09.): Unit storage.test.ts + DB 0009: pozitivna nabavna cijena i količine; granice nisu sve ponovljene u browseru.
 
 ### [STO-05] Prodaja iz magacina
 - **Prioritet:** Visoko
@@ -1666,7 +1666,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** „Ukupno: 3,00 €“ prije naplate; poslije „Prodaja je sačuvana.“
   Stanje pada za 2. Na `/payments/today` je stavka „Voda × 2“.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E storage.spec.ts + DB 0009: nabavka iz kase, prodaja, odbijanje viška, ispravka i poništavanje prolaze. Nisu svi filteri i prikazi sa svih ekrana upoređeni.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-high-d.spec.ts`: prodaja 2 × 1,50 € gotovinom → „Ukupno: 3,00 €“, „Prodaja je sačuvana.“, stanje 36 → 34; na S-12 „E2E Voda × 2“. Raniji dokaz (22.09.): E2E storage.spec.ts + DB 0009: nabavka iz kase, prodaja, odbijanje viška, ispravka i poništavanje prolaze. Nisu svi filteri i prikazi sa svih ekrana upoređeni.
 
 ### [STO-06] Prodaja više nego što ima na stanju (E17)
 - **Prioritet:** Kritično
@@ -1696,7 +1696,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** ispravka mijenja samo način plaćanja. Poništavanje vraća **količinu na
   stanje** (provjerite na `/storage`) i stavka je precrtana.
 - **Gdje provjeriti:** UI; `/storage`
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E storage.spec.ts + DB 0009: nabavka iz kase, prodaja, odbijanje viška, ispravka i poništavanje prolaze. Nisu svi filteri i prikazi sa svih ekrana upoređeni.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-high-d.spec.ts`: [Ispravi] mijenja samo način (na karticu; količina i cijena ostaju, polja količine nema); [Poništi] uz razlog „Test“ → „Stavka je poništena.“, red precrtan, stanje se vraća na 36. Raniji dokaz (22.09.): E2E storage.spec.ts + DB 0009: nabavka iz kase, prodaja, odbijanje viška, ispravka i poništavanje prolaze. Nisu svi filteri i prikazi sa svih ekrana upoređeni.
 
 ### [STO-09] Poništavanje nabavke kada je roba već prodata (E18)
 - **Prioritet:** Visoko
@@ -1706,7 +1706,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** „Poništavanje nije moguće – stanje bi bilo negativno.“ Ako stanje
   dozvoljava, poništavanje uspijeva i **zajedno s njim** se poništava automatski trošak nabavke.
 - **Gdje provjeriti:** UI; `/payments/today` ili `/finance/expenses`
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** DB 0009: nabavka van kase, negativna zaliha, poništavanje i vidljivost vrijednosti/zarade po ulogama. UI koraci nisu u cijelosti izvršeni.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-high-d.spec.ts`: nakon prodaje 30 kom (stanje 6) poništavanje nabavke od 24 → „Poništavanje nije moguće – stanje bi bilo negativno.“; nova nabavka od 5 se poništava i zajedno s njom njen trošak od 2,00 €; stanje 6. Raniji dokaz (22.09.): DB 0009: nabavka van kase, negativna zaliha, poništavanje i vidljivost vrijednosti/zarade po ulogama. UI koraci nisu u cijelosti izvršeni.
 
 ### [STO-10] Trošak nabavke se ne poništava zasebno
 - **Prioritet:** Srednje
@@ -1726,7 +1726,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** recepcioner vidi kolone Proizvod, Stanje, Nabavna cijena, Prodajna
   cijena — ali nigdje ukupnu vrijednost zalihe ni zaradu. Te brojke su samo na vlasnikovom ekranu.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** DB 0009: nabavka van kase, negativna zaliha, poništavanje i vidljivost vrijednosti/zarade po ulogama. UI koraci nisu u cijelosti izvršeni.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-high-d.spec.ts`: recepcioner na `/storage` ima kolone Proizvod, Stanje, Nabavna cijena, Prodajna cijena i nigdje „vrijednost zalihe“ ni „zarada“; vlasnikov `/finance/storage` prikazuje „Vrijednost zalihe“. Raniji dokaz (22.09.): DB 0009: nabavka van kase, negativna zaliha, poništavanje i vidljivost vrijednosti/zarade po ulogama. UI koraci nisu u cijelosti izvršeni.
 
 ### [STO-12] Prazan magacin
 - **Prioritet:** Nisko
@@ -2109,7 +2109,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Test podaci:** kao gore
 - **Očekivani rezultat:** `1` i `100` prolaze; ostalo daje „Unesite broj između 1 i 100.“
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** Dodatni UI: 0, 101, -1 i 1.5 ne kreiraju seriju; E2E 100 prolazi, DB 0/101 odbija. Nisu sve poruke i sve ostale vrijednosti iz plana provjerene.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-high-d.spec.ts` (menadžer): `0`, `101`, `-5`, `abc`, prazno i `2.5` → „Unesite broj između 1 i 100.“ bez nove serije; `1` i `100` → „Kartice su generisane.“ Raniji dokaz (22.09.): Dodatni UI: 0, 101, -1 i 1.5 ne kreiraju seriju; E2E 100 prolazi, DB 0/101 odbija. Nisu sve poruke i sve ostale vrijednosti iz plana provjerene.
 
 ### [CARD-03] PDF liste kartica
 - **Prioritet:** Visoko
@@ -2120,7 +2120,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   predviđen), naziv teretane, logo ako je otpremljen, i liniju „Ime i prezime:“ za upisivanje.
   Kodovi u PDF-u se poklapaju sa onima koje aplikacija prihvata pri skeniranju.
 - **Gdje provjeriti:** PDF; skeniranje jednog koda iz PDF-a
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E PDF preuzimanje + unit card-sheet.test.ts: QR payload, broj kartica po A4, dimenzije i čćšžđ. Fizička štampa, rezanje i skeniranje papira nisu izvršeni.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO uz napomenu.** `test-plan-high-d.spec.ts`: PDF se preuzima kao `kartice-gggg-mm-dd.pdf`, sadrži naziv teretane, „Ime i prezime:“ i kôd kartice (u grupama `ddd ddd dddd`, Courier); taj kôd skeniran na recepciji otvara registraciju (prazna kartica). QR sadržaj i dimenzije pokriva `tests/unit/card-sheet.test.ts`; fizička štampa i skeniranje sa papira nisu izvedeni. Raniji dokaz (22.09.): E2E PDF preuzimanje + unit card-sheet.test.ts: QR payload, broj kartica po A4, dimenzije i čćšžđ. Fizička štampa, rezanje i skeniranje papira nisu izvršeni.
 
 ### [CARD-04] Brojač praznih kartica se smanjuje
 - **Prioritet:** Srednje

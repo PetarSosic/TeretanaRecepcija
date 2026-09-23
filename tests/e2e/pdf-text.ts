@@ -73,7 +73,11 @@ export function pdfText(pdf: Buffer): string {
     }
 
   const decode = (hex: string, map: Map<string, string> | undefined) => {
-    if (!map) return "";
+    // A standard font (Courier for the card codes) writes its WinAnsi bytes as hex.
+    if (!map)
+      return (hex.match(/.{2}/g) ?? [])
+        .map((byte) => String.fromCharCode(parseInt(byte, 16)))
+        .join("");
     const width = [...map.keys()][0]?.length ?? 4;
     let out = "";
     for (let i = 0; i < hex.length; i += width)
@@ -91,17 +95,29 @@ export function pdfText(pdf: Buffer): string {
     if (!/\bT[Jj]\b/.test(stream)) continue;
     let current: Map<string, string> | undefined;
     let line = "";
+    // A standard font (Helvetica and the like) has no ToUnicode map and writes plain
+    // "(text) Tj" strings, which are read as they are.
+    const literal = (text: string) =>
+      text
+        .replace(/\\([()\\])/g, "$1")
+        .replace(/\\(\d{3})/g, (_, octal) =>
+          String.fromCharCode(parseInt(octal, 8)),
+        );
     for (const token of stream.matchAll(
-      /\/(F\d+)\s+[\d.]+\s+Tf|\[((?:[^\]\\]|\\.)*)\]\s*TJ|<([0-9a-fA-F]*)>\s*Tj|\b(ET)\b/g,
+      /\/(F\d+)\s+[\d.]+\s+Tf|\[((?:[^\]\\]|\\.)*)\]\s*TJ|<([0-9a-fA-F]*)>\s*Tj|\(((?:[^()\\]|\\.)*)\)\s*Tj|\b(ET)\b/g,
     )) {
       if (token[1]) current = fonts.get(token[1]);
       else if (token[2] !== undefined)
-        for (const part of token[2].matchAll(/<([0-9a-fA-F]*)>|(-?[\d.]+)/g)) {
+        for (const part of token[2].matchAll(
+          /<([0-9a-fA-F]*)>|\(((?:[^()\\]|\\.)*)\)|(-?[\d.]+)/g,
+        )) {
           if (part[1] !== undefined) line += decode(part[1], current);
-          else if (Number(part[2]) < -200) line += " ";
+          else if (part[2] !== undefined) line += literal(part[2]);
+          else if (Number(part[3]) < -200) line += " ";
         }
       else if (token[3] !== undefined) line += decode(token[3], current);
-      else if (token[4]) {
+      else if (token[4] !== undefined) line += literal(token[4]);
+      else if (token[5]) {
         if (line) lines.push(line);
         line = "";
       }
