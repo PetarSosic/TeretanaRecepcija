@@ -122,7 +122,14 @@ describe("BR-117: the shift report PDF", () => {
   }, 60_000);
 
   it("names how the shift ended", () => {
-    expect(closeTypeLabel(report.shift)).toBe("Zaključio/la recepcioner");
+    // D-64: the name of whoever closed it, the owner from S-19 included.
+    expect(closeTypeLabel(report.shift)).toBe("Zaključio/la Đurđa Ćirić");
+    expect(
+      closeTypeLabel({ ...report.shift, closed_by_name: "Matija Vojinović" }),
+    ).toBe("Zaključio/la Matija Vojinović");
+    expect(closeTypeLabel({ ...report.shift, closed_by_name: null })).toBe(
+      "Zaključio/la recepcioner",
+    );
     expect(
       closeTypeLabel({
         ...report.shift,

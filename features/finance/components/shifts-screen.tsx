@@ -44,7 +44,8 @@ export type ShiftRow = {
 };
 
 const CLOSE_TYPES: Record<string, string> = {
-  manual: me.report.closedManual,
+  // D-64: the name underneath says who closed it, as it does for a takeover.
+  manual: me.report.closedBy.replace(" {name}", ""),
   takeover: me.report.closedTakeover.replace(" {name}", ""),
   auto: me.report.closedAuto,
 };

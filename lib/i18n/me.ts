@@ -480,6 +480,8 @@ export const me = {
     closeType: "Način zaključenja",
     generatedAt: "Izvještaj napravljen",
     closedManual: "Zaključio/la recepcioner",
+    // D-64: who pressed [Zaključi], the receptionist on S-14 or the owner on S-19.
+    closedBy: "Zaključio/la {name}",
     closedTakeover: "Preuzeo/la {name}",
     closedAuto: "Automatski",
     stillOpen: "Smjena je otvorena",

@@ -117,11 +117,15 @@ const RECORD: Record<ShiftReport["voided"][number]["record"], string> = {
 const method = (value: "cash" | "card") =>
   value === "cash" ? me.memberships.cash : me.memberships.card;
 
-/** BR-117 header: "Zaključio/la recepcioner", "Preuzeo/la <ime>" or "Automatski". */
+/** BR-117 and D-64 header: "Zaključio/la <ime>", "Preuzeo/la <ime>" or "Automatski". */
 export function closeTypeLabel(shift: ShiftReport["shift"]): string {
   switch (shift.close_type) {
     case "manual":
-      return me.report.closedManual;
+      // D-64: close_shift records the caller in closed_by, so an owner's close from
+      // S-19 is no longer reported as the receptionist's.
+      return shift.closed_by_name
+        ? me.report.closedBy.replace("{name}", shift.closed_by_name)
+        : me.report.closedManual;
     case "takeover":
       return me.report.closedTakeover.replace(
         "{name}",

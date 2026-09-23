@@ -341,7 +341,7 @@ Every rule has an ID. Code comments and tests must reference these IDs, e.g. `//
     - gym name;
     - receptionist;
     - start and end date-time;
-    - close type (Zaključio/la recepcioner, Preuzeo/la <ime>, Automatski);
+    - close type (Zaključio/la <ime>, Preuzeo/la <ime>, Automatski). For a manual close the name is `closed_by`: the receptionist on S-14 or the owner on S-19 (D-64);
     - generated-at time.
   - **Payments table:** time, member (number and name) or "—", kind, plan, method, amount, entered by.
   - **Day passes:** quantity and total per method.

@@ -3317,9 +3317,10 @@ poništavanje nabavke na S-20.
 > nema staru poruku.
 
 **Zapažanja i pitanja za vlasnika (bez izmjene koda):**
-- **Ko je zaključio smjenu:** kad vlasnik zaključi smjenu sa S-19, upisuje se `close_type =
-  'manual'`, pa izvještaj kaže „Zaključio/la recepcioner“. BR-114/BR-117 ne predviđaju oznaku za
-  vlasnika. Da li izvještaj treba da kaže ko je stvarno zaključio? (Promjena bi dirala šemu.)
+- **Ko je zaključio smjenu — riješeno odlukom D-64 (23.09.2026).** Izvještaj je za vlasnikovo
+  zaključenje sa S-19 pisao „Zaključio/la recepcioner“. Sada piše „Zaključio/la <ime>“ iz
+  `closed_by`, koji baza već upisuje; šema nije mijenjana. S-19 prikazuje isto ime. Provjera:
+  `tests/unit/shift-report.test.ts` i SHIFT-08 u `test-plan-critical.spec.ts`.
 - **PERM-13:** krivotvoreni poziv vlasničke akcije od menadžera se odbija i ništa ne upisuje, ali
   kao HTTP 500 sa opštom greškom umjesto „Nemate dozvolu za ovu radnju.“ — bezbjedno, samo poruka.
 - **Zabranjene finansijske stranice** prikazuju 404, ali sa HTTP statusom 200 (Next streaming).

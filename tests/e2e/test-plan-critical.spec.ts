@@ -361,6 +361,11 @@ test("SHIFT-08: closing the shift from outside signs the receptionist out", asyn
   // The owner's own session is untouched.
   await owner.reload();
   await expect(owner).toHaveURL(/\/finance\/shifts/);
+  // D-64: S-19 says who closed it, and it was the owner, not the receptionist.
+  const row = owner.getByRole("row", { name: /E2E Ana/ });
+  await expect(row).toContainText("Zaključio/la");
+  await expect(row).toContainText("E2E Vlasnik kritični");
+  await expect(row).not.toContainText("recepcioner");
 
   const { data } = await adminClient()
     .from("shifts")
