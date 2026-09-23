@@ -1298,7 +1298,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   obrazloženje glasi „Početak je odredio vlasnik.“
   Neispravan datum (`32.13.2026`) daje „Unesite datum u formatu dd.mm.gggg.“
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** DB 0006/0007: datumi BR-052, prestari dolasci, vlasnikova prava, E14 kraj mjeseca, limiti/statusi, smjena i finansijski snapshot. Ovo potvrđuje baznu logiku, ne sve korake/poruke UI slučaja.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-high-c.spec.ts`: recepcioner u prodaji nema [Promijeni početak]; vlasnik ga ima, unos datuma odmah preračunava „Važi do“ i obrazloženje je „Početak je odredio vlasnik.“; `32.13.2026` → „Unesite datum u formatu dd.mm.gggg.“ i ništa se ne čuva. Raniji dokaz (22.09.): DB 0006/0007: datumi BR-052, prestari dolasci, vlasnikova prava, E14 kraj mjeseca, limiti/statusi, smjena i finansijski snapshot. Ovo potvrđuje baznu logiku, ne sve korake/poruke UI slučaja.
 
 ### [MSHIP-06] Iznos može da mijenja samo vlasnik (BR-059)
 - **Prioritet:** Kritično
@@ -1339,7 +1339,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** `1` i `50` prolaze; `0`, `51`, `2.5`, `-3`, `abc` daju
   „Unesite broj termina od 1 do 50.“
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** Unit members.test.ts i DB 0006: obavezni iznos/termini/trener/način plaćanja i format iznosa. Cijela tabela graničnih vrijednosti nije ponovljena kroz UI.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-high-c.spec.ts`: `0`, `51`, `2.5`, `-3`, `abc` termina → „Unesite broj termina od 1 do 50.“ bez čuvanja; `1` i `50` se čuvaju. Raniji dokaz (22.09.): Unit members.test.ts i DB 0006: obavezni iznos/termini/trener/način plaćanja i format iznosa. Cijela tabela graničnih vrijednosti nije ponovljena kroz UI.
 
 ### [MSHIP-10] Iznos — format i granice
 - **Prioritet:** Visoko
@@ -1351,7 +1351,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   negativan iznos, slova i prazno daju „Unesite iznos, na primjer 79 ili 79,50.“
   `0` pada na minimalnoj cijeni (E13). Vrlo veliki iznos mora dati jasnu poruku, ne opštu grešku.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** Unit members.test.ts i DB 0006: obavezni iznos/termini/trener/način plaćanja i format iznosa. Cijela tabela graničnih vrijednosti nije ponovljena kroz UI.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-high-c.spec.ts`: `100,50` i `100.50` se čuvaju; `100,555`, `-100`, `abc` i prazno → „Unesite iznos, na primjer 79 ili 79,50.“; `0` → „Iznos ne može biti manji od 80,00 €.“ (E13); `999999999` → „Unesite iznos, …“ ispod polja, bez opšte greške. Raniji dokaz (22.09.): Unit members.test.ts i DB 0006: obavezni iznos/termini/trener/način plaćanja i format iznosa. Cijela tabela graničnih vrijednosti nije ponovljena kroz UI.
 
 ### [MSHIP-11] Trener je obavezan za Grupni, G+T i Personalni (BR-058)
 - **Prioritet:** Kritično
@@ -1370,7 +1370,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Test podaci:** —
 - **Očekivani rezultat:** „Izaberite način plaćanja.“
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** Unit members.test.ts i DB 0006: obavezni iznos/termini/trener/način plaćanja i format iznosa. Cijela tabela graničnih vrijednosti nije ponovljena kroz UI.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-high-c.spec.ts`: prodaja bez načina plaćanja → „Izaberite način plaćanja.“, ništa se ne čuva. Raniji dokaz (22.09.): Unit members.test.ts i DB 0006: obavezni iznos/termini/trener/način plaćanja i format iznosa. Cijela tabela graničnih vrijednosti nije ponovljena kroz UI.
 
 ### [MSHIP-13] Granica trajanja: 31.01 + 1 mjesec (E14)
 - **Prioritet:** Visoko
@@ -1381,7 +1381,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** `31.01.2027` → važi do `27.02.2027`; `31.01.2028` → do `28.02.2028`;
   `31.12.2026` → do `30.01.2027`. (Posljednji važeći dan je uključen.)
 - **Gdje provjeriti:** UI (prikaz „Važi do“ prije čuvanja)
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** DB 0006/0007: datumi BR-052, prestari dolasci, vlasnikova prava, E14 kraj mjeseca, limiti/statusi, smjena i finansijski snapshot. Ovo potvrđuje baznu logiku, ne sve korake/poruke UI slučaja.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO uz napomenu o planu.** `test-plan-high-c.spec.ts`: vlasnikov početak → „Važi do“ po BR-051 (`kraj = početak + N kalendarskih mjeseci`, oba dana uključena): 01.01.2026 → 01.02.2026, 31.01.2027 → 28.02.2027 (E14), 31.01.2028 → 29.02.2028, 31.12.2026 → 31.01.2027. Brojke u planu (27.02.2027, 28.02.2028, 30.01.2027) protivrječe BR-051 i E14 (doc 03), pa je netačan plan, ne aplikacija. Raniji dokaz (22.09.): DB 0006/0007: datumi BR-052, prestari dolasci, vlasnikova prava, E14 kraj mjeseca, limiti/statusi, smjena i finansijski snapshot. Ovo potvrđuje baznu logiku, ne sve korake/poruke UI slučaja.
 
 ### [MSHIP-14] Iskorišćeni termini i status „Iskorištena“ (BR-054, BR-055)
 - **Prioritet:** Visoko
@@ -1392,7 +1392,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** brojač opada 12, 11, 10 … Kada dođe na 0, status članarine postaje
   „Iskorištena“, a sljedeći dolazak je **neplaćen** (žuti dijalog).
 - **Gdje provjeriti:** UI; profil → „Članarine“, kolona „Preostalo termina“
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** DB 0006/0007: datumi BR-052, prestari dolasci, vlasnikova prava, E14 kraj mjeseca, limiti/statusi, smjena i finansijski snapshot. Ovo potvrđuje baznu logiku, ne sve korake/poruke UI slučaja.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-high-c.spec.ts`: plan sa 12 dolazaka i 10 iskorištenih: prijava → „Teretana: 1 preostalo“, sljedeća → „Teretana: 0 preostalo“; na profilu status „Iskorištena“; sljedeći dolazak je neplaćen (žuti dijalog). Raniji dokaz (22.09.): DB 0006/0007: datumi BR-052, prestari dolasci, vlasnikova prava, E14 kraj mjeseca, limiti/statusi, smjena i finansijski snapshot. Ovo potvrđuje baznu logiku, ne sve korake/poruke UI slučaja.
 
 ### [MSHIP-15] [Produži članarinu] iz upozorenja o neplaćenom dolasku
 - **Prioritet:** Visoko
@@ -1426,7 +1426,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** stara uplata i dalje glasi 79,00 €; nova je 89,00 €. Na ekranu planova
   stoji napomena „Promjena cijene važi samo za nove prodaje.“ Vratite cijenu na 79 nakon testa.
 - **Gdje provjeriti:** UI; `/payments/today`
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** DB 0006/0007: datumi BR-052, prestari dolasci, vlasnikova prava, E14 kraj mjeseca, limiti/statusi, smjena i finansijski snapshot. Ovo potvrđuje baznu logiku, ne sve korake/poruke UI slučaja.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-high-c.spec.ts`: prodaja Mjesečne za 79 €, cijena plana promijenjena na 89 (uz napomenu „Promjena cijene važi samo za nove prodaje.“), nova prodaja 89 €; u bazi i na S-12 stara uplata ostaje 79,00 €. Cijena vraćena na 79. Raniji dokaz (22.09.): DB 0006/0007: datumi BR-052, prestari dolasci, vlasnikova prava, E14 kraj mjeseca, limiti/statusi, smjena i finansijski snapshot. Ovo potvrđuje baznu logiku, ne sve korake/poruke UI slučaja.
 
 ---
 
@@ -1455,7 +1455,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   [Jedna više] na 20. Ako ipak prođe neispravna vrijednost, server odgovara
   „Provjerite unesene podatke.“ i ništa se ne evidentira.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** Unit payments.test.ts + DB 0008: količina, način plaćanja, opis/kategorija i novčane granice. Nisu svi unosi ponovljeni kroz UI.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-high-c.spec.ts`: [Jedna manje] onemogućeno na 1, [Jedna više] na 20; kucanje u polje se vraća u opseg: `0`→1, `-1`→1, `21`→20, `abc`→1, `2.5`→2; na 20 „Ukupno: 200,00 €“. Raniji dokaz (22.09.): Unit payments.test.ts + DB 0008: količina, način plaćanja, opis/kategorija i novčane granice. Nisu svi unosi ponovljeni kroz UI.
 
 ### [PAY-03] Dnevna karta bez načina plaćanja
 - **Prioritet:** Visoko
@@ -1464,7 +1464,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Test podaci:** —
 - **Očekivani rezultat:** „Izaberite način plaćanja.“
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** Unit payments.test.ts + DB 0008: količina, način plaćanja, opis/kategorija i novčane granice. Nisu svi unosi ponovljeni kroz UI.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-high-c.spec.ts`: [Naplati] bez načina plaćanja → „Izaberite način plaćanja.“; nijedna dnevna karta nije evidentirana. Raniji dokaz (22.09.): Unit payments.test.ts + DB 0008: količina, način plaćanja, opis/kategorija i novčane granice. Nisu svi unosi ponovljeni kroz UI.
 
 ### [PAY-04] Dnevna karta kada plan nije podešen
 - **Prioritet:** Nisko
@@ -1506,7 +1506,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   | iznos `abc` | poruka o iznosu |
 - **Očekivani rezultat:** kako je u tablici; poruka stoji ispod pravog polja.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** Unit payments.test.ts + DB 0008: količina, način plaćanja, opis/kategorija i novčane granice. Nisu svi unosi ponovljeni kroz UI.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-high-c.spec.ts`: bez kategorije → „Izaberite kategoriju.“; opis 1 i 201 znak → „Unesite opis (2–200 znakova).“; iznos `0`, `10000,01`, `-5`, `12,345`, `abc` → „Unesite iznos od 0,01 do 10.000,00 €.“; `0,01` i `10000` se čuvaju. Raniji dokaz (22.09.): Unit payments.test.ts + DB 0008: količina, način plaćanja, opis/kategorija i novčane granice. Nisu svi unosi ponovljeni kroz UI.
 
 ### [PAY-07] Kategorija „Plate“ nije dostupna na pultu (D-37)
 - **Prioritet:** Visoko
@@ -1516,7 +1516,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** kategorije `Plate` nema u listi. (Vlasnik je ima na `/finance/expenses`.)
   Ako se ipak pošalje, odgovor je „Ova kategorija nije dozvoljena.“
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** DB 0008 provjerava ograničenja troškova pulta. Cijeli spisak ponuđenih kategorija nije zasebno upoređen.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-high-c.spec.ts`: kategorija za plate nije ponuđena na pultu; krivotvoren zahtjev sa njom → „Ova kategorija nije dozvoljena.“ Raniji dokaz (22.09.): DB 0008 provjerava ograničenja troškova pulta. Cijeli spisak ponuđenih kategorija nije zasebno upoređen.
 
 ### [PAY-08] Ispravka uplate — način i napomena (BR-094)
 - **Prioritet:** Kritično
@@ -1591,7 +1591,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** „Stavka je poništena.“ Trošak je precrtan i ne ulazi u „Troškovi iz kase“
   na zaključenju smjene.
 - **Gdje provjeriti:** UI; `/shift/close`
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** DB 0008 potvrđuje pravila poništavanja uplata/troškova. UI ponovnog poništavanja nije posebno testiran.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-high-c.spec.ts`: trošak od 0,01 € poništen razlogom „Pogrešan iznos“ → „Stavka je poništena.“, red precrtan; „Troškovi iz kase“ na S-14 pada sa 10.000,01 € na 10.000,00 €. Raniji dokaz (22.09.): DB 0008 potvrđuje pravila poništavanja uplata/troškova. UI ponovnog poništavanja nije posebno testiran.
 
 ### [PAY-15] Prazno stanje ekrana „Uplate danas“
 - **Prioritet:** Srednje
