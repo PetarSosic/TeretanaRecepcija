@@ -751,7 +751,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** jasna poruka o neispravnom iznosu; **ne** smije se pojaviti opšte
   „Došlo je do greške. Pokušajte ponovo.“ niti 500. Ako se pojavi opšta greška, zabilježite kao bug.
 - **Gdje provjeriti:** UI; serverska konzola (`npm run dev`)
-- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-extra.spec.ts`: `999999999999` → ispod polja „Unesite iznos ili ostavite prazno.“, bez opšte greške i bez greške na stranici; ostaje se na S-02, smjena A netaknuta. (Provjera je `^d{1,8}(.d{1,2})?$`, vidi SUSPECT-05.)
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-extra.spec.ts`: `999999999999` → ispod polja „Unesite iznos ili ostavite prazno.“, bez opšte greške i bez greške na stranici; ostaje se na S-02, smjena A netaknuta. (Provjera je `^\d{1,8}(\.\d{1,2})?$`, vidi SUSPECT-05.)
 
 ---
 
@@ -3361,9 +3361,10 @@ trajanja. Read-only upit nad bazom: **nijedan postojeći plan nije pogođen**.
 
 > **Riješeno u aplikaciji.** Dnevna karta mora imati oba polja prazna, svaki drugi plan oba
 > popunjena. Regresija: `tests/unit/schema-bounds.test.ts` (pada na starom kodu).
-> **Otvoreno:** ograničenje u bazi (`plans` check i `upsert_plan`) ima istu rupu. Zatvaranje
-> traži novu migraciju sa ograničenjem `(duration_value is null) = (duration_unit is null)` —
-> to je izmjena šeme, pa čeka odobrenje vlasnika.
+> **Riješeno i u bazi (vlasnik odobrio 23.09.2026).** Migracija
+> `0027_plan_duration_pair.sql` dodaje ograničenje `(duration_value is null) = (duration_unit is null)`;
+> suvi prolaz je pokazao da je to jedina migracija na čekanju, a postojeći planovi ga ne krše.
+> Regresija: dvije nove tvrdnje u `supabase/tests/0003_catalog.test.sql` (svih 14 pgTAP fajlova prolazi).
 
 **N-15 — forma plana odbijala tri polja bez poruke (SET-14).**
 „Dolazaka u teretanu“, „Grupnih termina“ i „Redoslijed“ nisu imali mjesto za poruku, a

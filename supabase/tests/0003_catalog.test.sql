@@ -1,7 +1,7 @@
 -- M-03: the catalogue rules — BR-024 (a slot's trainer must be on the program),
 -- BR-004 (a price change never rewrites an existing record), BR-026 and BR-131,
 -- plus the doc 07 §6 visibility of the owner-only finance tables.
-select plan(22);
+select plan(24);
 
 -- Fixtures --------------------------------------------------------------------
 insert into auth.users (id, email) values
@@ -95,6 +95,21 @@ select throws_ok(
   '23514',
   null,
   'doc 07 §3: a personal plan carries no price'
+);
+-- N-14 (migration 0027): a plan other than a day pass needs both halves of its duration.
+select throws_ok(
+  $$insert into plans (gym_id, name, kind, duration_value, duration_unit, price)
+    values ('33333333-0000-0000-0000-00000000b001', 'pgTAP Bez broja', 'gym', null, 'month', 50)$$,
+  '23514',
+  null,
+  'N-14: a gym plan with a unit but no number is rejected'
+);
+select throws_ok(
+  $$insert into plans (gym_id, name, kind, duration_value, duration_unit, price)
+    values ('33333333-0000-0000-0000-00000000b001', 'pgTAP Bez jedinice', 'gym', 1, null, 50)$$,
+  '23514',
+  null,
+  'N-14: a gym plan with a number but no unit is rejected'
 );
 
 -- Owner: the RPCs, and BR-004 ---------------------------------------------------

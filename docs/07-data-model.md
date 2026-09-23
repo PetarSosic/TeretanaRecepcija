@@ -160,6 +160,7 @@ create table plans (
   is_active           boolean not null default true,
   unique (gym_id, name),
   check ((kind = 'day_pass') = (duration_value is null and duration_unit is null)),
+  check ((duration_value is null) = (duration_unit is null)),   -- migration 0027 (N-14)
   check ((kind = 'personal') = (price is null))
 );
 
