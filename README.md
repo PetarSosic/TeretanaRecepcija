@@ -151,7 +151,10 @@ an account only the owner has.
    `CRON_SECRET` (at least 32 random characters), `APP_URL` (the deployed address),
    `STAFF_EMAIL_DOMAIN`. `DATABASE_URL` and the seed passwords belong to the developer's
    machine and must **not** be set on Vercel.
-2. Deploy, and check that `https://<app>/login` answers.
+2. Deploy, and check that `https://<app>/login` answers. `vercel.json` pins the functions
+   to `fra1`, next to the Supabase project in `eu-central-1`; the response header
+   `X-Vercel-Id` must read `…::fra1::…`. Pick the region closest to the database if the
+   project ever moves.
 3. Store `BACKUP_ZIP_PASSWORD` in a password manager. It is never sent by email and there
    is no way to recover a backup without it (doc 08 §9).
 

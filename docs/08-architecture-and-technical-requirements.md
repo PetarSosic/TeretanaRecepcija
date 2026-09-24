@@ -270,7 +270,7 @@ RPCs raise `P0001` with the message `E_<CODE>`. `lib/errors.ts` maps each code t
 
 ## 11. Environments and configuration
 - **Development (D-56):** `npm run dev` serves the app locally and connects directly to hosted Supabase project `paakuxiufzmdobpooqdi`. No Docker or local Supabase stack. Initialize the CLI metadata with `supabase init`, link the hosted project, inspect existing data, and apply only new numbered migrations with `supabase db push --linked`. No remote resets. Database tests use `scripts/test-db.mjs` with pgTAP over a TLS Postgres connection, isolated in transactions and rolled back. Synthetic E2E fixtures must avoid modifying existing gym data. Owner seeding arrives in M-01.
-- **Production:** one Supabase free project and one Vercel project (Hobby for now, OQ-5). Migrations are applied with `supabase db push`. The pg_cron schedules are created by a migration that reads `APP_URL` and `CRON_SECRET` from Supabase Vault.
+- **Production:** one Supabase free project and one Vercel project (Hobby for now, OQ-5). Vercel Functions run in `fra1` (Frankfurt), set in `vercel.json`, because the Supabase project is in `eu-central-1`; in Vercel's default `iad1` every database call crossed the Atlantic and a screen took about three times as long. Migrations are applied with `supabase db push`. The pg_cron schedules are created by a migration that reads `APP_URL` and `CRON_SECRET` from Supabase Vault.
 - **Environment variables:**
 
 | Variable | Used by |
