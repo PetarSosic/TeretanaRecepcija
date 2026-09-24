@@ -456,8 +456,14 @@ test("REC-21: two desks scan the same card at the same moment — one visit, nev
         ),
       ),
     );
-    await Promise.all(desks.map((desk) => desk.keyboard.type(card.trka)));
-    await Promise.all(desks.map((desk) => desk.keyboard.press("Enter")));
+    // Digits and Enter back to back on each desk, the desks at the same time: under
+    // load an Enter sent after both desks had typed could miss the one-second scan buffer.
+    await Promise.all(
+      desks.map(async (desk) => {
+        await desk.keyboard.type(card.trka);
+        await desk.keyboard.press("Enter");
+      }),
+    );
     const outcomes: string[] = [];
     for (const desk of desks) {
       const covered = desk.locator("[data-result=covered]");

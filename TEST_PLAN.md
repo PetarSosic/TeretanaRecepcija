@@ -15,6 +15,11 @@ sekciju **7. Otvorena pitanja**.
 
 ---
 
+> **Dopuna 24.09.2026 (2):** odluke vlasnika — emoji u imenu člana se odbija (N-16, D-66, MEM-07
+> sada PROŠLO), dnevnik izmjena prikazuje nazive i vrijednosti sa ekrana (N-21), izvještaj smjene
+> ide i vlasniku (D-65), N-23 ostaje bez provjere u bazi (D-67). Novo stanje: **215 prošlo ·
+> 0 palo · 1 djelimično · 1 nije izvršeno** (AUTH-13, AUTH-14). Detalji u **§9.11**.
+
 > **Dopuna 24.09.2026:** izvršena su sva 22 preostala djelimična slučaja prioriteta **Srednje** i
 > **Nisko** — svi PROŠLI, sedam tek nakon popravki **N-22 do N-26**. N-23 (recepcioner radi u
 > tuđoj smjeni mimo ekrana S-02) zatvoren je u aplikaciji, a S-02 više nema meni; vlasnik je
@@ -1119,7 +1124,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   pretraga, PDF). Razmaci ispred i iza se uklanjaju prije čuvanja. Emoji: ako se prihvata, mora se
   ispravno prikazati svuda uključujući PDF; ako PDF prikazuje kvadratiće, zabilježite kao bug.
 - **Gdje provjeriti:** UI; PDF izvještaja smjene; PDF kartica
-- [ ] Prošlo  [x] Palo  Napomena: **23.09.2026 — PALO (N-16, emoji u PDF-u).** `test-plan-high-b.spec.ts`: `Ćira Ćirić Šušnjić-Žižić`, `Ђорђе Петровић` i `  Ana  ` (sačuvano kao `Ana`) ispravno se prikazuju u listi, profilu, pretrazi (`ciric susnjic`, `петров`) i u PDF izvještaju smjene. `Ana😀` se prihvata i prikazuje na ekranima i u pretrazi, ali **u PDF-u emoji nestaje** (ostaje prazno mjesto, bez kvadratića) — font izvještaja nema emoji. Po kriterijumu plana to je nalaz; odluka je vlasnikova (§9.9, §7 pitanje 1). Raniji dokaz (22.09.): E2E registracija i pretraga Ćosić, unit normalizacija razmaka i PDF testovi čćšžđ prolaze. Ćirilica i emoji nisu provjereni.
+- [x] Prošlo  [ ] Palo  Napomena: **24.09.2026 — PROŠLO (nakon odluke vlasnika i popravke N-16).** `test-plan-high-b.spec.ts`: `Ćira Ćirić Šušnjić-Žižić`, `Ђорђе Петровић` i `  Ana  ` (sačuvano kao `Ana`) i dalje se ispravno prikazuju u listi, profilu, pretrazi i PDF-u. Vlasnik je odlučio da se emoji u imenu odbija (D-66): `Ana😀` / `Emoji 🇲🇪` sada daju „Ime ne smije sadržati emoji.“ i „Prezime ne smije sadržati emoji.“ ispod polja, a u bazi ništa nije sačuvano; baza isto odbija i direktan poziv (migracija 0028, pgTAP). Prvi nalaz (23.09.): **PALO (N-16, emoji u PDF-u).** `test-plan-high-b.spec.ts`: `Ćira Ćirić Šušnjić-Žižić`, `Ђорђе Петровић` i `  Ana  ` (sačuvano kao `Ana`) ispravno se prikazuju u listi, profilu, pretrazi (`ciric susnjic`, `петров`) i u PDF izvještaju smjene. `Ana😀` se prihvata i prikazuje na ekranima i u pretrazi, ali **u PDF-u emoji nestaje** (ostaje prazno mjesto, bez kvadratića) — font izvještaja nema emoji. Po kriterijumu plana to je nalaz; odluka je vlasnikova (§9.9, §7 pitanje 1). Raniji dokaz (22.09.): E2E registracija i pretraga Ćosić, unit normalizacija razmaka i PDF testovi čćšžđ prolaze. Ćirilica i emoji nisu provjereni.
 
 ### [MEM-08] Upozorenje o duplikatu (BR-043)
 - **Prioritet:** Visoko
@@ -3008,7 +3013,7 @@ potvrđuje ili opovrgava.
 Ovdje su stvari koje iz koda **nisu jednoznačne**. Nije pogađano kakvo ponašanje treba da bude —
 odluku donosi vlasnik.
 
-1. **Emoji i ćirilica u imenima članova.** Kod ih nigdje izričito ne zabranjuje (ograničenje je
+1. **Riješeno 24.09.2026 (D-66): emoji se odbija, ćirilica se prihvata.** ~~**Emoji i ćirilica u imenima članova.**~~ Kod ih nigdje izričito ne zabranjuje (ograničenje je
    samo dužina 1–50 znakova), ali nije napisano ni da su dozvoljeni, ni kako treba da izgledaju u
    PDF izvještaju. Da li ih treba odbiti pri unosu?
 2. **Velika slova u korisničkom imenu.** Obrazac traži mala slova, a unos se prije provjere pretvara
@@ -3443,7 +3448,7 @@ ostatak testova i dalje ne šalje nijedan pravi email (N-05).
 
 **Nalazi i popravke:**
 
-**N-16 — emoji nestaje u PDF-u (MEM-07) — otvoreno.** Ime `Ana😀` se prihvata i prikazuje na
+**N-16 — emoji nestaje u PDF-u (MEM-07) — riješeno 24.09.2026 (§9.11).** Ime `Ana😀` se prihvata i prikazuje na
 ekranima i u pretrazi, ali u PDF izvještaju smjene emoji nestaje (ostaje prazno mjesto, bez
 kvadratića), jer ugrađeni font nema emoji. Odluka je vlasnikova: odbiti emoji pri unosu imena,
 ili ga u PDF-u zamijeniti znakom, ili prihvatiti prazno mjesto (§7, pitanje 1).
@@ -3468,7 +3473,7 @@ Sada je precrtan, kao na svim ostalim listama, a razlog poništavanja ostaje či
 **N-20 — isplata treneru upisivala iznos sa tačkom (FIN-11) — popravljeno.** [Evidentiraj
 isplatu] je otvarala formu troška sa iznosom `107.30`; sada `107,30`, kao ostatak aplikacije.
 
-**N-21 — dnevnik izmjena prikazuje nazive kolona iz baze (FIN-14, S-21) — otvoreno.** Prikaz
+**N-21 — dnevnik izmjena prikazuje nazive kolona iz baze (FIN-14, S-21) — riješeno 24.09.2026 (§9.11).** Prikaz
 izmjene je „polje: staro → novo“, ali „polje“ je naziv kolone i vrijednost je sirova, npr.
 `date_of_birth: 01.01.1990 → 15.03.1995`, `gym_id: <uuid>`, `method: cash`,
 `created_by: <uuid>`, `voided_by: <uuid>`; u filteru „Stavka“ uplate se zovu „Uplate danas“
@@ -3619,6 +3624,45 @@ SHIFT-08 prolazi. Nije mijenjano; zabilježeno da se rezultati produkcijskih E2E
 | `npm run test` | **161/161** (+1 preskočen) |
 | `npm run test:db` | **14/14 fajlova** |
 | Zaostale `E2E` teretane u bazi | 0 |
+
+### 9.11 Dopuna — odluke vlasnika, 24.09.2026
+
+**N-16 → D-66: emoji u imenu člana se odbija.** Forma za novog člana i izmjenu podataka
+odbija emoji u imenu i prezimenu sa porukom ispod polja („Ime ne smije sadržati emoji.“,
+„Prezime ne smije sadržati emoji.“). Isto provjerava i baza (`clean_member()`, migracija
+`0028_member_name_no_emoji.sql`), pa ni direktan poziv ne može da sačuva takvo ime. Odbijaju se
+emoji i piktogrami (blokovi U+1F000–U+1FAFF, U+2300–U+23FF, U+2600–U+27BF, U+2B00–U+2BFF,
+zastave, spojnici i selektori); naša slova, ćirilica, apostrof, crtica, cifre i © ostaju
+dozvoljeni. Prije migracije read-only upit je potvrdio da u bazi nema člana sa emojijem.
+Regresija: unit (`members.test.ts`), pgTAP (`0006_members`, 84 tvrdnje) i MEM-07.
+
+**N-21: dnevnik izmjena govori jezikom ekrana.** Umjesto `date_of_birth: 01.01.1990 →
+15.03.1995`, `method: cash` i `gym_id: <uuid>`, S-21 sada prikazuje npr. „Datum rođenja:
+01.01.1990 → 15.03.1995“, „Način plaćanja: Gotovina → Platna kartica“, „Plan: Mjesečna“,
+„Član: #12 Marko Marković“. Ispod naziva stavke stoji i o kojem zapisu je riječ („Troškovi —
+Kirija: septembar“, „Uplate — Dnevna karta × 1“). Tehnička polja (`id`, `gym_id`, `shift_id`,
+ko je i kada unio — to već kažu kolone „Korisnik“ i „Vrijeme“) se ne prikazuju; kod poništavanja
+ostaje „Razlog poništavanja“. Filter „Stavka“ nudi samo tabele koje se zaista bilježe (i
+„Uplate“ umjesto „Uplate danas“). Kod: `features/finance/audit-format.ts`; regresija: unit
+`audit-format.test.ts` i FIN-14, koji sada provjerava i da se nazivi kolona i identifikatori
+više ne vide.
+
+**OQ-6 → D-65: izvještaj smjene ide i vlasniku.** Svaki izvještaj smjene (zaključenje,
+preuzimanje, noćno zatvaranje, ponovno slanje) ide na adrese iz podešavanja i uvijek na email
+svakog aktivnog vlasnika, svaka adresa jednom, pa se vlasnik ne može slučajno izbaciti iz
+podešavanja. To je jedini finansijski izvještaj koji aplikacija šalje emailom; sedmična rezervna
+kopija zadržava svoje primaoce. Regresija: unit `shift-report.test.ts`.
+
+**N-23 → D-67:** vlasnik je odlučio da se provjera vlasništva smjene ne dodaje u bazu; ostaje
+zaštita u aplikaciji (S-02 bez menija, preusmjerenje sa svih ekrana).
+
+**Specifikacija:** doc 10 (D-65, D-66, D-67; OQ-6 zatvoren), doc 03 BR-117 i doc 08 §7.
+
+| Provjera 24.09.2026 (2) | Rezultat |
+|---|---|
+| `npm run test:db` (poslije migracije 0028) | **14/14 fajlova**, `0006_members` 84 tvrdnje |
+| Unit: `members`, `audit-format`, `shift-report` | PROŠLO |
+| E2E: `test-plan-high-b`, `-high-f`, `-high-g`, `-medium-a`, `-money`, `finance`, `members` | PROŠLO (REC-21 pojačan: pod velikim opterećenjem odvojen Enter je mogao da zakasni za skener-bafer od 1 s) |
 
 *Kraj plana. Novi rezultati upisani su uz slučajeve; neoznačeni kvadratići nisu automatski prolaz.*
 
