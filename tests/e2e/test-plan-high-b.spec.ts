@@ -325,7 +325,7 @@ test("MEM-08: a duplicate phone warns on leaving the field, and [Ipak sačuvaj] 
   expect(count).toBe(2);
 });
 
-test("MEM-07: our letters, Cyrillic, trimmed spaces and an emoji everywhere, PDF included", async ({
+test("MEM-07: our letters, Cyrillic and trimmed spaces everywhere, PDF included; emoji refused (N-16)", async ({
   page,
   browser,
 }) => {
@@ -335,7 +335,6 @@ test("MEM-07: our letters, Cyrillic, trimmed spaces and an emoji everywhere, PDF
     ["Ćira", "Ćirić Šušnjić-Žižić", "069 200 001"],
     ["Ђорђе", "Петровић", "069 200 002"],
     ["  Ana  ", "Razmak", "069 200 003"],
-    ["Ana😀", "Emoji", "069 200 004"],
   ];
   const numbers: number[] = [];
   for (const [index, [first, last, phone]] of cases.entries())
@@ -359,8 +358,29 @@ test("MEM-07: our letters, Cyrillic, trimmed spaces and an emoji everywhere, PDF
     "Ćira",
     "Ђорђе",
     "Ana",
-    "Ana😀",
   ]);
+
+  // N-16: the owner decided that a name may not contain emoji (the PDF cannot print
+  // them); the form says so under the field and nothing is stored.
+  const dialog = await openRegistration(page, card.empties[4]);
+  await expect(dialog.getByText("Kartica je prazna i spremna.")).toBeVisible();
+  await dialog.getByLabel("Ime", { exact: true }).fill("Ana😀");
+  await dialog.getByLabel("Prezime").fill("Emoji 🇲🇪");
+  await dialog.getByLabel("Telefon").fill("069 200 004");
+  await dialog.getByLabel("Email").fill("069200004@e2e.invalid");
+  await dialog.getByLabel("Datum rođenja", { exact: true }).fill("01.02.2000");
+  await dialog.getByLabel("Vrsta članarine").selectOption(mjesecnaId);
+  await dialog.getByText("Gotovina", { exact: true }).click();
+  await dialog.getByRole("button", { name: "Sačuvaj" }).click();
+  await expect(dialog.getByText("Ime ne smije sadržati emoji.", { exact: true })).toBeVisible();
+  await expect(dialog.getByText("Prezime ne smije sadržati emoji.", { exact: true })).toBeVisible();
+  await page.keyboard.press("Escape");
+  const { count: emoji } = await adminClient()
+    .from("members")
+    .select("id", { count: "exact", head: true })
+    .eq("gym_id", gymId)
+    .eq("phone", "+38269200004");
+  expect(emoji).toBe(0);
 
   // The list is sorted, so the new members sit on the second page of 25.
   await page.goto("/members?page=2");
@@ -368,7 +388,6 @@ test("MEM-07: our letters, Cyrillic, trimmed spaces and an emoji everywhere, PDF
     "Ćira Ćirić Šušnjić-Žižić",
     "Ђорђе Петровић",
     "Ana Razmak",
-    "Ana😀 Emoji",
   ]) {
     const onPage = await page.getByText(text).count();
     if (!onPage) await page.goto("/members?page=1");
@@ -381,13 +400,12 @@ test("MEM-07: our letters, Cyrillic, trimmed spaces and an emoji everywhere, PDF
   for (const [query, expected] of [
     ["ciric susnjic", "Ćira Ćirić Šušnjić-Žižić"],
     ["петров", "Ђорђе Петровић"],
-    ["😀", "Ana😀 Emoji"],
   ]) {
     await search.fill(query);
     await expect(page.getByText(expected).first(), query).toBeVisible();
   }
 
-  // The shift report, closed by the owner, lists the four sales with the names.
+  // The shift report, closed by the owner, lists the three sales with the names.
   const owner = await signedIn(browser, staff.owner);
   await owner.goto("/finance/shifts");
   await owner.getByRole("button", { name: "Zaključi smjenu" }).click();
@@ -410,11 +428,8 @@ test("MEM-07: our letters, Cyrillic, trimmed spaces and an emoji everywhere, PDF
     latin: text.includes("Ćirić Šušnjić") && text.includes("Žižić"),
     cyrillic: text.includes("Ђорђе") && text.includes("Петровић"),
     trimmed: text.includes("Ana Razmak"),
-    emoji: text.includes("😀"),
   };
-  note(
-    `MEM-07 PDF: ${JSON.stringify(found)}; around emoji: "${text.match(/.{0,12}Emoji/)?.[0]}"`,
-  );
+  note(`MEM-07 PDF: ${JSON.stringify(found)}`);
   expect(found.latin).toBe(true);
   expect(found.cyrillic).toBe(true);
   expect(found.trimmed).toBe(true);

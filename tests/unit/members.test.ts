@@ -74,6 +74,30 @@ describe("memberFieldsSchema (BR-040, BR-041)", () => {
     expect(messages.email).toBe(me.members.emailInvalid);
     expect(messages.dateOfBirth).toBe(me.members.dateOfBirthInvalid);
   });
+  it("refuses emoji in either name, and nothing else (N-16)", () => {
+    for (const [firstName, lastName, field, message] of [
+      ["Ana😀", "Anić", "firstName", me.members.firstNameEmoji],
+      ["Marko❤️", "Marković", "firstName", me.members.firstNameEmoji],
+      ["Ana", "Anić 🇲🇪", "lastName", me.members.lastNameEmoji],
+      ["Ana", "👍🏽", "lastName", me.members.lastNameEmoji],
+      ["Ana", "Kafa☕", "lastName", me.members.lastNameEmoji],
+    ] as const) {
+      const result = memberFieldsSchema.safeParse({ ...member, firstName, lastName });
+      expect(result.success, `${firstName} ${lastName}`).toBe(false);
+      expect(result.error?.issues[0]).toMatchObject({ path: [field], message });
+    }
+    for (const [firstName, lastName] of [
+      ["Ćira", "Šušnjić-Žižić"],
+      ["Ђорђе", "Петровић"],
+      ["Sean", "O'Brien"],
+      ["<script>", "alert(1)"],
+      ["Jovan ©", "Jovanović"],
+    ])
+      expect(
+        memberFieldsSchema.safeParse({ ...member, firstName, lastName }).success,
+        `${firstName} ${lastName}`,
+      ).toBe(true);
+  });
 });
 
 const sale = {

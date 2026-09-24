@@ -329,6 +329,9 @@ export const me = {
       "Član #{number} je kreiran. Upišite ime olovkom na karticu: {name}.",
     firstNameInvalid: "Unesite ime (1–50 znakova).",
     lastNameInvalid: "Unesite prezime (1–50 znakova).",
+    // N-16: the shift report cannot print emoji.
+    firstNameEmoji: "Ime ne smije sadržati emoji.",
+    lastNameEmoji: "Prezime ne smije sadržati emoji.",
     emailInvalid: "Unesite ispravan email.",
     dateOfBirthInvalid:
       "Unesite datum rođenja (dd.mm.gggg), od 01.01.1900 do danas.",

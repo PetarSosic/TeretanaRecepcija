@@ -1,7 +1,7 @@
 -- M-06: members and memberships. The worked examples E1, E2, E4, E13 and E14, BR-052
 -- with unpaid visits from fixtures (E3 and E5, date logic only), the sale, registration,
 -- editing, anonymization and card replacement RPCs, and the doc 07 §6 visibility.
-select plan(82);
+select plan(84);
 
 -- Fixtures ------------------------------------------------------------------------
 insert into auth.users (id, email) values
@@ -274,6 +274,14 @@ select throws_ok(
   $$select register_member('6600000001', 'Ana', 'Anić', '067 111 222', 'ana@pgtap',
       '1995-05-05', '66666666-0000-0000-0000-00000000f001', null, null, null, 'cash')$$,
   'P0001', 'E_VALIDATION', 'BR-040: an email without a domain is rejected');
+select throws_ok(
+  $$select register_member('6600000001', 'Ana😀', 'Anić', '067 111 222', 'ana@pgtap.invalid',
+      '1995-05-05', '66666666-0000-0000-0000-00000000f001', null, null, null, 'cash')$$,
+  'P0001', 'E_VALIDATION', 'N-16: an emoji in the first name is rejected');
+select throws_ok(
+  $$select register_member('6600000001', 'Ana', 'Anić 🇲🇪', '067 111 222', 'ana@pgtap.invalid',
+      '1995-05-05', '66666666-0000-0000-0000-00000000f001', null, null, null, 'cash')$$,
+  'P0001', 'E_VALIDATION', 'N-16: a flag in the last name is rejected');
 
 select is(
   (register_member('6600000001', ' Ana ', 'Ćosić', '067 111 222', 'ANA@pgtap.invalid',
