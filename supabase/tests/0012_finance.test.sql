@@ -1,7 +1,8 @@
 -- M-12: the owner's finance reports. E9 to E12 (the BR-155 shares), BR-156 over a whole
 -- fixture month, BR-150 to BR-153 on the same fixtures, BR-157 (a manager gets nothing),
--- and BR-120: a back-dated record counts in finance and never in a shift.
-select plan(41);
+-- and BR-120: a back-dated record counts in finance and never in a shift. D-68: the
+-- chart's year by months and month by days.
+select plan(55);
 
 -- Fixtures --------------------------------------------------------------------------
 insert into auth.users (id, email) values
@@ -58,8 +59,13 @@ insert into members (id, gym_id, member_number, first_name, last_name, phone, em
 create temporary table fin_month as
   select date_trunc('month', gym_today('cccccccc-0000-0000-0000-00000000b001')
                              - interval '1 month')::date as first;
+-- D-68: the fixture month as the chart's arguments, and its last day.
+create temporary table fin_chart_month as
+  select extract(year from first)::int as year, extract(month from first)::int as month,
+         (first + interval '1 month' - interval '1 day')::date as last
+  from fin_month;
 -- The assertions below run as `authenticated`, which owns nothing of its own.
-grant select on fin_month to authenticated;
+grant select on fin_month, fin_chart_month to authenticated;
 
 insert into shifts (id, gym_id, staff_id, started_at, closed_at, close_type) values
   ('cccccccc-0000-0000-0000-00000000f001', 'cccccccc-0000-0000-0000-00000000b001',
@@ -240,6 +246,73 @@ select is(
    where value ->> 'name' = 'cash'),
   304.00::numeric, 'US-17.1 AC2: €289.00 of cash payments plus €15.00 of cash sales');
 
+-- D-68: the S-16 chart, a year by months and a month by days --------------------------
+select is(
+  json_array_length(fin_chart((select year from fin_chart_month)) -> 'points'),
+  12, 'D-68: a year is always twelve months, January to December');
+select is(
+  (select value ->> 'income'
+   from json_array_elements(fin_chart((select year from fin_chart_month)) -> 'points')
+   where value ->> 'date' = to_char((select first from fin_month), 'YYYY-MM-DD')),
+  '403.00', 'D-68: the fixture month holds the BR-150 income');
+select is(
+  (select json_typeof(value -> 'income')
+   from json_array_elements(fin_chart((select year from fin_chart_month)) -> 'points')
+   where value ->> 'date' = to_char((select first from fin_month), 'YYYY-MM-DD')),
+  'string', 'BR-003: and it crosses to the browser as text');
+select is(
+  (select value ->> 'expenses'
+   from json_array_elements(fin_chart((select year from fin_chart_month)) -> 'points')
+   where value ->> 'date' = to_char((select first from fin_month), 'YYYY-MM-DD')),
+  '150.00', 'D-68: and the BR-151 expenses');
+select is(
+  (fin_chart((select year from fin_chart_month)) ->> 'first_year')::int,
+  (select year from fin_chart_month),
+  'D-68: the year selector reaches back to the first year with money');
+select is(
+  (select count(*)::int
+   from json_array_elements(
+     fin_chart(extract(year from gym_today('cccccccc-0000-0000-0000-00000000b001'))::int)
+     -> 'points')
+   where json_typeof(value -> 'income') = 'null'),
+  12 - extract(month from gym_today('cccccccc-0000-0000-0000-00000000b001'))::int,
+  'D-68: a month after today is left empty, not drawn as zero');
+select is(
+  json_array_length(fin_chart((select year from fin_chart_month),
+                              (select month from fin_chart_month)) -> 'points'),
+  extract(day from (select last from fin_chart_month))::int,
+  'D-68: a month is shown day by day, every day of it');
+select is(
+  (select value ->> 'income'
+   from json_array_elements(fin_chart((select year from fin_chart_month),
+                                      (select month from fin_chart_month)) -> 'points')
+   where value ->> 'date' = to_char((select first from fin_month) + 9, 'YYYY-MM-DD')),
+  '403.00', 'D-68: the 10th holds the day''s payments and its bar sale');
+select is(
+  (fin_chart((select year from fin_chart_month),
+             (select month from fin_chart_month)) ->> 'income')::numeric,
+  (fin_summary((select first from fin_month),
+               (select last from fin_chart_month)) ->> 'income')::numeric,
+  'D-68: the month''s total income equals the S-16 card for the same month');
+select is(
+  (fin_chart((select year from fin_chart_month),
+             (select month from fin_chart_month)) ->> 'profit')::numeric,
+  253.00::numeric, 'D-68: and its profit is income minus expenses (BR-152)');
+select throws_ok(
+  format('select fin_chart(%s)',
+         extract(year from gym_today('cccccccc-0000-0000-0000-00000000b001'))::int + 1),
+  'E_VALIDATION', 'D-68: no year after this one');
+select throws_ok(
+  format('select fin_chart(%s, %s)',
+         extract(year from gym_today('cccccccc-0000-0000-0000-00000000b001')
+                           + interval '1 month')::int,
+         extract(month from gym_today('cccccccc-0000-0000-0000-00000000b001')
+                            + interval '1 month')::int),
+  'E_VALIDATION', 'D-68: nor a month that has not started yet');
+select throws_ok(
+  $$select fin_chart(2025, 13)$$,
+  'E_VALIDATION', 'D-68: a month is 1 to 12');
+
 -- BR-156 over the fixture month ---------------------------------------------------------
 select is(
   (select (value ->> 'clients')::int
@@ -344,6 +417,9 @@ select throws_ok(
 select throws_ok(
   $$select fin_trainer_stats(current_date)$$,
   'E_FORBIDDEN', 'BR-157: nor from fin_trainer_stats');
+select throws_ok(
+  $$select fin_chart(2026)$$,
+  'E_FORBIDDEN', 'BR-157: nor from fin_chart (D-68)');
 select throws_ok(
   $$select fin_expenses(current_date, current_date)$$,
   'E_FORBIDDEN', 'BR-157: nor from fin_expenses');

@@ -307,6 +307,60 @@ test("Flow 9: S-16 shows the period totals and the twelve-month chart", async ({
   await expect(page.getByRole("cell", { name: "220,00 €" })).toBeVisible();
 });
 
+test("D-68: the S-16 chart opens on this year and narrows to one month by day", async ({
+  page,
+}) => {
+  const { data: today } = await adminClient().rpc("gym_today", { p_gym: gymId });
+  const thisYear = (today as string).slice(0, 4);
+  const [year, month] = monthValue.split("-");
+  const months = [
+    "januar", "februar", "mart", "april", "maj", "jun",
+    "jul", "avgust", "septembar", "oktobar", "novembar", "decembar",
+  ];
+  const monthName = months[Number(month) - 1];
+
+  await signIn(page, owner);
+  await page.goto("/finance");
+  const yearSelect = page.getByLabel("Godina", { exact: true });
+  const monthSelect = page.getByLabel("Mjesec", { exact: true });
+  await expect(yearSelect).toHaveValue(thisYear);
+  await expect(monthSelect).toHaveValue("");
+  await expect(page.getByText("Prihod i troškovi po mjesecima (€)")).toBeVisible();
+  const chart = page.locator("figure", { hasText: "Prihod i troškovi po" });
+  await expect(chart.locator("svg text", { hasText: /^dec$/ })).toHaveCount(1);
+  await expect(chart).toContainText(`Ukupno za ${thisYear}:`);
+
+  // The fixture month through the two selects, as the owner would pick it.
+  if (year !== thisYear) {
+    // In January the fixture month is last December, in last year.
+    await yearSelect.selectOption(year);
+    await page.waitForURL((url) => url.searchParams.get("year") === year);
+  }
+  await monthSelect.selectOption(String(Number(month)));
+  await page.waitForURL(
+    (url) => url.searchParams.get("month") === String(Number(month)),
+  );
+  await expect(page.getByText("Prihod i troškovi po danima (€)")).toBeVisible();
+  await expect(chart).toContainText(`Ukupno za ${monthName} ${year}:`);
+  await expect(chart).toContainText("Prihod 388,00 €");
+  const days = new Date(Date.UTC(Number(year), Number(month), 0)).getUTCDate();
+  await expect(chart.locator("svg g:has(rect)")).toHaveCount(days);
+
+  // The 10th: BR-150's €69 + €99 + €120 + €100, paid that day.
+  await chart.locator("svg g:has(rect)").nth(9).locator("rect").first().hover();
+  await expect(chart.locator("p[aria-live=polite]")).toContainText(
+    `10.${month}.${year} — Prihod: 388,00 €`,
+  );
+
+  // The period of the cards stays its own: the chart filter leaves it alone.
+  await expect(page.getByLabel("Period")).toHaveValue("month");
+
+  // A year that has not come, or a month that is not one, falls back to this year.
+  await page.goto(`/finance?year=${Number(thisYear) + 1}&month=13`);
+  await expect(yearSelect).toHaveValue(thisYear);
+  await expect(monthSelect).toHaveValue("");
+});
+
 test("Flow 9 and E9–E12: S-18 shows each trainer's share, and none for an unknown fee", async ({
   page,
 }) => {

@@ -503,6 +503,7 @@ For managers, `shift_summary` must verify that the requested shift is the curren
 **Owner-only report functions** (`security definer`; each starts with `if my_role() <> 'owner' then raise`):
 - `fin_summary(p_from, p_to)`;
 - `fin_income_breakdown(p_from, p_to)`;
+- `fin_chart(p_year, p_month default null)` — the S-16 chart (D-68): the year's twelve months, or the month's days, each with income and expenses, `null` after today; plus the totals and the first year that holds any money;
 - `fin_expenses(p_from, p_to, filters)`;
 - `fin_trainer_stats(p_month date)`;
 - `fin_trainer_payments(p_trainer, p_month)`;

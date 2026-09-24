@@ -91,6 +91,7 @@ These are decisions made by Mihajlo (M) or the gym owner (O) during specificatio
 | D-40 | The visit statistics page is available to owner and manager. | M |
 | D-F4 | Stock-in asks "Iz kase / Van kase". | M |
 | D-63 | S-17 shows **Ukupno**: the sum of the expenses the current period and filters list, voided expenses excluded (BR-095). With no filter it equals the "Troškovi" card on S-16 for the same period. Requested by the gym owner after the 23.09.2026 test pass (FIN-09). | O |
+| D-68 | The S-16 chart shows one **calendar year**, January to December, month by month, and opens on the gym's current year instead of the last 12 months (US-17.1 AC3). Its own filter, independent of the period of the cards and tables, offers **Godina** (back to the first year that holds any money) and **Mjesec** (`Cijela godina`, or one month, which is then shown day by day). Months and days after today stay empty rather than zero. Under the chart, `Ukupno za <godina \| mjesec godina>:` gives Prihod, Troškovi and Profit for what is shown (BR-150–152). `fin_chart` replaces `fin_monthly` (migration 0029). Requested by the owner, 24.09.2026. | O |
 | D-55 | Free stock deliveries are not allowed. A stock-in purchase price must be at least €0.01, so its automatic expense is positive. Confirmed 18.09.2026. | M |
 
 ### Jobs, email and technical choices

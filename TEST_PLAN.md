@@ -15,6 +15,9 @@ sekciju **7. Otvorena pitanja**.
 
 ---
 
+> **Dopuna 24.09.2026 (3):** grafikon na `/finance` otvara tekuću godinu i ima filter po godini i
+> mjesecu (D-68); FIN-04 ponovo PROŠLO. Stanje se ne mijenja. Detalji u **§9.12**.
+
 > **Dopuna 24.09.2026 (2):** odluke vlasnika — emoji u imenu člana se odbija (N-16, D-66, MEM-07
 > sada PROŠLO), dnevnik izmjena prikazuje nazive i vrijednosti sa ekrana (N-21), izvještaj smjene
 > ide i vlasniku (D-65), N-23 ostaje bez provjere u bazi (D-67). Novo stanje: **215 prošlo ·
@@ -2195,16 +2198,24 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Gdje provjeriti:** UI; ručna kontrola zbira
 - [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-high-f.spec.ts`: za danas „Prihod po vrsti članarine“ = 100 + 99 + 79 + 69 = 347,00 € (poklapa se sa karticom „Prihod“), „Prihod po načinu plaćanja“ = Gotovina 179,00 € + Platna kartica 168,00 €; poništena dnevna karta se nigdje ne broji. „Troškovi po kategoriji“ bez troškova → „Nema podataka za izabrani period.“, isto i za oba raščlanjenja u „Prošlom mjesecu“. „Ističe u narednih 7 dana“ prikazuje člana čija članarina ističe za 3 dana (sa datumom), „Članovi sa neplaćenim dolascima“ člana sa neplaćenim dolaskom; oba imena vode na profil člana. Raniji dokaz (22.09.): E2E finance.spec.ts + DB 0012: zbirni prihodi/troškovi, podjele i grafikon za 12 mjeseci. Svi periodi i svaki detalj iz plana nisu provjereni.
 
-### [FIN-04] Grafikon prihoda i troškova po mjesecima
+### [FIN-04] Grafikon prihoda i troškova — godina i mjesec (D-68)
 - **Prioritet:** Srednje
-- **Uloga / preduslovi:** Vlasnik
-- **Koraci:** pređite mišem preko stupaca; smanjite prozor na 375 px i pogledajte ponovo.
+- **Uloga / preduslovi:** Vlasnik; uplate u prošlom mjesecu
+- **Koraci:**
+  1. Otvorite `/finance` bez parametara i pogledajte grafikon i polja „Godina“ i „Mjesec“.
+  2. Pređite mišem preko stupaca; smanjite prozor na 375 px i pogledajte ponovo.
+  3. U polju „Mjesec“ izaberite prošli mjesec, pa (ako postoji) u polju „Godina“ raniju godinu.
 - **Test podaci:** —
-- **Očekivani rezultat:** uz grafikon stoji „Pređite mišem preko mjeseca za iznose.“ i iznosi se
-  pojavljuju. Na uskom ekranu grafikon ostaje čitljiv i ne izlazi iz ekrana (bez vodoravnog
-  pomjeranja cijele stranice).
+- **Očekivani rezultat:** korak 1: „Godina“ je tekuća godina, „Mjesec“ je „Cijela godina“; grafikon
+  „Prihod i troškovi po mjesecima (€)“ ide od jan do dec, a mjeseci poslije tekućeg su prazni. Ispod
+  stoji „Ukupno za <godina>:“ sa prihodom, troškovima i profitom. Korak 2: uz grafikon stoji
+  „Pređite mišem preko mjeseca za iznose.“ i iznosi se pojavljuju; na uskom ekranu grafikon ostaje
+  čitljiv i ne izlazi iz ekrana (bez vodoravnog pomjeranja cijele stranice). Korak 3: naslov postaje
+  „Prihod i troškovi po danima (€)“, stupci su dani tog mjeseca, a „Ukupno za <mjesec> <godina>:“
+  ima isti prihod kao kartica „Prihod“ za „Prošli mjesec“. Izbor ostaje u adresi
+  (`?year=…&month=…`), a polje „Period“ kartica i tabela se ne mijenja.
 - **Gdje provjeriti:** UI
-- [x] Prošlo  [ ] Palo  Napomena: **24.09.2026 — PROŠLO (nakon popravke N-24).** `test-plan-medium-b.spec.ts`: uz grafikon stoji „Pređite mišem preko mjeseca za iznose.“; prelaz preko tekućeg mjeseca prikazuje „sep 26 — Prihod: 170,00 €, Troškovi: 7,20 €“, isto kao kartice, a kad miš ode, vraća se uputstvo. Prvi pokušaj PALO na 375 px: cijela stranica `/finance` bila je široka 660 px i pomjerala se u stranu. Sada se na 375 px stranica ne pomjera, a grafikon (640 px) se pomjera unutar svog okvira od 343 px. Dodir na mjesec (emulirani telefon) prikazuje iste iznose. Snimci pregledani. Raniji dokaz (22.09.): E2E finance.spec.ts + DB 0012: zbirni prihodi/troškovi, podjele i grafikon za 12 mjeseci. Svi periodi i svaki detalj iz plana nisu provjereni.
+- [x] Prošlo  [ ] Palo  Napomena: **24.09.2026 (D-68) — PROŠLO.** `finance.spec.ts` (1366 i 375 px): bez parametara „Godina“ je tekuća godina, „Mjesec“ je „Cijela godina“, grafikon ide jan–dec i ispod stoji „Ukupno za 2026:“. Izbor prošlog mjeseca daje „Prihod i troškovi po danima (€)“ sa stupcem za svaki dan; prelaz preko 10. u mjesecu prikazuje „Prihod: 388,00 €“, a „Ukupno za <mjesec> <godina>:“ ima isti prihod kao kartice. „Period“ ostaje „Ovaj mjesec“; `?year=<sljedeća godina>&month=13` vraća tekuću godinu. `test-plan-medium-b.spec.ts`: prelaz preko tekućeg mjeseca jednak je karticama, a na 375 px stranica se ne pomjera u stranu. Prethodno: **24.09.2026 — PROŠLO (nakon popravke N-24).** `test-plan-medium-b.spec.ts`: uz grafikon stoji „Pređite mišem preko mjeseca za iznose.“; prelaz preko tekućeg mjeseca prikazuje „sep 26 — Prihod: 170,00 €, Troškovi: 7,20 €“, isto kao kartice, a kad miš ode, vraća se uputstvo. Prvi pokušaj PALO na 375 px: cijela stranica `/finance` bila je široka 660 px i pomjerala se u stranu. Sada se na 375 px stranica ne pomjera, a grafikon (640 px) se pomjera unutar svog okvira od 343 px. Dodir na mjesec (emulirani telefon) prikazuje iste iznose. Snimci pregledani. Raniji dokaz (22.09.): E2E finance.spec.ts + DB 0012: zbirni prihodi/troškovi, podjele i grafikon za 12 mjeseci. Svi periodi i svaki detalj iz plana nisu provjereni.
 
 ### [FIN-05] Novi trošak — puna forma (BR-133)
 - **Prioritet:** Kritično
@@ -3663,6 +3674,32 @@ zaštita u aplikaciji (S-02 bez menija, preusmjerenje sa svih ekrana).
 | `npm run test:db` (poslije migracije 0028) | **14/14 fajlova**, `0006_members` 84 tvrdnje |
 | Unit: `members`, `audit-format`, `shift-report` | PROŠLO |
 | E2E: `test-plan-high-b`, `-high-f`, `-high-g`, `-medium-a`, `-money`, `finance`, `members` | PROŠLO (REC-21 pojačan: pod velikim opterećenjem odvojen Enter je mogao da zakasni za skener-bafer od 1 s) |
+
+### 9.12 Dopuna — grafikon po godini i mjesecu (D-68), 24.09.2026
+
+Vlasnik je tražio da grafikon na `/finance` uvijek otvara tekuću godinu, uz filter za ranije
+godine i za pojedinačni mjesec. Grafikon sada ide od januara do decembra izabrane godine, a
+mjeseci poslije tekućeg su prazni. Polja „Godina“ (unazad do prve godine sa uplatama ili
+troškovima) i „Mjesec“ („Cijela godina“ ili jedan mjesec) ne diraju polje „Period“, pa kartice i
+tabele ostaju kakve jesu. Izabran mjesec prikazuje se po danima („Prihod i troškovi po danima
+(€)“). Ispod grafikona stoji „Ukupno za <godina | mjesec godina>: Prihod … · Troškovi … · Profit …“.
+Izbor ostaje u adresi (`?year=…&month=…`). Baza: `fin_chart(p_year, p_month)` zamjenjuje
+`fin_monthly` (migracija `0029_fin_chart.sql`); budući mjesec i godina se odbijaju (`E_VALIDATION`),
+a menadžer i recepcioner ne dobijaju ništa (`E_FORBIDDEN`).
+
+**UX-04 na dev serveru.** U `npm run test:e2e` (dev server) Tab prvo staje na dugme Next.js dev
+alata (`nextjs-portal`), koje nema ime, pa UX-04 pada. U produkcijskom buildu (`E2E_PRODUCTION=1`)
+tog dugmeta nema i UX-04 prolazi. Nije vezano za ovu izmjenu.
+
+**Specifikacija:** doc 10 (D-68), doc 05 US-17.1 AC3, doc 06 S-16, doc 07 §5; FIN-04 dopunjen.
+
+| Provjera 24.09.2026 (3) | Rezultat |
+|---|---|
+| `npm run lint`, `npm run typecheck`, `npm run build` | PROŠLO |
+| `npm run test` | 182 prošlo (13 novih za `chartFromParams`) |
+| `npm run test:db` (poslije migracije 0029) | **14/14 fajlova**, `0012_finance` 55 tvrdnji (14 novih) |
+| `npm run test:e2e` (dev server) | 292 prošlo · 1 palo (UX-04, dugme dev alata) · 148 preskočeno |
+| E2E u produkcijskom buildu: `finance`, `test-plan-medium-b` | 19 prošlo (UX-04; FIN-04; D-68 na 1366 i 375 px) |
 
 *Kraj plana. Novi rezultati upisani su uz slučajeve; neoznačeni kvadratići nisu automatski prolaz.*
 

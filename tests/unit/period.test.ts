@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  chartFromParams,
   isDate,
   periodFromParams,
   periodInstants,
@@ -87,5 +88,57 @@ describe("N-18: a period's instants in Europe/Podgorica", () => {
     expect(inside("2026-01-14T22:30:00Z")).toBe(false); // 14.01 23:30
     expect(inside("2026-01-14T23:30:00Z")).toBe(true); // 15.01 00:30
     expect(inside("2026-01-15T22:30:00Z")).toBe(true); // 15.01 23:30
+  });
+});
+
+describe("D-68: the S-16 chart's year and month", () => {
+  it("opens on the whole of the gym's current year", () => {
+    expect(chartFromParams({}, TODAY)).toEqual({ year: 2026, month: null });
+  });
+
+  it("keeps an earlier year, whole or narrowed to one month", () => {
+    expect(chartFromParams({ year: "2025" }, TODAY)).toEqual({ year: 2025, month: null });
+    expect(chartFromParams({ year: "2025", month: "12" }, TODAY)).toEqual({
+      year: 2025,
+      month: 12,
+    });
+  });
+
+  it("allows this month and every month before it this year", () => {
+    expect(chartFromParams({ year: "2026", month: "9" }, TODAY)).toEqual({
+      year: 2026,
+      month: 9,
+    });
+    expect(chartFromParams({ year: "2026", month: "01" }, TODAY)).toEqual({
+      year: 2026,
+      month: 1,
+    });
+  });
+
+  it("reads a month without a year as that month of this year", () => {
+    expect(chartFromParams({ month: "3" }, TODAY)).toEqual({ year: 2026, month: 3 });
+  });
+
+  it("falls back to the whole year for a month that has not started", () => {
+    expect(chartFromParams({ year: "2026", month: "10" }, TODAY)).toEqual({
+      year: 2026,
+      month: null,
+    });
+  });
+
+  it.each([
+    [{ year: "2027" }],
+    [{ year: "1999" }],
+    [{ year: "26" }],
+    [{ year: "abcd", month: "3" }],
+  ])("falls back to this year for %o", (params) => {
+    expect(chartFromParams(params, TODAY)).toEqual({ year: 2026, month: null });
+  });
+
+  it.each([["0"], ["13"], ["x"], ["-1"]])("ignores the month %s", (month) => {
+    expect(chartFromParams({ year: "2025", month }, TODAY)).toEqual({
+      year: 2025,
+      month: null,
+    });
   });
 });

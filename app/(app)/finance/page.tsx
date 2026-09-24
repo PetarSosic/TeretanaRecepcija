@@ -5,20 +5,23 @@ import {
   BreakdownTable,
   type BreakdownRow,
 } from "@/features/finance/components/breakdown-table";
+import { ChartPicker } from "@/features/finance/components/chart-picker";
 import {
-  MonthlyChart,
-  type MonthlyPoint,
-} from "@/features/finance/components/monthly-chart";
+  IncomeChart,
+  type Chart,
+} from "@/features/finance/components/income-chart";
 import { PeriodPicker } from "@/features/finance/components/period-picker";
 import {
   StatCards,
   type Summary,
 } from "@/features/finance/components/stat-cards";
-import { periodFromParams } from "@/features/finance/period";
+import { chartFromParams, periodFromParams } from "@/features/finance/period";
 import { requireStaff } from "@/lib/auth";
+import { getErrorMessage } from "@/lib/errors";
 import { formatDate } from "@/lib/format";
 import { gymToday } from "@/lib/gym-date";
 import { me } from "@/lib/i18n/me";
+import { rpcCode } from "@/lib/rpc";
 import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = {
@@ -59,24 +62,37 @@ const METHODS: Record<string, string> = {
 export default async function FinancePage({
   searchParams,
 }: {
-  searchParams: Promise<{ period?: string; from?: string; to?: string }>;
+  searchParams: Promise<{
+    period?: string;
+    from?: string;
+    to?: string;
+    year?: string;
+    month?: string;
+  }>;
 }) {
   const staff = await requireStaff();
-  const period = periodFromParams(await searchParams, await gymToday(staff.gym_id));
+  const params = await searchParams;
+  const today = await gymToday(staff.gym_id);
+  const period = periodFromParams(params, today);
+  // D-68: the chart has its own year and month, and opens on the whole current year.
+  const range = chartFromParams(params, today);
 
   const supabase = await createClient();
-  const [summary, breakdown, monthly, expiring, unpaid] = await Promise.all([
+  const [summary, breakdown, chart, expiring, unpaid] = await Promise.all([
     supabase.rpc("fin_summary", { p_from: period.from, p_to: period.to }),
     supabase.rpc("fin_income_breakdown", {
       p_from: period.from,
       p_to: period.to,
     }),
-    supabase.rpc("fin_monthly", { p_months: 12 }),
+    supabase.rpc("fin_chart", { p_year: range.year, p_month: range.month }),
     supabase.rpc("fin_expiring", { p_days: 7 }),
     supabase.rpc("fin_unpaid_members"),
   ]);
 
   const totals = summary.data as Summary | null;
+  // SUSPECT-01: a rejected call answers with null data; say so instead of an empty chart.
+  const chartFailure = chart.error ? getErrorMessage(rpcCode(chart.error)) : null;
+  const chartData = chartFailure ? null : (chart.data as Chart | null);
   const split = (breakdown.data as Breakdown | null) ?? {
     by_plan: [],
     by_method: [],
@@ -91,8 +107,20 @@ export default async function FinancePage({
 
       {totals ? <StatCards summary={totals} /> : null}
 
-      <section>
-        <MonthlyChart data={(monthly.data as MonthlyPoint[] | null) ?? []} />
+      {/* N-24: minmax(0, 1fr), so the chart scrolls inside its frame at 375 px. */}
+      <section className="grid grid-cols-1 gap-4">
+        <ChartPicker
+          range={range}
+          firstYear={chartData?.first_year ?? range.year}
+          today={today}
+        />
+        {chartFailure ? (
+          <p className="text-sm text-danger">{chartFailure}</p>
+        ) : chartData ? (
+          <IncomeChart chart={chartData} />
+        ) : (
+          <p className="text-sm text-muted-foreground">{me.finance.noData}</p>
+        )}
       </section>
 
       <div className="grid gap-8 lg:grid-cols-2">

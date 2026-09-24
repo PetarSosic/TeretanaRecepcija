@@ -575,8 +575,10 @@ test("FIN-04: the monthly chart — hint, hover amounts, 375 px and touch", asyn
   const expenses = await tile(page, "Troškovi");
   const chart = page.locator("figure", { hasText: "Prihod i troškovi po mjesecima (€)" });
   await expect(chart).toContainText("Pređite mišem preko mjeseca za iznose.");
+  // D-68: the chart spans January to December of this year, and only the months up to
+  // this one have columns to hover; the last of them is the current month.
   const months = chart.locator("svg g:has(rect)");
-  await expect(months).toHaveCount(12);
+  await expect(months).toHaveCount(Number(gymDate(0).month.slice(5, 7)));
   await months.last().locator("rect").first().hover();
   const caption = chart.locator("p[aria-live=polite]");
   const hovered = (await caption.innerText()).replace(/\s+/g, " ");

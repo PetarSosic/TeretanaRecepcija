@@ -200,6 +200,7 @@ An `admin` sees everything an owner sees (D-58).
 ## S-16 Finance dashboard — `/finance` (owner)
 - **Content:** as in US-17.1.
 - **Cards:** Prihod, Troškovi, Profit, Zarada na magacinu.
+- **Chart (D-68):** `Prihod i troškovi po mjesecima (€)`, January to December of the chosen year. Its own controls, independent of the period: **Godina** (default: the current year; back to the first year with any money) and **Mjesec** (`Cijela godina`, or one month up to the current one). A chosen month shows `Prihod i troškovi po danima (€)`. Months and days after today stay empty. Under the chart: `Ukupno za <godina | mjesec godina>: Prihod … · Troškovi … · Profit …`.
 - **Tables:**
   - income by plan and by method;
   - expenses by category;

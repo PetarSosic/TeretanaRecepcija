@@ -160,7 +160,7 @@ Covered by US-04.4, BR-078 and BR-079.
 - AC1: The period presets are Danas, Ova sedmica (Monday–Sunday), Ovaj mjesec, Prošli mjesec, Ova godina, plus a custom range. The default is Ovaj mjesec.
 - AC2: The numbers follow BR-150–153 and have breakdowns by plan, method and category.
 - AC3: The page also shows:
-  - a bar chart of monthly income vs expenses for the last 12 months;
+  - a bar chart of income vs expenses for one calendar year, month by month, opening on the current year; its own filter picks an earlier year or narrows the chart to one month, day by day, with that year's or month's totals under it (D-68);
   - active members (count of members with at least one Aktivna membership today);
   - memberships expiring in the next 7 days (list);
   - members with unlinked unpaid visits (list).
