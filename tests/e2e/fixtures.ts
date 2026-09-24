@@ -182,7 +182,14 @@ export async function deleteTestGym(gymId: string): Promise<void> {
     ["gyms", "id"],
   ];
   for (const [table, column] of steps) {
-    const { error } = await admin.from(table).delete().eq(column, gymId);
+    let { error } = await admin.from(table).delete().eq(column, gymId);
+    // Doc 08 §8: pg_cron runs every job for every gym, test gyms included, and may
+    // record a run after its table was emptied above. Clear the run records again.
+    if (error && table === "gyms") {
+      for (const late of ["job_runs", "backup_runs"])
+        await admin.from(late).delete().eq("gym_id", gymId);
+      ({ error } = await admin.from(table).delete().eq(column, gymId));
+    }
     if (error)
       throw new Error(`Test cleanup of ${table} failed: ${error.message}`);
     if (table === "staff")

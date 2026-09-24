@@ -73,9 +73,11 @@ export async function proxy(request: NextRequest) {
       },
     });
 
-    // getUser revalidates the token with Supabase; getSession would trust the cookie.
-    const { data: auth } = await supabase.auth.getUser();
-    const user = auth.user;
+    // getClaims verifies the token's ES256 signature against the project's cached key,
+    // so it needs no Auth round trip, unlike getUser; getSession would trust the cookie
+    // unchecked. A deactivated account is still caught below by its staff row.
+    const { data: auth } = await supabase.auth.getClaims();
+    const user = auth?.claims.sub ? { id: auth.claims.sub } : null;
 
     if (!user) {
       if (!isPublic) return redirect(request, "/login", policy);

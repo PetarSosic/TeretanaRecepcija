@@ -1,4 +1,5 @@
 import "server-only";
+import { cache } from "react";
 import { createClient } from "@/lib/supabase/server";
 
 /** The gym's open shift as the header badge and S-02 need it (BR-110). */
@@ -12,9 +13,10 @@ export type OpenShift = {
 
 /**
  * Doc 07 §6 hides another receptionist's staff row, so the holder's name comes from
- * the open_shift_info function rather than from a join (see migration 0011).
+ * the open_shift_info function rather than from a join (see migration 0011). The layout
+ * and some pages both ask during one render, and `cache` lets them share the answer.
  */
-export async function getOpenShift(): Promise<OpenShift | null> {
+export const getOpenShift = cache(async (): Promise<OpenShift | null> => {
   const supabase = await createClient();
   const { data, error } = await supabase.rpc("open_shift_info");
   if (error) {
@@ -22,4 +24,4 @@ export async function getOpenShift(): Promise<OpenShift | null> {
     return null;
   }
   return (data as OpenShift | null) ?? null;
-}
+});

@@ -1,4 +1,5 @@
 import "server-only";
+import { cache } from "react";
 import { createClient } from "@/lib/supabase/server";
 
 // D-58: admin sits above owner and has every owner permission.
@@ -25,19 +26,25 @@ const COLUMNS =
  * A deactivated account makes the doc 07 §6 policies raise E_NOT_STAFF rather than
  * return an empty result, so an error is treated the same as "not staff" here and the
  * caller signs the user out (doc 04 §2 point 5).
+ *
+ * getClaims checks the token's signature locally instead of asking Auth, and `cache`
+ * lets the layout and the page of one render share a single lookup. Outside a render
+ * (server actions, route handlers) `cache` does not memoise, so an action always reads
+ * the row as it is now.
  */
-export async function getStaff(): Promise<Staff | null> {
+export const getStaff = cache(async (): Promise<Staff | null> => {
   const supabase = await createClient();
-  const { data: auth } = await supabase.auth.getUser();
-  if (!auth.user) return null;
+  const { data: auth } = await supabase.auth.getClaims();
+  const userId = auth?.claims.sub;
+  if (!userId) return null;
   const { data, error } = await supabase
     .from("staff")
     .select(COLUMNS)
-    .eq("user_id", auth.user.id)
+    .eq("user_id", userId)
     .maybeSingle<Staff>();
   if (error || !data || !data.is_active) return null;
   return data;
-}
+});
 
 /** The staff row, or an E_NOT_STAFF throw for routes that require a signed-in user. */
 export async function requireStaff(): Promise<Staff> {
