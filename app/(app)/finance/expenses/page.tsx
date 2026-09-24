@@ -85,7 +85,7 @@ export default async function ExpensesPage({
       : undefined;
 
   return (
-    <div className="grid gap-6">
+    <div className="grid grid-cols-1 gap-6">
       <PeriodPicker period={period} />
       <ExpensesScreen
         rows={(expenses.data as ExpenseRow[] | null) ?? []}

@@ -151,6 +151,10 @@ for (const screen of SCREENS) {
     await expect(page).toHaveURL(new RegExp(screen.path.replace("/", "\\/")));
 
     // Doc 08 §9: usable from 375 px up, with tables scrolling inside their own container.
+    // N-24: /finance only grew past 375 px after hydration, which a check straight after
+    // the load event never saw; measure once the page has settled.
+    await page.waitForLoadState("networkidle");
+    await page.waitForTimeout(500);
     expect(
       await page.evaluate(
         () => document.documentElement.scrollWidth <= window.innerWidth + 1,

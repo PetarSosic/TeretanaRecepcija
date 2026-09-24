@@ -69,7 +69,7 @@ export function StorageReport({
   const [voiding, setVoiding] = useState<StockInRow | null>(null);
 
   return (
-    <div className="grid gap-8">
+    <div className="grid grid-cols-1 gap-8">
       <RankedBars
         title={`${me.finance.profit} — ${me.finance.product}`}
         rows={products.map((row) => ({ label: row.name, value: row.profit }))}

@@ -1,3 +1,4 @@
+import { MagnitudeBar } from "@/components/common/magnitude-bar";
 import { Table, TableWrapper, Td, Th } from "@/components/ui/table";
 import { formatMoney } from "@/lib/format";
 import { me } from "@/lib/i18n/me";
@@ -52,12 +53,9 @@ export function BreakdownTable({
                 <tr key={row.name}>
                   <Td>
                     <span className="block">{row.name}</span>
-                    <span
-                      aria-hidden="true"
-                      className="mt-1 block h-1.5 rounded-full bg-chart-1"
-                      style={{
-                        width: `${Math.max((cents(row.total) / peak) * 100, 2)}%`,
-                      }}
+                    <MagnitudeBar
+                      className="mt-1 h-1.5"
+                      percent={Math.max((cents(row.total) / peak) * 100, 2)}
                     />
                   </Td>
                   <Td className="text-right tabular-nums">{row.count}</Td>

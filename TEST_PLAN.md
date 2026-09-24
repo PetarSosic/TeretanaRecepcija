@@ -15,6 +15,13 @@ sekciju **7. Otvorena pitanja**.
 
 ---
 
+> **Dopuna 24.09.2026:** izvršena su sva 22 preostala djelimična slučaja prioriteta **Srednje** i
+> **Nisko** — svi PROŠLI, sedam tek nakon popravki **N-22 do N-26**. N-23 (recepcioner radi u
+> tuđoj smjeni mimo ekrana S-02) zatvoren je u aplikaciji; da li to treba zabraniti i u bazi,
+> pitanje je za vlasnika. Otvoreni su i **N-27** (CSP u produkciji blokira stil dijaloga) i
+> **N-28** (samo lokalni produkcijski test na HTTP-u). Novo stanje: **214 prošlo · 1 palo · 1 djelimično · 1 nije izvršeno**
+> (MEM-07, AUTH-13, AUTH-14). Detalji u **§9.10**.
+
 > **Dopuna 23.09.2026:** izvršeno 18 od 19 slučajeva koji su bili NIJE IZVRŠENO (ostaje samo
 > AUTH-14, stvarni link iz sandučeta). Svih 18 PROŠLO; dva tek nakon popravki **N-06** i **N-07**.
 > Novo stanje: **70 prošlo · 0 palo · 146 djelimično · 1 nije izvršeno.** Detalji u **§9.5**.
@@ -705,7 +712,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** sa smjenom: „Smjena: <ime recepcionera> od HH:MM“. Bez smjene:
   „Nema otvorene smjene“.
 - **Gdje provjeriti:** UI zaglavlje
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** Značka recepcionera i odsustvo nove smjene pri prijavi vlasnika provjereni u shifts.spec.ts; sve kombinacije uloga i otvorena/zatvorena nisu upoređene.
+- [x] Prošlo  [ ] Palo  Napomena: **24.09.2026 — PROŠLO.** `test-plan-medium-a.spec.ts`: bez otvorene smjene vlasnik, menadžer i administrator vide „Nema otvorene smjene“. Dok je smjena otvorena, recepcioner, menadžer, administrator i vlasnik vide istu značku „Smjena: E2E Ana SA od HH:MM“, sa vremenom početka smjene. Kad je vlasnik zaključi sa `/finance/shifts`, vlasnik, menadžer i administrator poslije osvježavanja vide „Nema otvorene smjene“, a recepcioner je odjavljen (`/login?auto=1`). Raniji dokaz (22.09.): Značka recepcionera i odsustvo nove smjene pri prijavi vlasnika provjereni u shifts.spec.ts; sve kombinacije uloga i otvorena/zatvorena nisu upoređene.
 
 ### [SHIFT-07] Bez otvorene smjene novac se ne može unositi (BR-092)
 - **Prioritet:** Kritično
@@ -965,7 +972,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   [Počni rad] pojavljuje se jednom; zaglavlje i navigacija ostaju upotrebljivi ispod njega.
   Poslije klika se više ne pojavljuje do zatvaranja browsera.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** Dodatni UI test: Počni rad uklanja početni ekran, osvježavanje ga ne vraća. Nova kartica browsera i stvarni audio nisu provjereni.
+- [x] Prošlo  [ ] Palo  Napomena: **24.09.2026 — PROŠLO uz napomenu.** `test-plan-medium-a.spec.ts`: poslije prijave stoji preklop sa „Uključuje zvuk za rezultate skeniranja.“ i fokusiranim [Počni rad]; zaglavlje ispod njega radi (Članovi → Recepcija, preklop je i dalje tu). Poslije klika ga nema ni nakon osvježavanja ni nakon odlaska i povratka kroz meni; nova sesija browsera (incognito) ga opet prikazuje. Zvuk: `/sounds/ok.mp3`, `warning.mp3` i `alarm.mp3` vraćaju 200 `audio/mpeg`, a poslije osvježavanja i skeniranja browser izvršava `play()` za `ok.mp3` bez blokade. **Napomena:** nova kartica istog browsera ponovo prikazuje preklop, jer se oznaka čuva u `sessionStorage`, koji važi po kartici; zvuk se ionako mora otključati u svakoj kartici posebno. Da li se zvuk zaista čuje, automatski se ne može provjeriti. Raniji dokaz (22.09.): Dodatni UI test: Počni rad uklanja početni ekran, osvježavanje ga ne vraća. Nova kartica browsera i stvarni audio nisu provjereni.
 
 ### [REC-19] Dolazak preko ponoći i trajanje
 - **Prioritet:** Srednje
@@ -976,7 +983,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** dolazak se broji u dan **kada je počeo**; trajanje je ispravno (prelazi
   ponoć). Noćni posao u 23:00 ga automatski odjavljuje (vidi JOB-01), pa to provjerite prije 23:00.
 - **Gdje provjeriti:** profil člana → „Dolasci“; `/stats/visits`
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** Unit format.test.ts i DB 0000/0001 provjeravaju lokalni datum/prelaz ponoći i trajanje. Stvarni noćni UI scenario nije izvršen.
+- [x] Prošlo  [ ] Palo  Napomena: **24.09.2026 — PROŠLO.** `test-plan-medium-a.spec.ts`: otvoren dolazak od juče u 23:10 (upisan direktno, jer noćni posao u 23:00 zatvara samo ranije dolaske), pa odjava skeniranjem ujutru: „Odjavljen/a: E2E Ponoć Kasni – 9h 53min“, tačno trajanje preko ponoći (±1 min). Profil → Dolasci: datum 23.09.2026, ulaz 23:10, izlaz današnje vrijeme. `/stats/visits` za 23.–24.09.: taj dolazak je u stupcu 23.09, dana kada je počeo. Raniji dokaz (22.09.): Unit format.test.ts i DB 0000/0001 provjeravaju lokalni datum/prelaz ponoći i trajanje. Stvarni noćni UI scenario nije izvršen.
 
 ### [REC-20] Ručna prijava iz profila člana
 - **Prioritet:** Visoko
@@ -996,7 +1003,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** tačno jedan dolazak je evidentiran; drugi browser dobija
   „Član je već u teretani.“ ili pitanje o odjavi. Nikada dva otvorena dolaska za istog člana.
 - **Gdje provjeriti:** UI; profil člana → „Dolasci“
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** DB 0007 potvrđuje zabranu drugog otvorenog dolaska. Nije izvršena istovremena trka iz dva browsera.
+- [x] Prošlo  [ ] Palo  Napomena: **24.09.2026 — PROŠLO.** `test-plan-medium-a.spec.ts`: dva browsera na recepciji, ista kartica skenirana istovremeno (cifre u oba, pa Enter u oba), tri puta. Svaki put je evidentiran tačno jedan dolazak; drugi pult dobija pitanje „E2E Trka Dvojica je prijavljen/a prije 0 s. Odjaviti?“ (zaštita od duplog skeniranja), a Esc ostavlja člana unutra. Nikada dva otvorena dolaska; profil pokazuje tri dolaska. Raniji dokaz (22.09.): DB 0007 potvrđuje zabranu drugog otvorenog dolaska. Nije izvršena istovremena trka iz dva browsera.
 
 ---
 
@@ -1290,7 +1297,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** upozorenje „Neplaćeni dolasci su stariji od trajanja ove članarine i
   ostaju neplaćeni.“, a početak je **danas**. Nakon čuvanja ti dolasci ostaju neplaćeni.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** DB 0006/0007: datumi BR-052, prestari dolasci, vlasnikova prava, E14 kraj mjeseca, limiti/statusi, smjena i finansijski snapshot. Ovo potvrđuje baznu logiku, ne sve korake/poruke UI slučaja.
+- [x] Prošlo  [ ] Palo  Napomena: **24.09.2026 — PROŠLO.** `test-plan-medium-a.spec.ts`: neplaćeni dolazak od prije 20 dana unesen naknadnim unosom (vlasnik). Prodaja `Nedeljna` (7 dana) na profilu prikazuje „Neplaćeni dolasci su stariji od trajanja ove članarine i ostaju neplaćeni.“ i „Počinje danas“, 24.09.2026–01.10.2026. Poslije čuvanja dolazak ostaje neplaćen i nepovezan sa članarinom. Kraj je 01.10, jer BR-051 i E5 daju D + 7 (02.09 → 09.09). Raniji dokaz (22.09.): DB 0006/0007: datumi BR-052, prestari dolasci, vlasnikova prava, E14 kraj mjeseca, limiti/statusi, smjena i finansijski snapshot. Ovo potvrđuje baznu logiku, ne sve korake/poruke UI slučaja.
 
 ### [MSHIP-05] Samo vlasnik smije da pomjeri početak (BR-052 korak 4)
 - **Prioritet:** Visoko
@@ -1586,7 +1593,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** dugmad nisu dostupna; ako se zahtjev ipak pošalje, odgovor je jasna
   poruka o grešci, a ne dupli zapis.
 - **Gdje provjeriti:** UI; `/finance/audit` (samo jedan zapis poništenja)
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** DB 0008 potvrđuje pravila poništavanja uplata/troškova. UI ponovnog poništavanja nije posebno testiran.
+- [x] Prošlo  [ ] Palo  Napomena: **24.09.2026 — PROŠLO uz napomenu.** `test-plan-medium-a.spec.ts`: poništena dnevna karta ostaje precrtana, bez dugmadi [Ispravi] i [Poništi]. Drugi pult, koji je imao otvoren dijalog poništavanja, dobija „Ova stavka se ne može mijenjati (smjena je zaključena).“; direktni pozivi `void_payment` i `correct_payment` iz sesije recepcionera vraćaju `E_RECORD_NOT_EDITABLE`. Razlog i način plaćanja se ne mijenjaju, a u dnevniku izmjena je tačno jedan zapis „Poništeno“. **Napomena:** tekst poruke (doc 08) navodi „smjena je zaključena“ i kada je stvarni razlog to što je stavka već poništena; prijedlog je u §9.10. Raniji dokaz (22.09.): DB 0008 potvrđuje pravila poništavanja uplata/troškova. UI ponovnog poništavanja nije posebno testiran.
 
 ### [PAY-14] Poništavanje troška
 - **Prioritet:** Visoko
@@ -1690,7 +1697,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Test podaci:** —
 - **Očekivani rezultat:** stoji „Nema na stanju.“ i dugme [Prodaja] je nedostupno.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** DB 0009: nabavka van kase, negativna zaliha, poništavanje i vidljivost vrijednosti/zarade po ulogama. UI koraci nisu u cijelosti izvršeni.
+- [x] Prošlo  [ ] Palo  Napomena: **24.09.2026 — PROŠLO (nakon popravke N-22).** `test-plan-medium-a.spec.ts`. Prvi pokušaj PALO: [Prodaja] je bilo onemogućeno, ali bez objašnjenja — `MoneyButton` je prepisivao opis „Nema na stanju.“. Sada je dugme onemogućeno i nosi „Nema na stanju.“ (tooltip, a čitač ekrana čuje „Prodaja E2E Prazno Nema na stanju.“); proizvod koji ima stanje zadržava običan naziv. Tekst je tooltip, kako je zapisano u izvještaju M-09, a kolona „Stanje“ pokazuje 0. Raniji dokaz (22.09.): DB 0009: nabavka van kase, negativna zaliha, poništavanje i vidljivost vrijednosti/zarade po ulogama. UI koraci nisu u cijelosti izvršeni.
 
 ### [STO-08] Ispravka i poništavanje prodaje iz magacina
 - **Prioritet:** Visoko
@@ -1721,7 +1728,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** radnja nije dozvoljena; stoji objašnjenje „Trošak nabavke poništava
   vlasnik zajedno sa nabavkom.“
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** DB 0009: nabavka van kase, negativna zaliha, poništavanje i vidljivost vrijednosti/zarade po ulogama. UI koraci nisu u cijelosti izvršeni.
+- [x] Prošlo  [ ] Palo  Napomena: **24.09.2026 — PROŠLO uz napomenu.** `test-plan-medium-a.spec.ts`: nabavka „Iz kase“ (10 × 0,30 €). Na `/payments/today` i recepcioner i vlasnik vide [Poništi] onemogućeno sa objašnjenjem „Trošak nabavke poništava vlasnik zajedno sa nabavkom.“; vlasnikov direktni poziv `void_expense` vraća `E_RECORD_NOT_EDITABLE`. **Napomena:** na `/finance/expenses` red nabavke nema dugme [Poništi], ali ni objašnjenje zašto. Raniji dokaz (22.09.): DB 0009: nabavka van kase, negativna zaliha, poništavanje i vidljivost vrijednosti/zarade po ulogama. UI koraci nisu u cijelosti izvršeni.
 
 ### [STO-11] Recepcioner ne vidi vrijednost zalihe ni zaradu (BR-144)
 - **Prioritet:** Visoko
@@ -1768,7 +1775,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** razvija se spisak svih stavki smjene po grupama (uplate, dnevne karte,
   zamjenske kartice, prodaja, troškovi, poništeno). Recepcioner vidi **samo svoje** troškove.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E close-shift.spec.ts i DB 0010 provjeravaju E15 obračun i stavke smjene. Nije ručno vizuelno upoređen svaki red sa štampanim izvještajem.
+- [x] Prošlo  [ ] Palo  Napomena: **24.09.2026 — PROŠLO uz napomenu.** `test-plan-medium-a.spec.ts`: [Pregledaj stavke] otvara listu, [Sakrij stavke] je zatvara (`aria-expanded`). Lista: članarina (Gotovina, 39,00 €), nabavka iz kase −3,00 €, prodaja vode karticom 3,00 €, recepcionerov trošak −4,00 €. Vlasnikov trošak iz kase (7 €) u istoj smjeni **nije** na recepcionerovoj listi (BR-134), ali jeste u „Troškovi iz kase: 14,00 €“. **Napomena:** lista je hronološka i svaki red navodi vrstu, a nije podijeljena po grupama kako plan pretpostavlja; poništene stavke se samo broje („Poništeno: 1“) i ne navode se, dok ih PDF izvještaj navodi. Doc 06 (S-14) kaže samo da dugme „razvija cijelu listu“. Raniji dokaz (22.09.): E2E close-shift.spec.ts i DB 0010 provjeravaju E15 obračun i stavke smjene. Nije ručno vizuelno upoređen svaki red sa štampanim izvještajem.
 
 ### [CLOSE-03] Prebrojana gotovina je obavezna i računa razliku
 - **Prioritet:** Kritično
@@ -1834,7 +1841,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Test podaci:** —
 - **Očekivani rezultat:** „Nemate otvorenu smjenu.“ bez forme za zaključenje.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** DB 0010 i E2E payments provjeravaju zatvorenu/tuđu smjenu i prava izmjene. Sve UI putanje ovog slučaja nisu ponovljene.
+- [x] Prošlo  [ ] Palo  Napomena: **24.09.2026 — PROŠLO (nakon popravke N-23); očekivani rezultat je promijenjen.** `test-plan-medium-a.spec.ts`. Prvi pokušaj: recepcioner B na `/shift/close` dobija „Nemate otvorenu smjenu.“ bez forme, ali je kucanjem `/reception` mogao da radi bez preuzimanja i prodao dnevnu kartu koja je upisana u **Aninu** smjenu (N-23). Sada B, dok ne preuzme smjenu, sa svakog ekrana (`/shift/close`, `/reception`, `/payments/today`, `/storage`, `/members`, klik u meniju) završava na S-02 „Otvorena smjena“, pa „Nemate otvorenu smjenu.“ više ne vidi. Ana i dalje normalno radi i zaključuje. Direktan RPC poziv iz B-ove sesije baza i dalje prihvata — otvoreno pitanje u §9.10. Raniji dokaz (22.09.): DB 0010 i E2E payments provjeravaju zatvorenu/tuđu smjenu i prava izmjene. Sve UI putanje ovog slučaja nisu ponovljene.
 
 ---
 
@@ -2045,7 +2052,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** nova kategorija se čuva i odmah nudi u dijalogu troška. Sistemska
   kategorija se **ne može** deaktivirati (označena je kao „Sistemska“). Kategorije se nikad ne brišu.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E settings dodaje kategoriju; DB 0003 zabranjuje deaktivaciju sistemske kategorije. Sve UI varijante nisu izvršene.
+- [x] Prošlo  [ ] Palo  Napomena: **24.09.2026 — PROŠLO.** `test-plan-medium-b.spec.ts`: „E2E Čišćenje“ je sačuvana („Sačuvano.“) kao aktivna i odmah se nudi u dijalogu troška vlasnika (`/finance/expenses`) i recepcije. „Roba za prodaju“ nosi oznaku „Sistemska“, a polje „Aktivan“ je štiklirano i onemogućeno; direktan poziv za deaktivaciju vraća `E_CATEGORY_NOT_ALLOWED` i kategorija ostaje aktivna. U tabeli kategorija postoji samo [Uredi]; brisanja nema. Raniji dokaz (22.09.): E2E settings dodaje kategoriju; DB 0003 zabranjuje deaktivaciju sistemske kategorije. Sve UI varijante nisu izvršene.
 
 ### [SET-18] Podešavanja teretane — granice
 - **Prioritet:** Visoko
@@ -2134,7 +2141,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Test podaci:** —
 - **Očekivani rezultat:** kolona „Prazne“ pada sa 10 na 9.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E members i DB 0006 potvrđuju prelazak kartice iz unassigned u active. Brojač na S-28 nije zasebno upoređen prije/poslije.
+- [x] Prošlo  [ ] Palo  Napomena: **24.09.2026 — PROŠLO.** `test-plan-medium-b.spec.ts`: vlasnik generiše seriju od 10 („Kartice su generisane.“, red 10 / Prazne 10), recepcioner registruje člana jednom karticom iz serije, a poslije osvježavanja red pokazuje „10 9“. Raniji dokaz (22.09.): E2E members i DB 0006 potvrđuju prelazak kartice iz unassigned u active. Brojač na S-28 nije zasebno upoređen prije/poslije.
 
 ### [CARD-05] Prazno stanje
 - **Prioritet:** Nisko
@@ -2192,7 +2199,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   pojavljuju. Na uskom ekranu grafikon ostaje čitljiv i ne izlazi iz ekrana (bez vodoravnog
   pomjeranja cijele stranice).
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E finance.spec.ts + DB 0012: zbirni prihodi/troškovi, podjele i grafikon za 12 mjeseci. Svi periodi i svaki detalj iz plana nisu provjereni.
+- [x] Prošlo  [ ] Palo  Napomena: **24.09.2026 — PROŠLO (nakon popravke N-24).** `test-plan-medium-b.spec.ts`: uz grafikon stoji „Pređite mišem preko mjeseca za iznose.“; prelaz preko tekućeg mjeseca prikazuje „sep 26 — Prihod: 170,00 €, Troškovi: 7,20 €“, isto kao kartice, a kad miš ode, vraća se uputstvo. Prvi pokušaj PALO na 375 px: cijela stranica `/finance` bila je široka 660 px i pomjerala se u stranu. Sada se na 375 px stranica ne pomjera, a grafikon (640 px) se pomjera unutar svog okvira od 343 px. Dodir na mjesec (emulirani telefon) prikazuje iste iznose. Snimci pregledani. Raniji dokaz (22.09.): E2E finance.spec.ts + DB 0012: zbirni prihodi/troškovi, podjele i grafikon za 12 mjeseci. Svi periodi i svaki detalj iz plana nisu provjereni.
 
 ### [FIN-05] Novi trošak — puna forma (BR-133)
 - **Prioritet:** Kritično
@@ -2305,7 +2312,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** zarada na magacinu se poklapa sa karticom „Zarada na magacinu“ na
   pregledu. Prazan period: „Nema prometa u izabranom periodu.“
 - **Gdje provjeriti:** UI; ručna kontrola
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E screens.spec.ts: ekran, kontrole i bez overflowa; DB 0010/0009/0001/0012 pokrivaju obračun i audit. Svi filteri/akcije/detalji nisu izvršeni.
+- [x] Prošlo  [ ] Palo  Napomena: **24.09.2026 — PROŠLO.** `test-plan-medium-b.spec.ts`: `/finance/storage` za mjesec ima sekcije „Magacin“, „Dnevna prodaja“ i „Ulazi robe“ i kolone „Vrijednost zalihe“, „Prodato kom“ i „Nabavna vrijednost prodatog“. Izotonik: stanje 11, vrijednost 6,60 €, prodato 1, prihod 2,00 €, nabavna 0,60 €, profit 1,40 €. Zbir profita jednak je kartici „Zarada na magacinu“ na pregledu (1,40 €). Januar 2020: „Nema prometa u izabranom periodu.“ i za dnevnu prodaju i za ulaze robe. Raniji dokaz (22.09.): E2E screens.spec.ts: ekran, kontrole i bez overflowa; DB 0010/0009/0001/0012 pokrivaju obračun i audit. Svi filteri/akcije/detalji nisu izvršeni.
 
 ### [FIN-14] Dnevnik izmjena (S-21)
 - **Prioritet:** Visoko
@@ -2373,7 +2380,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   **svaki** dan perioda (i prazne dane), a „Dolasci po satima (06–23)“ svaki sat.
   Najviše 10 članova u listi, svaki vodi na svoj profil.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** DB 0013 potvrđuje zbir, kompletne dane/sate i trajanje; E2E screens provjerava ekran. Grafikoni sa većim podacima nisu vizuelno provjereni.
+- [x] Prošlo  [ ] Palo  Napomena: **24.09.2026 — PROŠLO (nakon popravki N-24 i N-25).** `test-plan-medium-b.spec.ts`: teretana sa 233 člana i 301 dolaskom u septembru, provjereno kao vlasnik i kao menadžer. „Ukupno dolazaka“ 301 i „Bez automatskih odjava (288 mjerenih dolazaka).“; 30 stupaca po danima (i prazni dani do 30.09) i 18 po satima (06–23); prelaz preko 01.09 prikazuje „01.09.2026 — 14 dolazaka“, isto kao baza; po vrsti 251, 30 i 20; „Najčešći članovi“ ima tačno 10 redova, a klik vodi na profil. Prvi pokušaj PALO: trake „Dolasci po vrsti“ bile su sve iste širine (CSP odbacuje `style`, N-25), a na 375 px stranica se pomjerala 201 px (N-24). Sada su trake 799, 96 i 64 px (srazmjerno), bez CSP grešaka i bez pomjeranja. Snimci pregledani. Raniji dokaz (22.09.): DB 0013 potvrđuje zbir, kompletne dane/sate i trajanje; E2E screens provjerava ekran. Grafikoni sa većim podacima nisu vizuelno provjereni.
 
 ### [STAT-02] Prazan period
 - **Prioritet:** Srednje
@@ -2402,7 +2409,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** ukupno uključuje automatski odjavljen dolazak; broj „mjerenih dolazaka“
   je za toliko manji.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** DB 0013: automatski odjavljeni dolazak ne ulazi u prosjek, anonimizovan član ne ulazi u top listu. Nije ponovljeno kroz UI sa tim podacima.
+- [x] Prošlo  [ ] Palo  Napomena: **24.09.2026 — PROŠLO.** `test-plan-medium-b.spec.ts`: od 301 dolaska 12 je automatski odjavljeno; „Ukupno dolazaka“ je 301, a „mjerenih“ 288 — razlika je tačno broj automatskih odjava (otvorenih dolazaka nema). Isto vidi menadžer. Raniji dokaz (22.09.): DB 0013: automatski odjavljeni dolazak ne ulazi u prosjek, anonimizovan član ne ulazi u top listu. Nije ponovljeno kroz UI sa tim podacima.
 
 ### [STAT-05] Anonimizovan član ne ulazi u listu najčešćih (BR-046)
 - **Prioritet:** Visoko
@@ -2475,7 +2482,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** izlaz pokazuje da je slanje preskočeno (`skipped`), bez greške; nijedan
   email ne odlazi.
 - **Gdje provjeriti:** izlaz komande
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** Unit jobs-morning.test.ts + shift-report.test.ts potvrđuju bez EMAIL_FROM nema slanja i not_sent/skipped. Nije pokrenut globalni jobs:run morning.
+- [x] Prošlo  [ ] Palo  Napomena: **24.09.2026 — PROŠLO.** `test-plan-medium-jobs.spec.ts` (uz `TEST_PLAN_LIVE_EMAIL=1`): pravi jutarnji posao za testnu teretanu, sa praznim `EMAIL_FROM`, vraća `{"ran":true,"sent":0,"failed":0,"skipped":1}` — to je izvještaj koji `npm run jobs:run` ispisuje — bez greške i bez ijednog emaila; podsjetnik je zapisan kao `not_sent`. Globalni `jobs:run morning` namjerno nije pokrenut (§9.9). **Napomena:** tako zapisan podsjetnik se kasnije ne šalje ponovo, pa posao bez pošiljaoca potroši podsjetnike tog dana. Raniji dokaz (22.09.): Unit jobs-morning.test.ts + shift-report.test.ts potvrđuju bez EMAIL_FROM nema slanja i not_sent/skipped. Nije pokrenut globalni jobs:run morning.
 
 ### [JOB-05] Sedmična rezervna kopija (BR-163)
 - **Prioritet:** Visoko
@@ -2510,7 +2517,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** izvještaj je poslat, status na `/finance/shifts` postaje „poslato“.
   Posao ne pokušava više od pet puta po smjeni.
 - **Gdje provjeriti:** izlaz komande; UI
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** Na testnoj smjeni prvo izazvan failed nevažećim ključem, zatim stvarni runEmailRetry sa izborom samo te smjene: sent, Resend delivered. Interval i limit pet pokušaja pokriva DB 0011; globalni red drugih teretana nije obrađivan.
+- [x] Prošlo  [ ] Palo  Napomena: **24.09.2026 — PROŠLO.** `test-plan-medium-jobs.spec.ts`: smjena zaključena na S-14 sa odbijenim ključem → `failed`, 1 pokušaj. Ponovno slanje odmah poslije zaključenja ne dira smjenu (nije prošlo 15 minuta). Sa pomjerenim vremenom posljednjeg pokušaja i i dalje odbijenim ključem, pokušaji 2–5 daju `failed`, a šesti poziv je više ne bira (ostaje 5). Druga smjena sa neuspjelim izvještajem, pa ispravan ključ: poslata je samo ona (`sent`, 2 pokušaja), Resend `delivered` na `delivered@resend.dev`, sa PDF prilogom. Na `/finance/shifts` jedna smjena ima „poslato“, druga „neuspješno“. Red za ponovno slanje ograničen je na testnu teretanu. Raniji dokaz (22.09.): Na testnoj smjeni prvo izazvan failed nevažećim ključem, zatim stvarni runEmailRetry sa izborom samo te smjene: sent, Resend delivered. Interval i limit pet pokušaja pokriva DB 0011; globalni red drugih teretana nije obrađivan.
 
 ---
 
@@ -2665,7 +2672,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   „bježi“ iza njega, Esc zatvara dijalog. Svako dugme i polje ima ime koje čitač ekrana može da
   pročita.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** E2E screens.spec.ts: imenovane kontrole na 19 ekrana i Tab na recepciji. Nije potvrđena potpuna tastaturna pristupačnost svih dijaloga/fokus zamki.
+- [x] Prošlo  [ ] Palo  Napomena: **24.09.2026 — PROŠLO (nakon popravke N-26).** `test-plan-medium-b.spec.ts`: Tab na recepciji ide kroz stvarne kontrole (naziv teretane, meni, Nalog, pretraga, [Dnevna karta], [Trošak], [Novi član], [Odjavi …]), i svaka ima ime i vidljiv okvir fokusa. U dijalogu članarine, 20 × Tab i 5 × Shift+Tab: fokus nijednom ne izlazi iz dijaloga, a Esc ga zatvara. Prvi pokušaj PALO: poslije Esc fokus je padao na `<body>` (Radix vraća fokus samo na `DialogTrigger`). Sada se vraća na dugme koje je otvorilo dijalog ([Nova članarina], [Dnevna karta]), nikad u polje za unos, a skeniranje odmah poslije toga i dalje radi. Meni „Nalog“: Enter ga otvara, strelica pomjera fokus, Esc zatvara i vraća fokus na dugme; meni na 375 px radi isto. **Napomena:** dugme menija prikazuje ime korisnika, a čitač ekrana ga čita kao „Nalog“. Raniji dokaz (22.09.): E2E screens.spec.ts: imenovane kontrole na 19 ekrana i Tab na recepciji. Nije potvrđena potpuna tastaturna pristupačnost svih dijaloga/fokus zamki.
 
 ### [UX-05] Poruke o uspjehu se same povlače
 - **Prioritet:** Nisko
@@ -2674,7 +2681,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Test podaci:** —
 - **Očekivani rezultat:** poruka se pojavi i nestane sama, ne zaklanja dugmad i ne ostaje zauvijek.
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** Dodatni UI: scan status se povlači nakon 5 s. Sve druge success poruke/toastovi nisu posebno mjereni.
+- [x] Prošlo  [ ] Palo  Napomena: **24.09.2026 — PROŠLO.** `test-plan-medium-b.spec.ts`: „Sačuvano.“ je vidljivo ≈ 6 s i nestaje samo; klik na mjesto poruke stiže do elementa ispod nje, pa poruka ne zaklanja dugmad. Sve potvrde u aplikaciji idu kroz isti toast (6 s). Raniji dokaz (22.09.): Dodatni UI: scan status se povlači nakon 5 s. Sve druge success poruke/toastovi nisu posebno mjereni.
 
 ### [UX-06] Mnogo podataka (performanse)
 - **Prioritet:** Srednje
@@ -2685,7 +2692,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** stranice se učitavaju u razumnom vremenu (do par sekundi), straničenje
   radi, grafikoni ostaju čitljivi, dnevnik izmjena pokazuje poruku o ograničenju od 200 zapisa.
 - **Gdje provjeriti:** UI; Network tab (vrijeme odgovora)
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** perf:scan sa 3.000 članova/150.000 dolazaka, 300 skenova: server p95 34,9 ms; round-trip p95 72,3 ms. Priprema 50,5 s, rollback. UI pretraga/straničenje sa velikim skupom nisu mjereni.
+- [x] Prošlo  [ ] Palo  Napomena: **24.09.2026 — PROŠLO.** `test-plan-medium-b.spec.ts`: 233 člana, 301 dolazak u mjesecu i preko 200 izmjena danas, produkcijski build protiv hostovane baze. `/members` 0,72 s („Strana 1 od 10“, 25 redova), sljedeća strana 0,84 s, pretraga „Član217“ 0,81 s (nalazi #217 i #218, čiji telefon sadrži 217); `/stats/visits` 0,65 s; `/finance/audit` 0,72 s, sa 200 redova i porukom „Prikazano je prvih 200 izmjena. Suzite period da vidite ostale.“ Grafikoni su čitljivi (snimci). Raniji dokaz (22.09.): perf:scan sa 3.000 članova/150.000 dolazaka, 300 skenova: server p95 34,9 ms; round-trip p95 72,3 ms. Priprema 50,5 s, rollback. UI pretraga/straničenje sa velikim skupom nisu mjereni.
 
 ---
 
@@ -2797,7 +2804,7 @@ Ovo su cjeloviti tokovi kroz više modula i uloga, onako kako će ih koristiti t
 4. Vlasnik pogleda staru uplatu od 79 € i novu od 89 €, i `/finance/storage`.
 - **Očekivani rezultat:** stare uplate ostaju na staroj cijeni; nova je 89 €; zarada na magacinu
   za izotonik je 1,40 € po komadu.
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** settings/storage/finance E2E + DB 0006 provjeravaju cijene, prodaju i snapshot, ali ne kao jedan povezani scenario sa Izotonikom.
+- [x] Prošlo  [ ] Palo  Napomena: **24.09.2026 — PROŠLO.** `test-plan-medium-b.spec.ts`, jedan povezani tok: prodaja Mjesečne po 79 € (CARD-04); vlasnik podiže cijenu na 89 €, dodaje „E2E Izotonik“ (0,60 € / 2,00 €) i unosi 12 komada; recepcioner prodaje Mjesečnu (89 €) i jedan izotonik (2,00 €). Stara uplata na profilu ostaje 79,00 €, nova je 89,00 €; na `/finance/storage` stanje je 11, a profit 1,40 € po komadu. Raniji dokaz (22.09.): settings/storage/finance E2E + DB 0006 provjeravaju cijene, prodaju i snapshot, ali ne kao jedan povezani scenario sa Izotonikom.
 
 ---
 
@@ -2827,6 +2834,8 @@ Aplikacija se razvija za dvije veličine: **desktop 1366×768** (pult) i **mobil
 ### 5.2 Mobilni telefon / uzak ekran (375 px)
 
 **22.09.2026 — djelimično:** izvršen Chrome desktop engine na 375×812, uključujući forme i 19 ekrana. Nije pravi telefon: virtuelna tastatura, dodir, landscape i veličina svih touch meta ostaju neprovjereni; kvadratići tih tvrdnji nisu označeni.
+
+**24.09.2026 — dopuna:** isti engine na 375×812, sada i sa punim mjesecom podataka (233 člana, 301 dolazak): 20 ekrana bez vodoravnog pomjeranja stranice tek nakon popravke **N-24** (`/finance`, `/finance/storage`, `/stats/visits` i `/settings/trainers` su se pomjerali); grafikoni statistike i finansija su čitljivi i pomjeraju se unutar svog okvira (snimci pregledani); dodir na grafikonu finansija prikazuje iznose kao i miš (emulacija dodira, ne pravi telefon). Meni „Otvori meni“ se otvara i zatvara i tastaturom. Kvadratići ostaju neoznačeni dok se ne provjeri na pravom telefonu.
 
 | Provjera | Gdje | Prošlo |
 |---|---|---|
@@ -3496,6 +3505,114 @@ bez odobrenja, jer traži izbor naziva za oko stotinu polja.
 | `npm run test` | **161/161** (+1 preskočen: izolovani pokretač poslova bez svojih varijabli) |
 | `npm run test:db` | **14/14 fajlova** |
 | `npm run lint`, `npm run typecheck` | PROŠLO |
+| Zaostale `E2E` teretane u bazi | 0 |
+
+### 9.10 Dopuna — slučajevi prioriteta Srednje i Nisko, 24.09.2026
+
+Izvršena su sva 22 preostala djelimična slučaja prioriteta **Srednje** i **Nisko**, u
+`test-plan-medium-a.spec.ts` (smjena, recepcija, članarine, novac na pultu, magacin,
+zaključenje), `test-plan-medium-b.spec.ts` (kategorije, kartice, finansije, statistika,
+tastatura, mnogo podataka, promjena cjenovnika) i `test-plan-medium-jobs.spec.ts` (JOB-04 i
+JOB-07, samo uz `TEST_PLAN_LIVE_EMAIL=1`). Grupa B radi na teretani sa 233 člana, 301 dolaskom u
+mjesecu i preko 200 izmjena u dnevniku, pa su statistika, lista članova i dnevnik provjereni sa
+više podataka nego ranije. Svih 22 je PROŠLO, sedam tek nakon popravki ispod. Ostaju MEM-07
+(PALO, N-16, odluka vlasnika), AUTH-13 i AUTH-14 (pravi link iz sandučeta).
+
+**Poslovi bez diranja prave teretane.** Pokretač iz §9.9 sada ograničava i red za ponovno
+slanje izvještaja (`shifts_pending_email`) na testnu teretanu; bez toga bi JOB-07 ponovo slao
+neuspjele izvještaje radne teretane.
+
+**Nalazi i popravke:**
+
+**N-22 — „Nema na stanju.“ se nikad nije prikazivalo (STO-07) — popravljeno.** `MoneyButton`
+je svoj opis (razlog iz BR-092, koji je prazan dok je smjena otvorena) upisivao preko opisa koji
+mu je dao ekran magacina, pa je [Prodaja] za proizvod sa stanjem 0 bilo sivo, bez ikakvog
+objašnjenja. Sada razlog smjene ili veze ima prednost, a inače ostaje razlog ekrana; čitač ekrana
+čuje „Prodaja <proizvod> Nema na stanju.“ Regresija: STO-07 u `test-plan-medium-a.spec.ts`.
+
+**N-23 — drugi recepcioner je radio u tuđoj smjeni mimo S-02 (CLOSE-08, BR-111) — popravljeno
+u aplikaciji, otvoreno u bazi.** Dok je Anina smjena otvorena, Bojan poslije prijave dobija S-02,
+ali kucanjem `/reception` (ili klikom u meniju) dolazio je do pulta i prodao dnevnu kartu — uplata
+je upisana u **Aninu** smjenu, pa bi Ana na zaključenju odgovarala za tuđi novac. Sada proxy
+(`proxy.ts`) svakog recepcionera kome otvorena smjena ne pripada vraća na `/shift/gate` sa bilo
+kog ekrana, dok je ne preuzme ili se ne odjavi; API rute (`/api/…`) zadržavaju svoje odgovore
+(PERM-10: PDF kartica recepcioneru i dalje daje 404). **Otvoreno:** baza i dalje prihvata direktan poziv
+novčanih funkcija iz Bojanove sesije (provjereno sa `sell_day_passes`), jer `require_open_shift`
+gleda samo da li je smjena otvorena, ne i čija je. Predlog je nova migracija u kojoj
+`require_open_shift` i `record_editable` recepcioneru dozvoljavaju samo njegovu smjenu
+(`E_SHIFT_TAKEN`, „Otvorena je smjena drugog recepcionera.“). Nije urađeno bez odobrenja, jer
+mijenja funkcije koje koristi svaka novčana radnja u živoj bazi.
+
+**N-24 — stranice su se na 375 px pomjerale u stranu (FIN-04, STAT-01, §5.2) — popravljeno.**
+`/finance` je bio širok 660 px, `/finance/storage` 526 px, a sa podacima i `/stats/visits`
+(+201 px) i `/settings/trainers` (+217 px). Uzrok: grid kolone veličine `auto` rastu do najšire
+tabele ili grafikona unutra, iako se oni sami pomjeraju u svom okviru. Kolona je sada
+`minmax(0, 1fr)` (`grid-cols-1`) na ekranima finansija, statistike, trenera i podešavanja.
+`screens.spec.ts` to ranije nije vidio, jer je mjerio odmah poslije učitavanja, a stranica se
+proširi tek poslije hidratacije; sada mjeri kada se stranica smiri. Regresija: taj test na 19
+praznih ekrana i novi prolaz kroz 20 ekrana sa podacima u `test-plan-medium-b.spec.ts`.
+
+**N-25 — sve trake „veličine“ bile su pune širine u produkciji (STAT-01) — popravljeno.**
+Trake uz „Dolasci po vrsti“, tabele raspodjele na `/finance` i rangirane trake magacina
+crtane su sa `style="width: …"`. Produkcijska CSP politika (doc 08 §9) ne dozvoljava inline
+stilove, pa ih je browser odbacivao (greška u konzoli), a svaka traka je bila široka koliko i red:
+grafikon nije ništa pokazivao. U dev serveru je radilo, zato nije primijećeno. Nova komponenta
+`MagnitudeBar` crta traku SVG-om čija širina je atribut, ne stil. Sada su trake srazmjerne
+(npr. 799 / 96 / 64 px za 251 / 30 / 20 dolazaka), bez CSP grešaka.
+
+**N-26 — poslije zatvaranja dijaloga fokus je padao na `<body>` (UX-04) — popravljeno.**
+Radix vraća fokus samo na `DialogTrigger`, a skoro svi dijalozi ovdje se otvaraju iz stanja.
+Korisnik tastature je poslije Esc bio na početku stranice. `DialogContent` sada pamti kontrolu
+koja je dijalog otvorila i vraća fokus na nju — nikad u polje za unos, gdje bi uhvatio sljedeće
+skeniranje kartice (REC-15). Regresija: UX-04, uključujući skeniranje odmah poslije zatvaranja.
+
+**N-27 — CSP u produkciji blokira stil koji Radix ubacuje za dijaloge — otvoreno.** Svako
+otvaranje dijaloga u produkcijskom buildu upisuje u konzolu „Applying inline style violates the
+following Content Security Policy directive 'style-src …'“: `react-remove-scroll` (dio Radix
+Dialoga) ubacuje `<style>` bez nonce-a, a politika iz doc 08 §9 ga odbija. Posljedica: greške u
+konzoli i zaključavanje pomjeranja stranice iza dijaloga ne radi kako je zamišljeno. Na dev
+serveru se ne vidi, jer tamo politika dozvoljava inline stilove. Zbog toga u produkcijskom
+buildu padaju MEM-18 i SEC-01 (oni traže nula grešaka u konzoli) — i na čistom HEAD-u, bez
+izmjena iz ove dopune. Popravka traži ili da se nonce preda biblioteci `get-nonce` (nova direktna
+zavisnost), ili da se politika za stilove ublaži; oboje je izmjena steka ili politike, pa nije
+urađeno bez odobrenja.
+
+**N-28 — `upgrade-insecure-requests` na lokalnom produkcijskom serveru (samo test okruženje).**
+Produkcijska politika traži nadogradnju na HTTPS. Kad proxy odgovori preusmjerenjem na RSC
+zahtjev, browser ga preko `http://127.0.0.1` pokuša kao `https://` i ne uspije, pa Next radi punu
+navigaciju. SHIFT-08 zato u produkcijskom buildu završava na `/login` bez `?auto=1` (kolačići su
+već obrisani) — takođe i na čistom HEAD-u. Na pravom HTTPS domenu toga nema, a na dev serveru
+SHIFT-08 prolazi. Nije mijenjano; zabilježeno da se rezultati produkcijskih E2E prolaza na
+`http://127.0.0.1` čitaju s tim na umu.
+
+**Zapažanja (bez izmjene koda):**
+- REC-18: nova kartica istog browsera ponovo prikazuje [Počni rad] (`sessionStorage` važi po
+  kartici); zvuk se ionako mora otključati u svakoj kartici.
+- PAY-13: poruka „Ova stavka se ne može mijenjati (smjena je zaključena).“ (doc 08) pojavljuje se
+  i kada je razlog to što je stavka već poništena. Predlog: „Ova stavka je poništena ili je
+  smjena zaključena.“ — traži izmjenu teksta u specifikaciji.
+- STO-10: na `/finance/expenses` red troška nabavke nema [Poništi], ali ni objašnjenje zašto.
+- CLOSE-02: [Pregledaj stavke] je hronološka lista, a ne po grupama; poništene stavke se samo
+  broje, dok ih PDF izvještaj navodi.
+- JOB-04: podsjetnik zapisan kao `not_sent` (posao bez `EMAIL_FROM`) kasnije se ne šalje ponovo.
+- UX-04: dugme menija pokazuje ime korisnika, a čitač ekrana ga čita kao „Nalog“.
+- UX-06: pretraga „Član217“ nalazi i člana #218, jer njegov telefon sadrži „217“ — pretraga po
+  telefonu, očekivano.
+- `app/global-error.tsx` koristi inline stilove, koje CSP u produkciji odbacuje, pa bi ta
+  stranica (samo kad padne cijeli layout) bila bez stila; tekst i dugme i dalje rade.
+- Na 1366 px stavke menija „Uplate danas“ i „Statistika dolazaka“ prelaze u dva reda.
+
+| Provjera 24.09.2026 | Rezultat |
+|---|---|
+| `test-plan-medium-a.spec.ts` | **11/11** |
+| `test-plan-medium-b.spec.ts` | **9/9** |
+| `test-plan-medium-jobs.spec.ts` uz `TEST_PLAN_LIVE_EMAIL=1` | **2/2**, jedan email isporučen na `delivered@resend.dev` |
+| `screens.spec.ts`, 375 px, sa novom provjerom | **20/20** |
+| Cijeli E2E, oba projekta, produkcijski build | **270 prošlo**, 5 palo, 17 nije pokrenuto (serijski nastavci palih), 148 preskočeno (mobilne varijante i opt-in poslovi). PERM-10 i SET-10/12/13 pala su zbog N-23 (proxy je i API rutu slao na S-02; test je radio na pultu bez preuzimanja smjene) — ispravljeno, `test-plan-high-a` i `test-plan-high-e` ponovo **13/13**. SHIFT-08, MEM-18 i SEC-01 padaju i na čistom HEAD-u (N-27, N-28). |
+| `test-plan-critical`, `test-plan-extra`, `test-plan-security` na dev serveru | **27/27**, uključujući tri gornja i 17 ranije nepokrenutih |
+| `npm run lint`, `npm run typecheck` | PROŠLO |
+| `npm run test` | **161/161** (+1 preskočen) |
+| `npm run test:db` | **14/14 fajlova** |
 | Zaostale `E2E` teretane u bazi | 0 |
 
 *Kraj plana. Novi rezultati upisani su uz slučajeve; neoznačeni kvadratići nisu automatski prolaz.*

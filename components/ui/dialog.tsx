@@ -14,8 +14,15 @@ export const DialogClose = DialogPrimitive.Close;
 export function DialogContent({
   className,
   children,
+  onOpenAutoFocus,
+  onCloseAutoFocus,
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Content>) {
+  // UX-04 (N-26): Radix hands focus back only to a <DialogTrigger>, and almost every
+  // dialog here opens from state, so closing one dropped focus onto <body>. Focus goes
+  // back to the control that opened it — never to a text field, where it would catch
+  // the next card scan at the desk (REC-15).
+  const opener = React.useRef<HTMLElement | null>(null);
   return (
     <DialogPrimitive.Portal>
       <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-foreground/40" />
@@ -24,6 +31,22 @@ export function DialogContent({
           "fixed top-1/2 left-1/2 z-50 grid w-[calc(100vw-2rem)] max-w-md -translate-x-1/2 -translate-y-1/2 gap-4 rounded-2xl border bg-card p-6 shadow-lg",
           className,
         )}
+        onOpenAutoFocus={(event) => {
+          const active = document.activeElement;
+          opener.current =
+            active instanceof HTMLElement &&
+            active !== document.body &&
+            !active.closest("input, textarea, select, [contenteditable=true]")
+              ? active
+              : null;
+          onOpenAutoFocus?.(event);
+        }}
+        onCloseAutoFocus={(event) => {
+          onCloseAutoFocus?.(event);
+          if (event.defaultPrevented || !opener.current?.isConnected) return;
+          event.preventDefault();
+          opener.current.focus();
+        }}
         {...props}
       >
         {children}

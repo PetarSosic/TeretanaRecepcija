@@ -58,7 +58,7 @@ export function TrainersScreen({
   canSeeFees: boolean;
 }) {
   return (
-    <div className="grid gap-10">
+    <div className="grid grid-cols-1 gap-10">
       <h1 className="text-2xl font-semibold tracking-tight">
         {me.settings.trainersTitle}
       </h1>

@@ -92,7 +92,7 @@ export default async function AuditPage({
   const list = rows.data ?? [];
 
   return (
-    <div className="grid gap-6">
+    <div className="grid grid-cols-1 gap-6">
       <PeriodPicker period={period} />
 
       <form className="flex flex-wrap items-end gap-3" method="get">

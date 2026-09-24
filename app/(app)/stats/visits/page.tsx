@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { MagnitudeBar } from "@/components/common/magnitude-bar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableWrapper, Td, Th } from "@/components/ui/table";
 import { PeriodPicker } from "@/features/finance/components/period-picker";
@@ -63,8 +64,9 @@ export default async function VisitStatsPage({
   const failure = error ? getErrorMessage(rpcCode(error)) : null;
   const stats = failure ? null : (data as Stats | null);
 
+  // Doc 08 §9 (N-24): minmax(0, 1fr), so the charts scroll inside their frames at 375 px.
   return (
-    <div className="grid gap-8">
+    <div className="grid grid-cols-1 gap-8">
       <h1 className="text-2xl font-semibold tracking-tight">{me.stats.title}</h1>
       <PeriodPicker period={period} />
 
@@ -143,12 +145,9 @@ export default async function VisitStatsPage({
                         <span className="block">
                           {TYPES[row.type] ?? row.type}
                         </span>
-                        <span
-                          aria-hidden="true"
-                          className="mt-1 block h-1.5 rounded-full bg-chart-1"
-                          style={{
-                            width: `${Math.max((row.count / stats.total) * 100, 2)}%`,
-                          }}
+                        <MagnitudeBar
+                          className="mt-1 h-1.5"
+                          percent={Math.max((row.count / stats.total) * 100, 2)}
                         />
                       </Td>
                       <Td className="text-right font-medium tabular-nums">

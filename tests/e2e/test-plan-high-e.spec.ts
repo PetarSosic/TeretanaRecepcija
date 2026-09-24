@@ -525,6 +525,11 @@ test("SET-10, SET-12 and SET-13: trainers, programs, assignments and the schedul
     (await trainerDialog(editTrainer, "Novi Trener Izmijenjen", false)).saved,
   ).toBe(true);
   const desk = await signedIn(browser, staff.ana);
+  // N-23: Cena has held the shift since SET-07, so Ana takes it over at S-02 first.
+  if (new URL(desk.url()).pathname === "/shift/gate") {
+    await desk.getByRole("button", { name: "Preuzmi smjenu" }).click();
+    await desk.waitForURL(/\/reception/);
+  }
   await desk.goto(`/members/${groupMember}`);
   await desk.getByRole("button", { name: "Nova članarina" }).click();
   const sale = desk.getByRole("dialog");

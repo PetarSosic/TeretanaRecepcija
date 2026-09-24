@@ -33,7 +33,7 @@ export default async function ShiftsPage({
   });
 
   return (
-    <div className="grid gap-6">
+    <div className="grid grid-cols-1 gap-6">
       <PeriodPicker period={period} />
       <ShiftsScreen rows={(shifts.data as ShiftRow[] | null) ?? []} />
     </div>

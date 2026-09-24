@@ -15,20 +15,24 @@ import { moneyActionState } from "@/lib/money-action";
  */
 export function MoneyButton({
   disabled,
+  title,
   ...props
 }: ComponentProps<typeof Button>) {
   const { hasOpenShift, isOffline } = useAppState();
   const state = moneyActionState({ hasOpenShift, isOffline });
+  // N-22 (STO-07): a caller that disables the button for its own reason, such as
+  // `Nema na stanju.`, keeps that reason; BR-092's shift or connection reason wins.
+  const reason = state.reason ?? (disabled ? title : undefined);
 
   return (
     <Button
       {...props}
       disabled={disabled || state.disabled}
-      title={state.reason}
+      title={reason ?? title}
       aria-describedby={undefined}
       aria-label={
-        state.reason
-          ? `${props["aria-label"] ?? ""} ${state.reason}`.trim()
+        reason
+          ? `${props["aria-label"] ?? ""} ${reason}`.trim()
           : props["aria-label"]
       }
     />

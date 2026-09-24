@@ -78,7 +78,7 @@ export default async function TrainersPage({
   const payments = (detail?.data as PaymentRow[] | null) ?? [];
 
   return (
-    <div className="grid gap-8">
+    <div className="grid grid-cols-1 gap-8">
       <MonthPicker month={month.slice(0, 7)} />
 
       <RankedBars

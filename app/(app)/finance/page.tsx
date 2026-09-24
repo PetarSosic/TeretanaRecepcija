@@ -86,7 +86,7 @@ export default async function FinancePage({
   const unpaidRows = (unpaid.data as Unpaid[] | null) ?? [];
 
   return (
-    <div className="grid gap-8">
+    <div className="grid grid-cols-1 gap-8">
       <PeriodPicker period={period} />
 
       {totals ? <StatCards summary={totals} /> : null}

@@ -6,6 +6,7 @@ import { NextResponse, type NextRequest } from "next/server";
 // must not stand in front of it; the handler authorises those calls with CRON_SECRET.
 const PUBLIC_ROUTES = ["/login", "/auth/callback", "/api/jobs"];
 const PASSWORD_ROUTE = "/change-password";
+const GATE_ROUTE = "/shift/gate";
 
 function securityHeaders(request: NextRequest) {
   // Doc 08 §9: per-request nonce.
@@ -116,6 +117,17 @@ export async function proxy(request: NextRequest) {
           await supabase.auth.signOut();
           return redirect(request, "/login", policy, response, "auto=1");
         }
+        // BR-111 (N-23): another receptionist holds the open shift. Until it is taken
+        // over, S-02 is the only screen; a typed desk URL or a menu click would
+        // otherwise record this receptionist's money in the other one's shift. Route
+        // handlers (/api) are not screens and keep their own answers (PERM-10).
+        if (
+          !shiftError &&
+          !(shift as { is_mine: boolean }).is_mine &&
+          path !== GATE_ROUTE &&
+          !path.startsWith("/api/")
+        )
+          return redirect(request, GATE_ROUTE, policy, response);
       } else if (path === "/login") {
         const home = staff.must_change_password
           ? PASSWORD_ROUTE

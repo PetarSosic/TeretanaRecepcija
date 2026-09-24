@@ -1,16 +1,16 @@
 import { writeFile } from "node:fs/promises";
 import { expect, it, vi } from "vitest";
 
-// TEST_PLAN.md JOB-03, JOB-05 and E2E-07: one real scheduled-job handler (doc 08 §8),
-// run for ONE synthetic gym. `tests/e2e/test-plan-jobs.spec.ts` starts this file with
-// TEST_PLAN_JOB, TEST_PLAN_GYM and TEST_PLAN_OUT set; without them it is skipped, so
-// `npm run test` never runs a job.
+// TEST_PLAN.md JOB-03, JOB-04, JOB-05, JOB-07 and E2E-07: one real scheduled-job
+// handler (doc 08 §8), run for ONE synthetic gym. `tests/e2e/test-plan-jobs.spec.ts` and
+// `test-plan-medium-jobs.spec.ts` start this file with TEST_PLAN_JOB, TEST_PLAN_GYM and
+// TEST_PLAN_OUT set; without them it is skipped, so `npm run test` never runs a job.
 //
 // A real handler acts on every gym whose time has come, which would close the working
-// gym's shift or use up its members' reminders. Here `jobs_due` answers with the test gym
-// alone; everything else — the Postgres job functions, the shift report, the backup,
-// Resend — is the real thing against the hosted project (D-56). Each email's Resend id is
-// kept, so its delivery can be read back.
+// gym's shift, use up its members' reminders or resend its reports. Here `jobs_due` and
+// the retry queue answer with the test gym alone; everything else — the Postgres job
+// functions, the shift report, the backup, Resend — is the real thing against the hosted
+// project (D-56). Each email's Resend id is kept, so its delivery can be read back.
 vi.mock("server-only", () => ({}));
 
 const scope = vi.hoisted(() => ({
@@ -30,11 +30,27 @@ vi.mock("@/lib/supabase/admin", async (importOriginal) => {
   return {
     createAdminClient: () => {
       const client = original.createAdminClient();
-      const rpc = client.rpc.bind(client);
-      client.rpc = ((name: string, ...rest: unknown[]) =>
-        name === "jobs_due"
-          ? Promise.resolve({ data: [scope.gym], error: null })
-          : (rpc as (...args: unknown[]) => unknown)(name, ...rest)) as typeof client.rpc;
+      const rpc = client.rpc.bind(client) as (...args: unknown[]) => PromiseLike<{
+        data: unknown;
+        error: unknown;
+      }>;
+      client.rpc = ((name: string, ...rest: unknown[]) => {
+        if (name === "jobs_due")
+          return Promise.resolve({ data: [scope.gym], error: null });
+        // JOB-07: the BR-118 retry queue spans every gym; keep only the test gym's shifts.
+        if (name === "shifts_pending_email")
+          return (async () => {
+            const result = await rpc(name, ...rest);
+            if (result.error) return result;
+            const { data } = await client
+              .from("shifts")
+              .select("id")
+              .eq("gym_id", scope.gym)
+              .in("id", (result.data as string[] | null) ?? []);
+            return { data: (data ?? []).map((row) => row.id as string), error: null };
+          })();
+        return rpc(name, ...rest);
+      }) as typeof client.rpc;
       return client;
     },
   };

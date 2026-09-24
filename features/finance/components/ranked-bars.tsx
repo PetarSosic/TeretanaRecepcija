@@ -1,3 +1,4 @@
+import { MagnitudeBar } from "@/components/common/magnitude-bar";
 import { formatMoney } from "@/lib/format";
 import { me } from "@/lib/i18n/me";
 
@@ -43,12 +44,9 @@ export function RankedBars({
                   {formatMoney(row.value)}
                 </span>
               </div>
-              <span
-                aria-hidden="true"
-                className="block h-2 rounded-r-sm bg-chart-1"
-                style={{
-                  width: `${Math.max((cents(row.value) / peak) * 100, 1)}%`,
-                }}
+              <MagnitudeBar
+                className="h-2"
+                percent={Math.max((cents(row.value) / peak) * 100, 1)}
               />
             </li>
           ))}

@@ -14,8 +14,10 @@ export default async function FinanceLayout({
   const staff = await requireStaff();
   if (staff.role !== "owner" && staff.role !== "admin") notFound();
 
+  // Doc 08 §9 (N-24): a grid column sized minmax(0, 1fr), so a wide chart or the tab
+  // row scrolls inside its own frame instead of stretching the page past 375 px.
   return (
-    <div className="grid gap-6">
+    <div className="grid grid-cols-1 gap-6">
       <h1 className="text-2xl font-semibold tracking-tight">
         {me.finance.title}
       </h1>
