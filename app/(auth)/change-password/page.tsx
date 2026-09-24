@@ -8,11 +8,17 @@ export const metadata: Metadata = {
   title: `${me.password.title} — ${me.app.name}`,
 };
 
-// S-01b at first login (AS-18); the same route serves US-01.4 from the user menu.
-export default async function ChangePasswordPage() {
+// S-01b at first login (AS-18) and after a reset link (D-69); the same route serves
+// US-01.4 from the user menu.
+export default async function ChangePasswordPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ reset?: string }>;
+}) {
   const staff = await getStaff();
   if (!staff) redirect("/login");
   const firstLogin = staff.must_change_password;
+  const reset = (await searchParams).reset === "1";
 
   return (
     <>
@@ -21,7 +27,9 @@ export default async function ChangePasswordPage() {
       </h1>
       {firstLogin ? (
         <p className="mb-6 text-sm text-muted-foreground">
-          {me.password.firstLoginDescription}
+          {reset
+            ? me.password.resetDescription
+            : me.password.firstLoginDescription}
         </p>
       ) : (
         <div className="mb-6" />

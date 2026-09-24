@@ -98,7 +98,7 @@ Resend: shift report emails · expiry reminders
 
 ## 4. Authentication
 - **All staff (D-57):** a username and password. The Auth user email is `<username>@staff.kpfitness.internal` (domain from `STAFF_EMAIL_DOMAIN`). The account is created through the admin API with `email_confirm: true`. Login maps a username to that email. Staff passwords are reset by an owner, a manager or the admin on S-23, following P-03 and P-04.
-- **Admin (D-58):** a real email + password, so a forgotten admin password can be reset. Password reset uses Supabase's reset email, sent through Resend SMTP (configured in Supabase Auth settings) from `noreply@stamenkovicc.com` (BR-161). The seeded owner account of Matija Vojinović keeps its email login as the one exception among non-admin staff.
+- **Admin (D-58):** a real email + password, so a forgotten admin password can be reset. Password reset uses Supabase's reset email, sent through Resend SMTP (configured in Supabase Auth settings) from `noreply@stamenkovicc.com` (BR-161). Its template links to `{{ .SiteURL }}/auth/callback?token_hash={{ .TokenHash }}&type=recovery`; the route verifies the token with `verifyOtp`, raises `must_change_password` and continues on S-01b (D-69). The seeded owner account of Matija Vojinović keeps its email login as the one exception among non-admin staff.
 - **Stored passwords (D-59):** every password the application sets for a staff account is also written in readable form to `staff_credentials`, which only the admin may read. Changing a password anywhere — admin reset, owner or manager reset, or the user changing their own — updates that copy, so it is never stale.
 
 > ASSUMPTION (AS-4): Receptionists use internal, non-deliverable emails. Usernames are unique across the whole system.

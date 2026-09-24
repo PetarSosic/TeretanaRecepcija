@@ -97,7 +97,9 @@ export async function requestPasswordReset(
   if (staff?.is_active && staff.email) {
     const supabase = await createClient();
     await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${process.env.APP_URL ?? ""}/auth/callback?next=/change-password`,
+      // D-69: the email template builds the link from the Site URL instead; this only
+      // serves a template that still uses {{ .ConfirmationURL }}.
+      redirectTo: `${process.env.APP_URL ?? ""}/auth/callback`,
     });
   }
   // The same confirmation either way, so the form cannot be used to find accounts.
@@ -106,7 +108,9 @@ export async function requestPasswordReset(
 
 /**
  * US-01.4 and S-01b. The current password is required except at first login, where the
- * user already proved it with the temporary password they just used (AS-18).
+ * user already proved it with the temporary password they just used (AS-18), and after
+ * a reset link, which proved it through the mailbox (D-69). Both raise
+ * must_change_password.
  */
 export async function changeOwnPassword(
   _state: ActionState,

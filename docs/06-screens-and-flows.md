@@ -48,6 +48,7 @@ An `admin` sees everything an owner sees (D-58).
 - **Fields:** `Nova lozinka`, `Ponovi lozinku` (≥ 8 characters, must match).
 - **Button:** [Sačuvaj].
 - **Access:** blocks every other route until the password is saved.
+- **Opened by:** the first login with a temporary password (`Prijavili ste se privremenom lozinkom. Postavite novu lozinku da nastavite.`) or the password-reset link, as `/change-password?reset=1` (`Otvorili ste link za novu lozinku. Postavite novu lozinku da nastavite.`, D-69).
 
 ## S-02 Shift gate — `/shift/gate` (receptionist)
 - **Text:** `Otvorena je smjena: <ime> (od <dd.mm.yyyy HH:mm>).`

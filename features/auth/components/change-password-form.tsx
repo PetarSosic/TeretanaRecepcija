@@ -13,7 +13,8 @@ import { changeOwnPassword } from "../actions";
 
 /**
  * S-01b when `firstLogin` is true: only the new password and its repeat, because the
- * temporary password was just used. Otherwise US-01.4 also asks for the current one.
+ * temporary password was just used, or the reset link proved who it is (D-69).
+ * Otherwise US-01.4 also asks for the current one.
  */
 export function ChangePasswordForm({ firstLogin }: { firstLogin: boolean }) {
   const [state, action, pending] = useActionState(changeOwnPassword, idleState);

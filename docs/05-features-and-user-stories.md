@@ -15,6 +15,7 @@ All features are **MVP**. Acceptance criteria (AC) are written so each one can b
 **US-01.2** As the admin, I log in with my email, and I can reset a forgotten password by email (D-57, D-58).
 - AC1: "Zaboravljena lozinka?" sends a reset link only to an account that has an email, which is the admin and the seeded owner account.
 - AC2: For a username, it shows `Lozinku vam postavlja administrator, vlasnik ili menadžer.`
+- AC3: The link in the email works once, in any browser and on any device. It opens S-01b, which asks only for the new password; after saving, the user lands on their home screen (D-69).
 
 **US-01.3** As an owner or manager, I create and manage staff accounts (S-23).
 - AC1: Creating a receptionist requires full name, username (`^[a-z0-9._]{3,30}$`, unique) and a temporary password (≥ 8 characters).
@@ -24,7 +25,7 @@ All features are **MVP**. Acceptance criteria (AC) are written so each one can b
 - AC5: Deactivating a user bans them in Supabase Auth. Their next request redirects to login. Nobody may deactivate their own account, and the last active owner or admin cannot be deactivated (P-07, D-60).
 
 **US-01.4** As any user, I change my own password from the user menu.
-- AC1: The current password is required, the new one must be ≥ 8 characters, and a success toast appears.
+- AC1: The current password is required, the new one must be ≥ 8 characters, and a success toast appears. S-01b after a first login (AS-18) or a reset link (D-69) does not ask for it.
 
 ## F-02 Shifts
 **US-02.1** As a receptionist, a shift opens automatically when I log in (BR-111).

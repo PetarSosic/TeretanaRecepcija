@@ -15,6 +15,10 @@ sekciju **7. Otvorena pitanja**.
 
 ---
 
+> **Dopuna 24.09.2026 (4):** link za reset lozinke vodio je na prijavu, a S-01b je tražio
+> zaboravljenu lozinku (**N-29**); popravljeno odlukom **D-69**. AUTH-14 čeka novi šablon mejla
+> na produkciji. Detalji u **§9.13**.
+
 > **Dopuna 24.09.2026 (3):** grafikon na `/finance` otvara tekuću godinu i ima filter po godini i
 > mjesecu (D-68); FIN-04 ponovo PROŠLO. Stanje se ne mijenja. Detalji u **§9.12**.
 
@@ -74,7 +78,7 @@ sekciju **7. Otvorena pitanja**.
 | `STAFF_EMAIL_DOMAIN` | korisničko ime se mapira u `<ime>@<domen>` (AS-4) | prijava korisničkim imenom baca grešku (vidi SUSPECT-03) |
 | `DATABASE_URL` | samo `npm run test:db` | ne utiče na ručno testiranje |
 | `EMAIL_FROM`, `RESEND_API_KEY` | izvještaj smjene, podsjetnici, backup mail | slanje se preskače (BR-161), status ostaje „nije slato“ |
-| `APP_URL` | link u emailu za reset lozinke | link vodi na pogrešnu adresu |
+| `APP_URL` | `npm run jobs:secrets` je upisuje u Vault kao adresu zakazanih poslova; link za reset gradi se od Site URL-a (D-69) | poslovi ne stižu do aplikacije |
 | `CRON_SECRET` | zaštita `/api/jobs/*` | svaki poziv posla vraća 401 |
 | `BACKUP_ZIP_PASSWORD` | lozinka ZIP-a sedmične kopije | backup posao pada |
 | `SEED_OWNER_PASSWORD`, `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `ADMIN_NAME` | seed naloga | nema s kim se prijaviti |
@@ -383,11 +387,16 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 
 ### [AUTH-14] Link iz emaila vodi na promjenu lozinke
 - **Prioritet:** Visoko
-- **Uloga / preduslovi:** email iz AUTH-13 je stigao; `APP_URL` je podešen
-- **Koraci:** otvorite link iz emaila; postavite novu lozinku; prijavite se njome.
+- **Uloga / preduslovi:** email iz AUTH-13 je stigao; šablon „Reset Password“ je podešen
+  (README, Supabase korak 5; D-69)
+- **Koraci:** otvorite link iz emaila, i to u drugom pregledaču ili na telefonu; postavite novu
+  lozinku; prijavite se njome. Zatim ponovo otvorite isti link.
 - **Test podaci:** nova lozinka `AdminNova123`
-- **Očekivani rezultat:** link vodi na `/auth/callback?...next=/change-password`, pa na ekran
-  promjene lozinke. Nakon čuvanja, prijava novom lozinkom uspijeva.
+- **Očekivani rezultat:** link vodi na `/auth/callback?token_hash=…&type=recovery`, pa na
+  `/change-password?reset=1` sa tekstom „Otvorili ste link za novu lozinku. Postavite novu
+  lozinku da nastavite.“ i bez polja „Trenutna lozinka“. Druge stranice vraćaju na taj ekran.
+  Nakon čuvanja otvaraju se Finansije, a prijava novom lozinkom uspijeva. Drugo otvaranje istog
+  linka vodi na `/login`.
 - **Gdje provjeriti:** UI, adresna linija, email
 - [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — NIJE IZVRŠENO.** Nije dostupan stvarni recovery link iz sandučeta testnog Auth naloga. Slanje poslovnih emailova kroz Resend nije ovaj tok.
 
@@ -3700,6 +3709,32 @@ tog dugmeta nema i UX-04 prolazi. Nije vezano za ovu izmjenu.
 | `npm run test:db` (poslije migracije 0029) | **14/14 fajlova**, `0012_finance` 55 tvrdnji (14 novih) |
 | `npm run test:e2e` (dev server) | 292 prošlo · 1 palo (UX-04, dugme dev alata) · 148 preskočeno |
 | E2E u produkcijskom buildu: `finance`, `test-plan-medium-b` | 19 prošlo (UX-04; FIN-04; D-68 na 1366 i 375 px) |
+
+### 9.13 Dopuna — link za reset lozinke (N-29, D-69), 24.09.2026
+
+**N-29 — link za reset lozinke vodio je na prijavu, a S-01b je tražio zaboravljenu lozinku —
+popravljeno (odobrio vlasnik 24.09.2026).** Prvi put isproban na produkciji, sa privremenim
+admin nalogom na Resendovoj probnoj adresi i mejlom pročitanim kroz Resend API. Mejl je stigao
+za 7 s sa `noreply@stamenkovicc.com`, ali je link nosio `redirect_to=https://teretana-recepcija.vercel.app`:
+`APP_URL` na Vercelu nije dao ispravnu adresu, Supabase ga je zamijenio svojim Site URL-om,
+pa je kod stigao na `/?code=…` i početna stranica je poslala na `/login`. Dva dodatna problema
+bi ostala i sa ispravnim `APP_URL`: PKCE kod radi samo u pregledaču koji je tražio reset
+(verifier je u njegovim kolačićima), a S-01b je bez `must_change_password` tražio
+„Trenutna lozinka“, koju korisnik upravo nije znao (US-01.4). Popravka (D-69):
+`app/auth/callback/route.ts` prihvata `token_hash` + `type=recovery` (`verifyOtp`, bez kolačića),
+podiže `must_change_password` za aktivnog zaposlenog i vodi na `/change-password?reset=1`;
+neaktivni se odjavljuje. Stari PKCE link radi isto u istom pregledaču. Ruta više ne čita
+odredište iz adrese, pa je `inAppRedirect` (N-03) uklonjen zajedno sa svojih 5 jediničnih
+testova; AUTH-16 sada pokriva E2E. Preusmjerenje je relativno, jer ruta na dev serveru vidi
+`localhost` umjesto `127.0.0.1` i kolačić sesije bi ostao na drugom hostu. Šablon mejla je u
+README (Supabase, korak 5).
+
+| Provjera 24.09.2026 (4) | Rezultat |
+|---|---|
+| `npm run lint`, `npm run typecheck`, `npm run test` | PROŠLO (unit: 177 prošlo, 5 testova `inAppRedirect` uklonjeno) |
+| E2E `password-reset`, `admin`, `auth` (dev server, oba projekta) | **28/28** (novi `password-reset.spec.ts`: D-69, AUTH-15, AUTH-16, neaktivan nalog) |
+| Hostovani Supabase: token iz pravog PKCE mejla u drugom „pregledaču“ | `verifyOtp` otvara sesiju za pravog korisnika; drugi pokušaj `otp_expired` |
+| Test podaci | privremeni nalozi i teretane obrisani; nula `@resend.dev` korisnika, nula `E2E` teretana |
 
 *Kraj plana. Novi rezultati upisani su uz slučajeve; neoznačeni kvadratići nisu automatski prolaz.*
 

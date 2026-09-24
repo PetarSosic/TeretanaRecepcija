@@ -113,7 +113,24 @@ an account only the owner has.
 3. In **Authentication → SMTP Settings**, enter the Resend SMTP credentials, so the
    password-reset mail of US-01.2 leaves from the verified domain rather than from
    Supabase's shared sender, which is rate-limited and often filtered.
-4. Confirm that the extensions `pg_cron` and `pg_net` are enabled (migration `0019` does
+4. In **Authentication → URL Configuration**, set **Site URL** to the deployed address
+   (`https://teretana-recepcija.vercel.app`). The reset link below is built from it.
+5. In **Authentication → Emails → Templates → Reset Password** (D-69), set the subject
+   `KP Fitness — nova lozinka` and the body below. The link carries a token hash, so it
+   works in any browser; Supabase's default `{{ .ConfirmationURL }}` works only in the
+   browser that asked for the reset. Deploy the application first, since only
+   `/auth/callback` from D-69 on understands this link.
+
+   ```html
+   <h2>Nova lozinka</h2>
+   <p>Zatražena je nova lozinka za vaš nalog u aplikaciji KP Fitness.</p>
+   <p><a href="{{ .SiteURL }}/auth/callback?token_hash={{ .TokenHash }}&type=recovery">Postavite novu lozinku</a></p>
+   <p>Link se može iskoristiti samo jednom. Ako niste tražili novu lozinku, zanemarite ovaj email.</p>
+   ```
+6. In **Authentication → Sign In / Providers**, turn off **Allow new users to sign up**.
+   Accounts are created only on S-23 through the admin API, which this setting does not
+   block (D-01, doc 08 §4).
+7. Confirm that the extensions `pg_cron` and `pg_net` are enabled (migration `0019` does
    this) and that `cron.job` holds one row named `kp-fitness-jobs` on `*/5 * * * *`.
 
 ### 2. Resend

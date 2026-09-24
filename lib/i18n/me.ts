@@ -59,6 +59,9 @@ export const me = {
     firstLoginTitle: "Postavite novu lozinku",
     firstLoginDescription:
       "Prijavili ste se privremenom lozinkom. Postavite novu lozinku da nastavite.",
+    // D-69: S-01b opened by the reset link from the email.
+    resetDescription:
+      "Otvorili ste link za novu lozinku. Postavite novu lozinku da nastavite.",
     current: "Trenutna lozinka",
     next: "Nova lozinka",
     repeat: "Ponovi lozinku",
@@ -723,7 +726,8 @@ export const me = {
     invoice: "Račun",
     method: "Način",
     fromTill: "Iz kase",
-    fromTillHint: "Datum se postavlja na danas, način na gotovinu, i traži otvorenu smjenu.",
+    fromTillHint:
+      "Datum se postavlja na danas, način na gotovinu, i traži otvorenu smjenu.",
     vat: "PDV uračunat",
     vatYes: "Da",
     vatNo: "Ne",
@@ -812,7 +816,8 @@ export const me = {
     actionVoid: "Poništeno",
     actionAnonymize: "Anonimizacija",
     auditEmpty: "Nema izmjena u izabranom periodu.",
-    auditMore: "Prikazano je prvih {count} izmjena. Suzite period da vidite ostale.",
+    auditMore:
+      "Prikazano je prvih {count} izmjena. Suzite period da vidite ostale.",
     // S-22 Naknadni unos (F-23).
     backdatedTitle: "Naknadni unos",
     backdatedBanner: "Naknadni unos – ne ulazi u smjenu.",

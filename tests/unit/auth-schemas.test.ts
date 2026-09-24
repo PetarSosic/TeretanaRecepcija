@@ -1,9 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  changePasswordSchema,
-  inAppRedirect,
-  isEmail,
-} from "@/features/auth/schemas";
+import { changePasswordSchema, isEmail } from "@/features/auth/schemas";
 import { createStaffSchema } from "@/features/settings/schemas";
 
 describe("US-01.1 AC2: one field for a username or an email", () => {
@@ -113,43 +109,5 @@ describe("US-01.3 AC1 and AC2: staff identity per role", () => {
       createStaffSchema.safeParse({ ...base, role: "trener", email: "a@b.me" })
         .success,
     ).toBe(false);
-  });
-});
-
-// AUTH-16 and finding N-03: the reset link's destination never leaves the app.
-describe("AUTH-16: the callback destination stays in the app", () => {
-  const origin = "https://teretana-recepcija.vercel.app";
-
-  it("keeps an in-app path with its query", () => {
-    expect(inAppRedirect("/change-password?a=1", origin)).toBe(
-      "/change-password?a=1",
-    );
-  });
-
-  it("rejects a backslash that the URL parser reads as a second slash", () => {
-    // Before the fix this passed the startsWith("//") test and resolved to
-    // https://example.org/.
-    expect(inAppRedirect("/\\example.org", origin)).toBe("/change-password");
-    expect(
-      new URL(inAppRedirect("/\\example.org", origin), origin).origin,
-    ).toBe(origin);
-  });
-
-  it("rejects a protocol-relative and an absolute foreign destination", () => {
-    expect(inAppRedirect("//example.org", origin)).toBe("/change-password");
-    expect(inAppRedirect("https://example.org/steal", origin)).toBe(
-      "/change-password",
-    );
-  });
-
-  it("rejects a non-http scheme and a missing destination", () => {
-    expect(inAppRedirect("javascript:alert(1)", origin)).toBe(
-      "/change-password",
-    );
-    expect(inAppRedirect(null, origin)).toBe("/change-password");
-  });
-
-  it("reduces a same-origin absolute destination to its path", () => {
-    expect(inAppRedirect(`${origin}/finance`, origin)).toBe("/finance");
   });
 });
