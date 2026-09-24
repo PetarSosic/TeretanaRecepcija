@@ -858,11 +858,17 @@ test("CLOSE-08 and N-23: the second receptionist cannot close, or work in, the o
   }
   await expect(b.getByLabel("Prebrojana gotovina (€)")).toHaveCount(0);
   await expect(b.getByRole("button", { name: /Zaključi smjenu/ })).toHaveCount(0);
-  // The menu is a client navigation; the proxy sees it too.
-  await b.locator("header").getByRole("link", { name: "Recepcija", exact: true }).click();
-  await expect(b).toHaveURL(/\/shift\/gate$/);
-  await expect(gate).toBeVisible();
-  note("CLOSE-08/N-23 B on /shift/close, /reception, /payments/today, /storage, /members and the menu → /shift/gate");
+  // S-02 offers no menu at all (the owner's decision, 24.09.2026): only the badge, the
+  // account menu and the gate's own two buttons.
+  await expect(b.getByRole("navigation", { name: "Meni" })).toHaveCount(0);
+  await expect(b.getByRole("button", { name: "Otvori meni" })).toHaveCount(0);
+  await expect(b.getByRole("button", { name: "Nalog" })).toBeVisible();
+  await expect(b.getByRole("button", { name: "Preuzmi smjenu" })).toBeVisible();
+  await expect(b.getByRole("button", { name: "Odjavi se" })).toBeVisible();
+  await b.setViewportSize({ width: 375, height: 812 });
+  await expect(b.getByRole("button", { name: "Otvori meni" })).toHaveCount(0);
+  await b.setViewportSize({ width: 1366, height: 768 });
+  note("CLOSE-08/N-23 B on /shift/close, /reception, /payments/today, /storage, /members → /shift/gate, which shows no menu");
 
   // The database still attaches a direct call to the open shift (not closed by N-23).
   const session = await sessionOf(staff.bojan);

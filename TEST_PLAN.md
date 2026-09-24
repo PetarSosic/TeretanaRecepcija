@@ -17,8 +17,8 @@ sekciju **7. Otvorena pitanja**.
 
 > **Dopuna 24.09.2026:** izvršena su sva 22 preostala djelimična slučaja prioriteta **Srednje** i
 > **Nisko** — svi PROŠLI, sedam tek nakon popravki **N-22 do N-26**. N-23 (recepcioner radi u
-> tuđoj smjeni mimo ekrana S-02) zatvoren je u aplikaciji; da li to treba zabraniti i u bazi,
-> pitanje je za vlasnika. Popravljen je i **N-27** (CSP u produkciji blokirao stil dijaloga);
+> tuđoj smjeni mimo ekrana S-02) zatvoren je u aplikaciji, a S-02 više nema meni; vlasnik je
+> odlučio da se to ne zabranjuje i u bazi. Popravljen je i **N-27** (CSP u produkciji blokirao stil dijaloga);
 > **N-28** se tiče samo lokalnog produkcijskog testa na HTTP-u. Novo stanje: **214 prošlo · 1 palo · 1 djelimično · 1 nije izvršeno**
 > (MEM-07, AUTH-13, AUTH-14). Detalji u **§9.10**.
 
@@ -1841,7 +1841,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Test podaci:** —
 - **Očekivani rezultat:** „Nemate otvorenu smjenu.“ bez forme za zaključenje.
 - **Gdje provjeriti:** UI
-- [x] Prošlo  [ ] Palo  Napomena: **24.09.2026 — PROŠLO (nakon popravke N-23); očekivani rezultat je promijenjen.** `test-plan-medium-a.spec.ts`. Prvi pokušaj: recepcioner B na `/shift/close` dobija „Nemate otvorenu smjenu.“ bez forme, ali je kucanjem `/reception` mogao da radi bez preuzimanja i prodao dnevnu kartu koja je upisana u **Aninu** smjenu (N-23). Sada B, dok ne preuzme smjenu, sa svakog ekrana (`/shift/close`, `/reception`, `/payments/today`, `/storage`, `/members`, klik u meniju) završava na S-02 „Otvorena smjena“, pa „Nemate otvorenu smjenu.“ više ne vidi. Ana i dalje normalno radi i zaključuje. Direktan RPC poziv iz B-ove sesije baza i dalje prihvata — otvoreno pitanje u §9.10. Raniji dokaz (22.09.): DB 0010 i E2E payments provjeravaju zatvorenu/tuđu smjenu i prava izmjene. Sve UI putanje ovog slučaja nisu ponovljene.
+- [x] Prošlo  [ ] Palo  Napomena: **24.09.2026 — PROŠLO (nakon popravke N-23); očekivani rezultat je promijenjen.** `test-plan-medium-a.spec.ts`. Prvi pokušaj: recepcioner B na `/shift/close` dobija „Nemate otvorenu smjenu.“ bez forme, ali je kucanjem `/reception` mogao da radi bez preuzimanja i prodao dnevnu kartu koja je upisana u **Aninu** smjenu (N-23). Sada B, dok ne preuzme smjenu, sa svakog ekrana (`/shift/close`, `/reception`, `/payments/today`, `/storage`, `/members`, klik u meniju) završava na S-02 „Otvorena smjena“, pa „Nemate otvorenu smjenu.“ više ne vidi. Ana i dalje normalno radi i zaključuje. S-02 više ne prikazuje meni. Direktan RPC poziv iz B-ove sesije baza i dalje prihvata; vlasnik je odlučio da tako ostane (§9.10). Raniji dokaz (22.09.): DB 0010 i E2E payments provjeravaju zatvorenu/tuđu smjenu i prava izmjene. Sve UI putanje ovog slučaja nisu ponovljene.
 
 ---
 
@@ -3536,12 +3536,12 @@ ali kucanjem `/reception` (ili klikom u meniju) dolazio je do pulta i prodao dne
 je upisana u **Aninu** smjenu, pa bi Ana na zaključenju odgovarala za tuđi novac. Sada proxy
 (`proxy.ts`) svakog recepcionera kome otvorena smjena ne pripada vraća na `/shift/gate` sa bilo
 kog ekrana, dok je ne preuzme ili se ne odjavi; API rute (`/api/…`) zadržavaju svoje odgovore
-(PERM-10: PDF kartica recepcioneru i dalje daje 404). **Otvoreno:** baza i dalje prihvata direktan poziv
-novčanih funkcija iz Bojanove sesije (provjereno sa `sell_day_passes`), jer `require_open_shift`
-gleda samo da li je smjena otvorena, ne i čija je. Predlog je nova migracija u kojoj
-`require_open_shift` i `record_editable` recepcioneru dozvoljavaju samo njegovu smjenu
-(`E_SHIFT_TAKEN`, „Otvorena je smjena drugog recepcionera.“). Nije urađeno bez odobrenja, jer
-mijenja funkcije koje koristi svaka novčana radnja u živoj bazi.
+(PERM-10: PDF kartica recepcioneru i dalje daje 404). Na S-02 se više ne prikazuje meni (ni na
+375 px), jer bi svaki link ionako vodio nazad; ostaju značka smjene, „Nalog“ i dugmad [Preuzmi
+smjenu] i [Odjavi se]. Baza i dalje prihvata direktan poziv novčanih funkcija iz Bojanove sesije
+(provjereno sa `sell_day_passes`), jer `require_open_shift` gleda samo da li je smjena
+otvorena, ne i čija je; to može samo neko ko namjerno šalje zahtjeve svojim nalogom mimo
+aplikacije. **Odluka vlasnika 24.09.2026:** migracija koja bi to zabranila i u bazi se ne radi.
 
 **N-24 — stranice su se na 375 px pomjerale u stranu (FIN-04, STAT-01, §5.2) — popravljeno.**
 `/finance` je bio širok 660 px, `/finance/storage` 526 px, a sa podacima i `/stats/visits`

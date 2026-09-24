@@ -48,6 +48,9 @@ export function AppHeader({
   const signOutForm = useRef<HTMLFormElement>(null);
   const isCurrent = (href: string) =>
     pathname === href || pathname.startsWith(`${href}/`);
+  // BR-111 (N-23): on S-02 the receptionist takes the shift over or signs out. Every
+  // menu link would only lead back to it, so the menu is not offered there.
+  const links = pathname === "/shift/gate" ? [] : navigation;
 
   return (
     <header className="border-b bg-card">
@@ -59,36 +62,40 @@ export function AppHeader({
           <span className="hidden sm:inline">{gymName}</span>
         </Link>
 
-        <nav aria-label={me.nav.menu} className="hidden flex-1 md:block">
-          <ul className="flex items-center gap-1">
-            {navigation.map((item) =>
-              item.children ? (
-                <li key={item.href}>
-                  <SubMenu item={item} isCurrent={isCurrent} />
-                </li>
-              ) : (
-                <li key={item.href}>
-                  <Link
-                    href={item.href}
-                    aria-current={isCurrent(item.href) ? "page" : undefined}
-                    className={cn(
-                      "rounded-lg px-3 py-2 text-sm hover:bg-muted",
-                      isCurrent(item.href) && "bg-muted font-medium",
-                    )}
-                  >
-                    {item.label}
-                  </Link>
-                </li>
-              ),
-            )}
-          </ul>
-        </nav>
+        {links.length ? (
+          <nav aria-label={me.nav.menu} className="hidden flex-1 md:block">
+            <ul className="flex items-center gap-1">
+              {links.map((item) =>
+                item.children ? (
+                  <li key={item.href}>
+                    <SubMenu item={item} isCurrent={isCurrent} />
+                  </li>
+                ) : (
+                  <li key={item.href}>
+                    <Link
+                      href={item.href}
+                      aria-current={isCurrent(item.href) ? "page" : undefined}
+                      className={cn(
+                        "rounded-lg px-3 py-2 text-sm hover:bg-muted",
+                        isCurrent(item.href) && "bg-muted font-medium",
+                      )}
+                    >
+                      {item.label}
+                    </Link>
+                  </li>
+                ),
+              )}
+            </ul>
+          </nav>
+        ) : null}
 
         {/* Doc 08 §9: at 375 px the badge and the name give way (truncate) rather
             than push the page sideways; min-w-0 is what lets flex items shrink. */}
         <div className="ml-auto flex min-w-0 items-center justify-end gap-2">
           <ShiftBadge openShift={openShift} />
-          <MobileNav navigation={navigation} isCurrent={isCurrent} />
+          {links.length ? (
+            <MobileNav navigation={links} isCurrent={isCurrent} />
+          ) : null}
           <DropdownMenu.Root>
             <DropdownMenu.Trigger asChild>
               <Button
