@@ -742,6 +742,11 @@ test("FIN-14: the audit log — actions, changes, filters, the 200 cap, an empty
   await expect(change).toContainText("1995");
   expect(text).toContain("E2E Ana F");
   expect(text).toContain("E2E Vlasnik F");
+  // N-21: the screens' own words, never a database column, an id or a raw value.
+  await expect(change).toContainText("Datum rođenja:");
+  for (const raw of ["date_of_birth", "gym_id", "created_by", "voided_by", "method:", ": cash", "Uplate danas"])
+    expect(text, raw).not.toContain(raw);
+  expect(text).not.toMatch(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/);
 
   const insert = main.locator("tbody tr", { hasText: "Unos" }).first();
   console.log(
@@ -762,8 +767,9 @@ test("FIN-14: the audit log — actions, changes, filters, the 200 cap, an empty
   await page.getByRole("button", { name: "Prikaži" }).last().click();
   await expect(page).toHaveURL(/table=expenses/);
   await expect(main.locator("tbody tr").first()).toBeVisible();
+  // The first line names the table; N-21's second line names the record itself.
   const kinds = await main.locator("tbody tr td:nth-child(4)").allInnerTexts();
-  expect(new Set(kinds.map((k) => k.trim()))).toEqual(new Set(["Troškovi"]));
+  expect(new Set(kinds.map((k) => k.trim().split("\n")[0]))).toEqual(new Set(["Troškovi"]));
   const voidRow = main.locator("tbody tr", { hasText: "Poništeno" }).first();
   console.log(
     `[note] FIN-14 a void entry: ${(await voidRow.innerText()).replace(/\s+/g, " ")}`,

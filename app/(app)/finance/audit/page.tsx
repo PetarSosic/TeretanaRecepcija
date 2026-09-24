@@ -4,9 +4,13 @@ import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
 import { Table, TableWrapper, Td, Th } from "@/components/ui/table";
 import {
-  AuditDiff,
+  AUDITED_TABLES,
+  auditReferences,
+  auditSubject,
+  type AuditLookups,
   type AuditRow,
-} from "@/features/finance/components/audit-diff";
+} from "@/features/finance/audit-format";
+import { AuditDiff } from "@/features/finance/components/audit-diff";
 import { PeriodPicker } from "@/features/finance/components/period-picker";
 import { periodFromParams, periodInstants } from "@/features/finance/period";
 import { requireStaff } from "@/lib/auth";
@@ -19,22 +23,11 @@ export const metadata: Metadata = {
   title: `${me.finance.auditTitle} — ${me.app.name}`,
 };
 
-/** US-24.1: the tables an owner recognises, with the names the glossary uses (doc 02). */
-const TABLES: Record<string, string> = {
-  members: me.nav.members,
-  memberships: me.finance.plan,
-  payments: me.payments.title,
-  visits: me.finance.visits,
-  expenses: me.finance.expensesTitle,
-  stock_movements: me.finance.storageTitle,
-  shifts: me.finance.shiftsTitle,
-  cards: me.nav.cards,
-  plans: me.settings.plansTitle,
-  products: me.settings.productsTitle,
-  trainers: me.nav.trainers,
-  staff: me.nav.users,
-  gym_settings: me.settings.gymTitle,
-};
+/**
+ * US-24.1 and N-21: the audited tables (BR-096), by the names the screens use. Only
+ * these are offered in the filter; a table with no trigger would always list nothing.
+ */
+const TABLES: Record<string, string> = me.audit.tables;
 
 const ACTIONS: Record<string, string> = {
   insert: me.finance.actionInsert,
@@ -42,6 +35,9 @@ const ACTIONS: Record<string, string> = {
   void: me.finance.actionVoid,
   anonymize: me.finance.actionAnonymize,
 };
+
+type Named = { id: string; name: string };
+type Person = { id: string; full_name: string };
 
 /** Doc 08 §9: one screenful of history at a time; the filters narrow it further. */
 const LIMIT = 200;
@@ -88,8 +84,51 @@ export default async function AuditPage({
       .returns<{ id: string; full_name: string }[]>(),
   ]);
 
-  const names = new Map((people.data ?? []).map((row) => [row.id, row.full_name]));
+  const names = new Map(
+    (people.data ?? []).map((row) => [row.id, row.full_name]),
+  );
   const list = rows.data ?? [];
+
+  // N-21: every id an entry points at becomes a name. The member list is fetched by the
+  // ids on the page; the catalogues are small enough to read whole.
+  const ids = auditReferences(list);
+  const [members, plans, trainers, categories, products] = await Promise.all([
+    ids.members.size
+      ? supabase
+          .from("members")
+          .select("id, member_number, first_name, last_name")
+          .in("id", [...ids.members])
+          .returns<
+            {
+              id: string;
+              member_number: number;
+              first_name: string;
+              last_name: string;
+            }[]
+          >()
+      : Promise.resolve({ data: [] }),
+    supabase.from("plans").select("id, name").returns<Named[]>(),
+    supabase.from("trainers").select("id, full_name").returns<Person[]>(),
+    supabase.from("expense_categories").select("id, name").returns<Named[]>(),
+    supabase.from("products").select("id, name").returns<Named[]>(),
+  ]);
+  const lookups: AuditLookups = {
+    staff: names,
+    members: new Map(
+      (members.data ?? []).map((m) => [
+        m.id,
+        `#${m.member_number} ${m.first_name} ${m.last_name}`,
+      ]),
+    ),
+    plans: new Map((plans.data ?? []).map((row) => [row.id, row.name])),
+    trainers: new Map(
+      (trainers.data ?? []).map((row) => [row.id, row.full_name]),
+    ),
+    categories: new Map(
+      (categories.data ?? []).map((row) => [row.id, row.name]),
+    ),
+    products: new Map((products.data ?? []).map((row) => [row.id, row.name])),
+  };
 
   return (
     <div className="grid grid-cols-1 gap-6">
@@ -128,9 +167,9 @@ export default async function AuditPage({
             className="w-52"
           >
             <option value="">{me.finance.allRecords}</option>
-            {Object.entries(TABLES).map(([value, label]) => (
+            {AUDITED_TABLES.map((value) => (
               <option key={value} value={value}>
-                {label}
+                {TABLES[value]}
               </option>
             ))}
           </Select>
@@ -169,10 +208,17 @@ export default async function AuditPage({
                     </Td>
                     <Td className="align-top">{ACTIONS[row.action]}</Td>
                     <Td className="align-top">
-                      {TABLES[row.table_name] ?? row.table_name}
+                      <span className="block">
+                        {TABLES[row.table_name] ?? row.table_name}
+                      </span>
+                      {auditSubject(row, lookups) ? (
+                        <span className="block text-xs text-muted-foreground">
+                          {auditSubject(row, lookups)}
+                        </span>
+                      ) : null}
                     </Td>
                     <Td className="align-top">
-                      <AuditDiff row={row} />
+                      <AuditDiff row={row} lookups={lookups} />
                     </Td>
                   </tr>
                 ))}
