@@ -232,6 +232,8 @@ test.beforeAll(async ({}, workerInfo) => {
 });
 
 test.afterAll(async ({}, workerInfo) => {
+  // 233 members, 300 visits and their audit rows take a while to remove under load.
+  test.setTimeout(120_000);
   if (workerInfo.project.name !== "desktop") return;
   console.log(`[notes]\n${notes.join("\n")}`);
   await deleteTestGym(gymId);
@@ -750,6 +752,11 @@ test("UX-04: the keyboard — Tab through reception, a trapped dialog, Esc, and 
 }) => {
   test.setTimeout(120_000);
   const desk = await signedIn(browser, staff.ana);
+  const csp: string[] = [];
+  desk.on("console", (msg) => {
+    if (msg.type() === "error" && msg.text().includes("Content Security Policy"))
+      csp.push(msg.text().slice(0, 80));
+  });
   await startWork(desk);
   await expect(desk.getByRole("heading", { name: "Skenirajte karticu" })).toBeVisible();
   await desk.evaluate(() => (document.activeElement as HTMLElement | null)?.blur());
@@ -810,6 +817,11 @@ test("UX-04: the keyboard — Tab through reception, a trapped dialog, Esc, and 
   await desk.keyboard.press("Enter");
   const dialog = desk.getByRole("dialog");
   await expect(dialog.getByLabel("Vrsta članarine")).toBeVisible();
+  // N-27: the scroll lock Radix injects carries the nonce, so the policy lets it apply.
+  const locked = await desk.evaluate(() => getComputedStyle(document.body).overflow);
+  note(`UX-04/N-27 page behind the open dialog: overflow ${locked}; CSP errors so far: ${csp.length}`);
+  expect(locked).toBe("hidden");
+  expect(csp).toEqual([]);
   let escaped = 0;
   for (let i = 0; i < 25; i++) {
     await desk.keyboard.press(i < 20 ? "Tab" : "Shift+Tab");

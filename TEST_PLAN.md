@@ -18,8 +18,8 @@ sekciju **7. Otvorena pitanja**.
 > **Dopuna 24.09.2026:** izvršena su sva 22 preostala djelimična slučaja prioriteta **Srednje** i
 > **Nisko** — svi PROŠLI, sedam tek nakon popravki **N-22 do N-26**. N-23 (recepcioner radi u
 > tuđoj smjeni mimo ekrana S-02) zatvoren je u aplikaciji; da li to treba zabraniti i u bazi,
-> pitanje je za vlasnika. Otvoreni su i **N-27** (CSP u produkciji blokira stil dijaloga) i
-> **N-28** (samo lokalni produkcijski test na HTTP-u). Novo stanje: **214 prošlo · 1 palo · 1 djelimično · 1 nije izvršeno**
+> pitanje je za vlasnika. Popravljen je i **N-27** (CSP u produkciji blokirao stil dijaloga);
+> **N-28** se tiče samo lokalnog produkcijskog testa na HTTP-u. Novo stanje: **214 prošlo · 1 palo · 1 djelimično · 1 nije izvršeno**
 > (MEM-07, AUTH-13, AUTH-14). Detalji u **§9.10**.
 
 > **Dopuna 23.09.2026:** izvršeno 18 od 19 slučajeva koji su bili NIJE IZVRŠENO (ostaje samo
@@ -3566,16 +3566,20 @@ Korisnik tastature je poslije Esc bio na početku stranice. `DialogContent` sada
 koja je dijalog otvorila i vraća fokus na nju — nikad u polje za unos, gdje bi uhvatio sljedeće
 skeniranje kartice (REC-15). Regresija: UX-04, uključujući skeniranje odmah poslije zatvaranja.
 
-**N-27 — CSP u produkciji blokira stil koji Radix ubacuje za dijaloge — otvoreno.** Svako
-otvaranje dijaloga u produkcijskom buildu upisuje u konzolu „Applying inline style violates the
-following Content Security Policy directive 'style-src …'“: `react-remove-scroll` (dio Radix
-Dialoga) ubacuje `<style>` bez nonce-a, a politika iz doc 08 §9 ga odbija. Posljedica: greške u
-konzoli i zaključavanje pomjeranja stranice iza dijaloga ne radi kako je zamišljeno. Na dev
-serveru se ne vidi, jer tamo politika dozvoljava inline stilove. Zbog toga u produkcijskom
-buildu padaju MEM-18 i SEC-01 (oni traže nula grešaka u konzoli) — i na čistom HEAD-u, bez
-izmjena iz ove dopune. Popravka traži ili da se nonce preda biblioteci `get-nonce` (nova direktna
-zavisnost), ili da se politika za stilove ublaži; oboje je izmjena steka ili politike, pa nije
-urađeno bez odobrenja.
+**N-27 — CSP u produkciji blokirao je stil koji Radix ubacuje za dijaloge — popravljeno
+(odobrio vlasnik 24.09.2026).** Svako otvaranje dijaloga ili menija u produkcijskom buildu
+upisivalo je u konzolu „Applying inline style violates the following Content Security Policy
+directive 'style-src …'“: `react-remove-scroll` (dio Radixa) ubacuje `<style>` bez nonce-a, a
+politika iz doc 08 §9 ga odbija. Posljedica: greške u konzoli, a stranica iza dijaloga se i dalje
+pomjerala (`overflow: visible`). Na dev serveru se ne vidi, jer tamo politika dozvoljava inline
+stilove; zato su MEM-18 i SEC-01 u produkcijskom buildu padali i na čistom HEAD-u. Popravka:
+`get-nonce` 1.0.1 (paket koji Radix već koristi) sada je direktna zavisnost, a
+`components/common/style-nonce.tsx` mu jednom predaje nonce stranice, pročitan iz njenih
+skripti. Nonce se namjerno ne prosljeđuje iz layouta: dokument zadržava nonce sa kojim je
+učitan, a poslije prijave (klijentska navigacija) layout se renderuje za novi zahtjev sa drugim
+nonce-om — takav pokušaj je i dalje davao grešku. Sada: nula CSP grešaka, stranica iza dijaloga
+zaključana (`overflow: hidden`); MEM-18 i SEC-01 prolaze u produkcijskom buildu. Regresija:
+UX-04 u `test-plan-medium-b.spec.ts`.
 
 **N-28 — `upgrade-insecure-requests` na lokalnom produkcijskom serveru (samo test okruženje).**
 Produkcijska politika traži nadogradnju na HTTPS. Kad proxy odgovori preusmjerenjem na RSC
@@ -3610,6 +3614,7 @@ SHIFT-08 prolazi. Nije mijenjano; zabilježeno da se rezultati produkcijskih E2E
 | `screens.spec.ts`, 375 px, sa novom provjerom | **20/20** |
 | Cijeli E2E, oba projekta, produkcijski build | **270 prošlo**, 5 palo, 17 nije pokrenuto (serijski nastavci palih), 148 preskočeno (mobilne varijante i opt-in poslovi). PERM-10 i SET-10/12/13 pala su zbog N-23 (proxy je i API rutu slao na S-02; test je radio na pultu bez preuzimanja smjene) — ispravljeno, `test-plan-high-a` i `test-plan-high-e` ponovo **13/13**. SHIFT-08, MEM-18 i SEC-01 padaju i na čistom HEAD-u (N-27, N-28). |
 | `test-plan-critical`, `test-plan-extra`, `test-plan-security` na dev serveru | **27/27**, uključujući tri gornja i 17 ranije nepokrenutih |
+| Cijeli E2E ponovo, produkcijski build, poslije N-27 | **287 prošlo**, 1 palo (SHIFT-08, N-28), 4 nije pokrenuto (serijski nastavci SHIFT-08, na dev serveru prolaze), 148 preskočeno. MEM-18 i SEC-01 sada prolaze i u produkcijskom buildu. |
 | `npm run lint`, `npm run typecheck` | PROŠLO |
 | `npm run test` | **161/161** (+1 preskočen) |
 | `npm run test:db` | **14/14 fajlova** |
