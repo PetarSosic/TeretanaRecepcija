@@ -164,7 +164,7 @@ RPCs raise `P0001` with the message `E_<CODE>`. `lib/errors.ts` maps each code t
 **Resend:**
 - Sender address: `EMAIL_FROM` = `noreply@stamenkovicc.com` (BR-161). Before go-live, add the Resend DNS records (SPF, DKIM) for `stamenkovicc.com` and confirm the domain shows as verified in Resend.
 - **Shift report** (BR-117):
-  - to: `gym_settings.shift_report_emails`;
+  - to: `gym_settings.shift_report_emails` and every active owner with an email (D-65);
   - PDF attachment named `smjena-<yyyy-mm-dd>-<ime>.pdf`;
   - body: `U prilogu je izvještaj smjene <ime> (<period>). Očekivana gotovina: <iznos>. Prebrojano: <iznos|nije prebrojano>.`
 - **Expiry reminder** (BR-160):

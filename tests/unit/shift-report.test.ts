@@ -7,7 +7,8 @@ vi.mock("server-only", () => ({}));
 
 const { renderShiftReport, closeTypeLabel } =
   await import("@/lib/pdf/shift-report");
-const { reportEmail, reportFileName } = await import("@/lib/shift-report");
+const { reportEmail, reportFileName, reportRecipients } =
+  await import("@/lib/shift-report");
 const { sendEmail } = await import("@/lib/email/send");
 
 /** E15, with a receptionist and a member whose names carry every Montenegrin letter. */
@@ -176,5 +177,20 @@ describe("BR-161: sending", () => {
     await expect(
       sendEmail({ to: ["a@example.invalid"], subject: "x", text: "y" }),
     ).resolves.toBe("skipped");
+  });
+});
+
+describe("D-65: the report also goes to the owners", () => {
+  it("adds every active owner to the settings list, each address once", () => {
+    expect(
+      reportRecipients(
+        ["recepcija@kp.me", " Vlasnik@kp.me "],
+        ["vlasnik@kp.me", "drugi.vlasnik@kp.me"],
+      ),
+    ).toEqual(["recepcija@kp.me", "Vlasnik@kp.me", "drugi.vlasnik@kp.me"]);
+  });
+  it("still reaches the owner when the settings list is empty", () => {
+    expect(reportRecipients([], ["vlasnik@kp.me"])).toEqual(["vlasnik@kp.me"]);
+    expect(reportRecipients([], [])).toEqual([]);
   });
 });

@@ -52,8 +52,27 @@ export function reportEmail(report: ShiftReport) {
 }
 
 /**
+ * D-65 (OQ-6, decided 24.09.2026): the shift report goes to the addresses in the gym's
+ * settings and always to every active owner who has an email, each address once.
+ */
+export function reportRecipients(
+  listed: readonly string[],
+  owners: readonly string[],
+): string[] {
+  const seen = new Set<string>();
+  return [...listed, ...owners]
+    .map((address) => address.trim())
+    .filter((address) => {
+      const key = address.toLowerCase();
+      if (!address || seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+}
+
+/**
  * BR-114 step 4 and BR-117/118: render the PDF, store it in `shift-reports`, email it to
- * `shift_report_emails`, and record the outcome on the shift. It runs after the shift is
+ * `shift_report_emails` and the owners (D-65), and record the outcome on the shift. It runs after the shift is
  * already closed and never throws, so a report problem can never undo a close.
  *
  * The service role is used because the report holds every record of the shift (other
@@ -81,14 +100,27 @@ export async function deliverShiftReport(
     if (upload.error) throw new Error(`report upload: ${upload.error.message}`);
     path = target;
 
-    const { data: settings } = await admin
-      .from("gym_settings")
-      .select("shift_report_emails")
-      .eq("gym_id", report.shift.gym_id)
-      .maybeSingle<{ shift_report_emails: string[] }>();
+    const [{ data: settings }, { data: owners }] = await Promise.all([
+      admin
+        .from("gym_settings")
+        .select("shift_report_emails")
+        .eq("gym_id", report.shift.gym_id)
+        .maybeSingle<{ shift_report_emails: string[] }>(),
+      admin
+        .from("staff")
+        .select("email")
+        .eq("gym_id", report.shift.gym_id)
+        .eq("role", "owner")
+        .eq("is_active", true)
+        .not("email", "is", null)
+        .returns<{ email: string }[]>(),
+    ]);
     const email = reportEmail(report);
     const sent = await sendEmail({
-      to: settings?.shift_report_emails ?? [],
+      to: reportRecipients(
+        settings?.shift_report_emails ?? [],
+        (owners ?? []).map((owner) => owner.email),
+      ),
       subject: email.subject,
       text: email.text,
       attachments: [{ filename: reportFileName(report), content: pdf }],

@@ -353,7 +353,7 @@ Every rule has an ID. Code comments and tests must reference these IDs, e.g. `//
   - **Open visits** at close time: count.
 
   Email:
-  - recipients: gym setting `shift_report_emails`;
+  - recipients: gym setting `shift_report_emails`, plus every active owner who has an email (D-65);
   - subject: `Izvještaj smjene – <ime> – <dd.mm.yyyy> <HH:mm>–<HH:mm>`;
   - short text body, with the PDF attached.
 - **BR-118 (email failure):**

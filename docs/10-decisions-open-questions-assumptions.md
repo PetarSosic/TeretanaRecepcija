@@ -28,6 +28,7 @@ These are decisions made by Mihajlo (M) or the gym owner (O) during specificatio
 | D-58 | A fourth role, `admin`, sits above `owner`. It has every owner permission and is additionally the only role that may create, edit, deactivate and set passwords for owners and other admins, and the only role that may read stored staff passwords (D-59). | O |
 | D-59 | Staff passwords are stored in readable form beside the Supabase bcrypt hash, in an admin-only table, so the admin can look up any employee password. The owner was told that Supabase keeps only a one-way hash, and that a readable copy exposes every staff password to anyone who obtains the database or a backup ZIP, and accepted that risk on 18.09.2026. The readable copy is kept for staff accounts only, never for members, and is never exposed to any other role, any log or any report. | O |
 | D-64 | The shift report names whoever closed the shift: `Zaključio/la <ime>` from `closed_by`, so an owner closing a shift on S-19 is no longer reported as the receptionist. Takeover (`Preuzeo/la <ime>`) and automatic close are unchanged; S-19 shows the same name. No schema change: `close_shift` already records the caller. Confirmed by the gym owner, 23.09.2026. | O |
+| D-67 | A receptionist who signs in while another receptionist's shift is open is held on S-02 by the app: every page leads back to `/shift/gate`, which shows no menu, until the shift is taken over (BR-111, N-23). The database does **not** check whose shift a receptionist's money RPC lands in; the owner decided on 24.09.2026 that the app-level gate is enough. | O |
 | D-60 | An owner may not deactivate their own account, and the last active owner may not be deactivated. The same protection applies to the last active admin. This keeps the gym from losing account administration. | O |
 | D-06 | Only receptionists have shifts; their login opens a shift. | M |
 | D-07 | One open shift per gym. | M |
@@ -56,6 +57,7 @@ These are decisions made by Mihajlo (M) or the gym owner (O) during specificatio
 | D-16 | The "start after the old one ends" rule applies whenever the plans share an access type. | M |
 | D-17 | Unpaid visits are linked only if the new plan covers their type. | M |
 | D-18 | A member without gym coverage may still enter the gym, as an unpaid visit with a warning. | M |
+| D-66 | A member's first and last name may not contain emoji (the shift report's font cannot print them, N-16). The form says `Ime ne smije sadržati emoji.` / `Prezime ne smije sadržati emoji.`, and `clean_member()` refuses them too (migration 0028). Letters of any script, digits and punctuation stay allowed. Decided by the owner, 24.09.2026. | O |
 | D-19 | With several covering memberships, the receptionist chooses. | M |
 | D-F7 | …with the earliest-ending one preselected. | M |
 | D-20 | "3x nedeljno" is a label only. | M |
@@ -102,6 +104,7 @@ These are decisions made by Mihajlo (M) or the gym owner (O) during specificatio
 | D-44 | The UI uses ijekavica. | M |
 | D-45 | Reception runs Chrome on desktop at 1366×768 or larger; the owner uses a phone at 375 px or wider. | M |
 | D-46 | The scan result appears within 1 second. | M |
+| D-65 | The shift report (BR-117) goes to the addresses in `shift_report_emails` **and always to every active owner who has an email**, each address once, so removing the owner from S-27 cannot stop it. It is the only financial report the app emails; the weekly backup keeps its own recipients. Resolves OQ-6. Decided by the owner, 24.09.2026. | O |
 
 ### Earlier owner answers (September 2026)
 | ID | Decision | By |
@@ -118,14 +121,13 @@ These are decisions made by Mihajlo (M) or the gym owner (O) during specificatio
 | D-O10 | The database starts clean; nothing is imported. | O |
 
 ## 2. Open questions
-Resolved and removed: OQ-3 (now D-F8) and OQ-4 (now D-F9). The remaining IDs keep their numbers.
+Resolved and removed: OQ-3 (now D-F8), OQ-4 (now D-F9) and OQ-6 (now D-65). The remaining IDs keep their numbers.
 
 | ID | Question | Temporary behaviour | Where |
 |---|---|---|---|
 | OQ-1 | What is Julija's personal-training arrangement? | Fee `null`, shares "nije definisano" | BR-020, BR-155 |
 | OQ-2 | Should the personal minimum price differ per trainer? | One gym-wide minimum (€80) | BR-012, BR-059 |
 | OQ-5 | Vercel Hobby is for non-commercial use. Which host is used for production? | Hobby during development | 08 §1 |
-| OQ-6 | When the app goes live, should the shift report also go to the owner? | Only mihajlo@stamenkovicc.com; editable in S-27 | BR-012 |
 
 ## 3. Assumptions (made by the author, not confirmed by the owner)
 | ID | Assumption | Where |
