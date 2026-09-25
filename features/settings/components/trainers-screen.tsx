@@ -16,7 +16,7 @@ import {
   saveTrainer,
   saveTrainerFee,
 } from "../catalog-actions";
-import { ActionDialog, InlineForm } from "./action-dialog";
+import { ActionDialog, InlineForm, useInlineAction } from "./action-dialog";
 
 export type Trainer = {
   id: string;
@@ -143,11 +143,7 @@ function TrainersSection({
                 <tr key={trainer.id}>
                   <Td className="font-medium">{trainer.full_name}</Td>
                   <Td>{trainer.is_active ? me.users.yes : me.users.no}</Td>
-                  {canSeeFees ? (
-                    <Td colSpan={2}>
-                      <TrainerFeeForm trainer={trainer} />
-                    </Td>
-                  ) : null}
+                  {canSeeFees ? <TrainerFeeCells trainer={trainer} /> : null}
                   <Td className="text-right">
                     <Button
                       variant="outline"
@@ -224,12 +220,18 @@ function TrainerFields({
 /**
  * BR-004: both are prices, so a change applies to new sales only.
  * D-62: an empty group share means the plan's percentage applies.
+ *
+ * Each field sits under its own column header. A form cannot span table cells, so the
+ * share field and the button join the fee cell's form through the `form` attribute
+ * and one save still sends both values.
  */
-function TrainerFeeForm({ trainer }: { trainer: Trainer }) {
+function TrainerFeeCells({ trainer }: { trainer: Trainer }) {
+  const [formAction, pending] = useInlineAction(saveTrainerFee);
+  const formId = `trainer-fee-${trainer.id}`;
   return (
-    <InlineForm action={saveTrainerFee} className="flex items-center gap-2">
-      {(pending) => (
-        <>
+    <>
+      <Td>
+        <form id={formId} action={formAction}>
           <input type="hidden" name="trainerId" value={trainer.id} />
           <Input
             name="fee"
@@ -244,7 +246,12 @@ function TrainerFeeForm({ trainer }: { trainer: Trainer }) {
             aria-label={me.settings.trainerFee}
             className="h-9 w-32"
           />
+        </form>
+      </Td>
+      <Td>
+        <div className="flex items-center gap-2">
           <Input
+            form={formId}
             name="groupSharePct"
             defaultValue={
               trainer.group_share_pct ? Number(trainer.group_share_pct) : ""
@@ -254,12 +261,18 @@ function TrainerFeeForm({ trainer }: { trainer: Trainer }) {
             inputMode="decimal"
             className="h-9 w-28"
           />
-          <Button type="submit" variant="outline" size="sm" disabled={pending}>
+          <Button
+            form={formId}
+            type="submit"
+            variant="outline"
+            size="sm"
+            disabled={pending}
+          >
             {me.common.save}
           </Button>
-        </>
-      )}
-    </InlineForm>
+        </div>
+      </Td>
+    </>
   );
 }
 

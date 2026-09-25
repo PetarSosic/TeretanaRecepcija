@@ -99,6 +99,25 @@ function ActionForm({
   );
 }
 
+/**
+ * The action behind an inline form, for a row whose fields sit in separate table
+ * cells and so reach one form through the `form` attribute.
+ */
+export function useInlineAction(
+  action: (state: ActionState, formData: FormData) => Promise<ActionState>,
+) {
+  const [state, formAction, pending] = useActionState(action, idleState);
+  // N-13: an inline form has no field to put a message under, so a refused field is
+  // reported as a toast instead of being dropped. Memoised on the state, because the
+  // toast effect fires on every new object it is given.
+  const reported = useMemo(() => {
+    const fieldError = Object.values(state.fieldErrors ?? {}).find(Boolean);
+    return !state.error && fieldError ? { ...state, error: fieldError } : state;
+  }, [state]);
+  useActionToast(reported);
+  return [formAction, pending] as const;
+}
+
 /** A form that submits on its own, used for the assignment checkboxes and toggles. */
 export function InlineForm({
   action,
@@ -109,15 +128,7 @@ export function InlineForm({
   children: (pending: boolean) => ReactNode;
   className?: string;
 }) {
-  const [state, formAction, pending] = useActionState(action, idleState);
-  // N-13: an inline form has no field to put a message under, so a refused field is
-  // reported as a toast instead of being dropped. Memoised on the state, because the
-  // toast effect fires on every new object it is given.
-  const reported = useMemo(() => {
-    const fieldError = Object.values(state.fieldErrors ?? {}).find(Boolean);
-    return !state.error && fieldError ? { ...state, error: fieldError } : state;
-  }, [state]);
-  useActionToast(reported);
+  const [formAction, pending] = useInlineAction(action);
   return (
     <form action={formAction} className={className}>
       {children(pending)}

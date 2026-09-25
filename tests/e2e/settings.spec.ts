@@ -66,6 +66,16 @@ test("US-22.1 AC3: the owner sees the trainer fee column and can change it", asy
     }),
   ).toBeVisible();
 
+  // D-62: the group share field sits under its own header, not beside the fee.
+  const shareHeader = await page
+    .getByRole("columnheader", { name: "Udio za grupne (%)" })
+    .boundingBox();
+  const shareField = await page
+    .getByRole("row", { name: "E2E Trenerka" })
+    .getByLabel("Udio za grupne (%)")
+    .boundingBox();
+  expect(shareField!.x).toBeGreaterThanOrEqual(shareHeader!.x);
+
   const feeField = page.getByLabel(
     "Naknada teretani po personalnom klijentu (€)",
   );
