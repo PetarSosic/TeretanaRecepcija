@@ -32,7 +32,7 @@ Every rule has an ID. Code comments and tests must reference these IDs, e.g. `//
 | Grupni (3x nedeljno) | group | 1 month | €69 | group | group 12 | €0 | 70 | yes |
 | G+T (Grupni + Teretana) | combo | 1 month | €99 | gym + group | group 12 | €50 | 100 | yes |
 | Personalni | personal | 1 month | entered at sale (≥ personal minimum) | personal | personal: entered at sale (1–50) | trainer fee | — | yes |
-| Dnevna karta | day_pass | — | €10 per person | — | — | — | — | no |
+| Dnevna karta | day_pass | — | €15 per person (D-70) | — | — | — | — | no |
 
 - **BR-011:** "3x nedeljno" in the Grupni name is a label only. There is **no weekly limit**, only the 12-session limit.
 - **BR-012:** Other seeded settings:

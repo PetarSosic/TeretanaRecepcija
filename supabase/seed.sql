@@ -39,7 +39,7 @@ begin
     ('G+T (Grupni + Teretana)','combo',          1::smallint,  'month',                99,          true,  true,  false, null,           12::smallint,   true,  10),
     -- BR-010: the Personalni price and session count are entered at sale.
     ('Personalni',            'personal',        1::smallint,  'month',              null,          false, false, true,  null,           null,           true,  11),
-    ('Dnevna karta',          'day_pass',     null::smallint,  null,                   10,          false, false, false, null,           null,           false, 12)
+    ('Dnevna karta',          'day_pass',     null::smallint,  null,                   15,          false, false, false, null,           null,           false, 12)
   ) as seed (name, kind, duration_value, duration_unit, price, covers_gym, covers_group,
              covers_personal, gym_visit_limit, group_session_limit, requires_trainer, sort_order)
   where not exists (

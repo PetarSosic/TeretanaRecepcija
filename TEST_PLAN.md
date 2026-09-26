@@ -133,7 +133,7 @@ postavite npr. `Lozinka5678`.
    pritisnete **Enter**.
 2. **Planovi (iz seeda, BR-010):** Nedeljna 39 €, Dvonedeljna 49 €, Mjesečna 79 €, Mjesečna 12
    termina 59 €, Studentska mjesečna 49 €, Tromjesečna 200 €, Šestomjesečna 400 €, Godišnja 790 €,
-   Grupni (3x nedeljno) 69 €, G+T 99 €, Personalni (cijena se unosi), Dnevna karta 10 €.
+   Grupni (3x nedeljno) 69 €, G+T 99 €, Personalni (cijena se unosi), Dnevna karta 15 €.
 3. **Treneri:** Milena (grupni), Julija (grupni + personalni), Tamara (grupni + personalni),
    Tatjana (personalni). Naknada teretani: Tamara 80 €, Tatjana 80 €, Milena i Julija „nije definisano“.
 4. **Raspored:** Milena uto/čet/sub 08:00 i 18:00; Julija pon/sri/pet 08:30; Tamara pon/sri/pet 19:00.
@@ -1464,13 +1464,13 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 
 ### [PAY-01] Prodaja dnevnih karata (happy path)
 - **Prioritet:** Kritično
-- **Uloga / preduslovi:** otvorena smjena; plan „Dnevna karta“ postoji (10 €)
+- **Uloga / preduslovi:** otvorena smjena; plan „Dnevna karta“ postoji (15 €)
 - **Koraci:** `/reception` → [Dnevna karta] → strelicom [Jedna više] postavite 3 → [Gotovina] →
   [Naplati].
 - **Test podaci:** 3 karte
-- **Očekivani rezultat:** dok mijenjate količinu, red „Ukupno: …“ se osvježava (3 × 10 = 30,00 €).
-  Nakon čuvanja poruka „Prodato: 3 × dnevna karta = 30,00 €“. Na `/payments/today` je stavka
-  „Dnevna karta × 3“ na 30,00 €.
+- **Očekivani rezultat:** dok mijenjate količinu, red „Ukupno: …“ se osvježava (3 × 15 = 45,00 €).
+  Nakon čuvanja poruka „Prodato: 3 × dnevna karta = 45,00 €“. Na `/payments/today` je stavka
+  „Dnevna karta × 3“ na 45,00 €.
 - **Gdje provjeriti:** UI; `/payments/today`
 - [x] Prošlo  [ ] Palo  Napomena: **22.09.2026 — PROŠLO.** E2E payments.spec.ts + DB 0008: dnevne karte i trošak pulta, iznosi i zapisi u bazi.
 

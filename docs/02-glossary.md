@@ -64,7 +64,7 @@ Use these terms **exactly** in the documents, code and UI.
 | Payment | `payment` | Uplata | Money received for a membership, day passes or a card replacement. |
 | Payment kind | `payment_kind` | — | `membership`, `day_pass`, `card_replacement`. |
 | Payment method | `payment_method` | Način plaćanja: **Gotovina** / **Platna kartica** | `cash`, `card`. |
-| Day pass | plan kind `day_pass` | Dnevna karta | Single-day entry sold by quantity, without a name or check-in. Default €10. |
+| Day pass | plan kind `day_pass` | Dnevna karta | Single-day entry sold by quantity, without a name or check-in. Default €15 (D-70). |
 | Sale (bar) | `stock_movement.type = 'out'` | Prodaja | A product sold at the desk. It is income. |
 | Income | computed | Prihod | Non-voided payments plus non-voided sales. |
 | Expense | `expense` | Trošak | Money spent. |

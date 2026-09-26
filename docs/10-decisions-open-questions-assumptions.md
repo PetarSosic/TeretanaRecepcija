@@ -48,6 +48,7 @@ These are decisions made by Mihajlo (M) or the gym owner (O) during specificatio
 | D-14 | Voiding a membership sale voids the membership; its visits become unpaid. | M |
 | D-15 | Only the owner may back-date. | M |
 | D-26 | Grupni costs €69 for 12 sessions (fixed price). | M/O |
+| D-70 | A day pass (Dnevna karta) costs **€15** per person, not €10. BR-010, the glossary and the seed default now say €15, and the live KP Fitness plan price was changed from 10.00 to 15.00 in the hosted database (the `plans_audit` trigger recorded it in Dnevnik izmjena). As BR-004 requires, day passes already sold keep their €10. Decided by the owner, 26.09.2026. | O |
 | D-27 | Revenue is counted by payment date. | M |
 | D-F5 | Personal training has one gym-wide minimum (default €80, editable); the receptionist enters the amount per member. | M |
 | D-F6 | Owner back-dated entries include membership sales. | M |
