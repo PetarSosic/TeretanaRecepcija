@@ -105,7 +105,9 @@ export function useCheckInFlow({
             kind: "confirm",
             visitId: outcome.visit_id,
             member: outcome.member,
-            seconds: outcome.seconds,
+            // BR-072: a second desk's scan can start its transaction a moment before
+            // the first desk's check-in, and would read "prije -1 s".
+            seconds: Math.max(0, outcome.seconds),
           });
           return true;
         case "checked_out":
