@@ -30,13 +30,16 @@ export function pdfText(pdf: Buffer): string {
   const cmapOf = (id: string): Map<string, string> => {
     const map = new Map<string, string>();
     const text = objects.get(id)?.stream ?? "";
+    // A ligature maps to several units written with spaces: <0004><0066 0069> is "fi".
     const utf16 = (hex: string) =>
       String.fromCodePoint(
-        ...(hex.match(/.{4}/g) ?? []).map((unit) => parseInt(unit, 16)),
+        ...(hex.replace(/\s/g, "").match(/.{4}/g) ?? []).map((unit) =>
+          parseInt(unit, 16),
+        ),
       );
     for (const block of text.matchAll(/beginbfchar([\s\S]*?)endbfchar/g))
       for (const pair of block[1].matchAll(
-        /<([0-9a-fA-F]+)>\s*<([0-9a-fA-F]+)>/g,
+        /<([0-9a-fA-F]+)>\s*<([0-9a-fA-F\s]+)>/g,
       ))
         map.set(pair[1].toLowerCase(), utf16(pair[2]));
     for (const block of text.matchAll(/beginbfrange([\s\S]*?)endbfrange/g))

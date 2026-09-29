@@ -1,6 +1,7 @@
 import QRCode from "qrcode";
 import { describe, expect, it } from "vitest";
 import { formatCardCode, renderCardSheet } from "@/lib/pdf/card-sheet";
+import { pdfText } from "../e2e/pdf-text";
 
 // S-28 and US-03.1 AC2: the printed card must be an ID-1 card, 85.6 × 54 mm, ten to a
 // page. The PDF is rendered for real and its page geometry is read back, so a layout
@@ -63,6 +64,19 @@ describe("S-28: the card sheet", () => {
     expect(A4_WIDTH - sheetWidth).toBeCloseTo(2 * 19.4 * MM, 0);
     expect(A4_HEIGHT - sheetHeight).toBeCloseTo(2 * 13.5 * MM, 0);
   });
+
+  it("D-71: prints the gym name, the handle, the code and the name label", async () => {
+    const pdf = await renderCardSheet({
+      codes: ["4801234567"],
+      gymName: "KP Fitness",
+    });
+    // Runs are joined, since the helper may break a line between two of them.
+    const text = pdfText(pdf).replace(/\n/g, "");
+    expect(text).toContain("KP Fitness");
+    expect(text).toContain("@kpfitness.me");
+    expect(text).toContain("480 123 4567");
+    expect(text).toContain("Ime i prezime:");
+  }, 60_000);
 
   it("renders Montenegrin letters with the embedded font", async () => {
     // Doc 08 §7: č ć š ž đ must survive; an unembedded font would throw or drop them.

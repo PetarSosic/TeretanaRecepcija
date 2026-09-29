@@ -3,8 +3,9 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
-import { ChevronDown, Dumbbell, Menu } from "lucide-react";
+import { ChevronDown, Menu } from "lucide-react";
 import { useRef, useState } from "react";
+import { BrandMark } from "@/components/common/brand-mark";
 import {
   Dialog,
   DialogClose,
@@ -56,9 +57,7 @@ export function AppHeader({
     <header className="border-b bg-card">
       <div className="mx-auto flex max-w-7xl items-center gap-4 px-4 py-3 sm:px-6">
         <Link href="/" className="flex items-center gap-2 font-semibold">
-          <span className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-            <Dumbbell aria-hidden="true" className="size-4" />
-          </span>
+          <BrandMark className="h-7" />
           <span className="hidden sm:inline">{gymName}</span>
         </Link>
 
