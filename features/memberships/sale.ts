@@ -12,7 +12,9 @@ export function saleFieldsFrom(formData: FormData) {
     planId: formData.get("planId") ?? "",
     planKind: formData.get("planKind") ?? "",
     requiresTrainer: formData.get("requiresTrainer") ?? "false",
+    coversGroup: formData.get("coversGroup") ?? "false",
     trainerId: formData.get("trainerId") ?? "",
+    classTime: formData.get("classTime") ?? "",
     sessions: formData.get("sessions") ?? "",
     amount: formData.get("amount") ?? "",
     method: formData.get("method") ?? "",
@@ -25,6 +27,11 @@ export function saleArguments(value: SaleFields) {
   return {
     p_plan: value.planId,
     p_trainer: value.requiresTrainer ? value.trainerId : null,
+    // D-71: the database checks it is one of that trainer's active times.
+    p_class_time:
+      value.requiresTrainer && value.coversGroup
+        ? (value.classTime ?? null)
+        : null,
     p_amount: value.amount,
     p_sessions: value.planKind === "personal" ? value.sessions : null,
     p_method: value.method,

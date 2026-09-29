@@ -39,6 +39,10 @@ insert into trainer_programs (gym_id, trainer_id, program_id) values
   ('66666666-0000-0000-0000-00000000b001', '66666666-0000-0000-0000-00000000d001', '66666666-0000-0000-0000-00000000e002'),
   ('66666666-0000-0000-0000-00000000b001', '66666666-0000-0000-0000-00000000d002', '66666666-0000-0000-0000-00000000e002'),
   ('66666666-0000-0000-0000-00000000b001', '66666666-0000-0000-0000-00000000d003', '66666666-0000-0000-0000-00000000e001');
+-- D-71: Tamara's group class on Mondays at 19:00, the fixed time a G+T sale needs.
+insert into class_slots (gym_id, program_id, trainer_id, weekday, starts_at) values
+  ('66666666-0000-0000-0000-00000000b001', '66666666-0000-0000-0000-00000000e001',
+   '66666666-0000-0000-0000-00000000d001', 1, '19:00');
 
 -- BR-010 plans: f001 Mjesečna, f002 Nedeljna, f003 Personalni, f004 G+T,
 -- f005 Mjesečna 12 termina, f006 Dnevna karta.
@@ -392,8 +396,9 @@ set local role authenticated;
 
 select lives_ok(
   $$select sell_membership('66666666-0000-0000-0000-000000020004',
-      '66666666-0000-0000-0000-00000000f004', '66666666-0000-0000-0000-00000000d001', null, null, 'cash')$$,
-  'BR-058: G+T is sold with a group trainer');
+      '66666666-0000-0000-0000-00000000f004', '66666666-0000-0000-0000-00000000d001', null, null, 'cash',
+      null, '19:00')$$,
+  'BR-058 and D-71: G+T is sold with a group trainer and her fixed class time');
 reset role;
 select is(
   (select mf.gym_fixed_amount || '|' || mf.trainer_share_pct from membership_finance mf

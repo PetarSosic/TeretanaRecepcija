@@ -1457,6 +1457,26 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Gdje provjeriti:** UI; `/payments/today`
 - [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-high-c.spec.ts`: prodaja Mjesečne za 79 €, cijena plana promijenjena na 89 (uz napomenu „Promjena cijene važi samo za nove prodaje.“), nova prodaja 89 €; u bazi i na S-12 stara uplata ostaje 79,00 €. Cijena vraćena na 79. Raniji dokaz (22.09.): DB 0006/0007: datumi BR-052, prestari dolasci, vlasnikova prava, E14 kraj mjeseca, limiti/statusi, smjena i finansijski snapshot. Ovo potvrđuje baznu logiku, ne sve korake/poruke UI slučaja.
 
+### [MSHIP-18] Fiksni termin za Grupni i G+T (D-71, BR-058a)
+- **Prioritet:** Visoko
+- **Uloga / preduslovi:** Recepcioner, otvorena smjena; u rasporedu (S-24) Milena ima aktivne
+  časove uto/čet/sub u 08:00 i 18:00, Tamara pon/sri/pet u 19:00, a Julija nijedan aktivan čas.
+- **Koraci:** 1) Novi član → `Grupni (3x nedeljno)` → Trener Milena, pa Tamara, pa Julija.
+  2) Sa Milenom sačuvajte bez termina, pa sa terminom `Uto, čet, sub · 18:00`. 3) Na profilu
+  člana [Promijeni termin] → `Uto, čet, sub · 08:00` → [Sačuvaj]. 4) [Produži] na toj članarini.
+- **Test podaci:** —
+- **Očekivani rezultat:** 1) „Fiksni termin“ se pojavljuje tek kad je trener izabran i nudi samo
+  njegove termine (Milena: dva, Tamara: `Pon, sri, pet · 19:00`); za Juliju polja nema, a stoji
+  „Trener nema nijedan aktivan termin u rasporedu, pa se članarina ne može prodati. …“ i član se ne
+  čuva. Za `Mjesečna` polja nema. 2) Bez termina: „Izaberite fiksni termin.“; sa terminom se član
+  čuva. 3) Dijalog prikazuje „Trenutni termin: Uto, čet, sub · 18:00“ i samo Milenine termine;
+  poslije čuvanja „Termin sačuvan.“, bez nove uplate, a promjena je u Dnevniku izmjena
+  („Fiksni termin: 18:00 → 08:00“). 4) Predloženi su isti plan, Milena i `Uto, čet, sub · 08:00`.
+- **Gdje provjeriti:** UI; `memberships.class_time`; `/finance/audit`
+- [x] Prošlo  [ ] Palo  Napomena: **29.09.2026 — PROŠLO.** `class-time.spec.ts` (oba projekta) i
+  DB `0014_class_time` (36 tvrdnji: prodaja, registracija, naknadni unos, promjena, neaktivni čas i
+  program, istekla, poništena i anonimizovana članarina, druga teretana, dnevnik, prava).
+
 ---
 
 

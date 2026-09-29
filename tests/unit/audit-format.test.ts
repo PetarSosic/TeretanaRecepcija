@@ -126,6 +126,17 @@ describe("auditChanges (N-21)", () => {
     expect(auditSubject(voided, lookups)).toBe("Kirija: septembar");
   });
 
+  it("shows a changed fixed class time as hours and minutes (D-71)", () => {
+    const moved = row(
+      "memberships",
+      "update",
+      { plan_id: "p1", member_id: "m1", class_time: "08:00:00" },
+      { plan_id: "p1", member_id: "m1", class_time: "18:00:00" },
+    );
+    expect(lines(moved)).toEqual(["Fiksni termin: 08:00 → 18:00"]);
+    expect(auditSubject(moved, lookups)).toBe("Mjesečna – #12 Marko Marković");
+  });
+
   it("reads plan kinds, percentages, units, times, lists and the logo", () => {
     expect(
       lines(

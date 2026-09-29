@@ -128,6 +128,8 @@ RPCs raise `P0001` with the message `E_<CODE>`. `lib/errors.ts` maps each code t
 | E_MEMBER_HAS_OPEN_VISIT | `Član je već u teretani.` |
 | E_TRAINER_REQUIRED | `Izaberite trenera.` |
 | E_TRAINER_NOT_ASSIGNED | `Trener nije dodijeljen ovom programu.` |
+| E_CLASS_TIME_REQUIRED | `Izaberite fiksni termin.` (D-71) |
+| E_CLASS_TIME_INVALID | `Izabrani termin nije među aktivnim terminima ovog trenera.` (D-71) |
 | E_AMOUNT_BELOW_MIN | `Iznos ne može biti manji od {min} €.` |
 | E_AMOUNT_LOCKED | `Samo vlasnik može mijenjati iznos.` |
 | E_RECORD_NOT_EDITABLE | `Ova stavka se ne može mijenjati (smjena je zaključena).` |

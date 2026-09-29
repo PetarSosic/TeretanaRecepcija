@@ -20,8 +20,13 @@ import {
 import { me } from "@/lib/i18n/me";
 import { previewMembership, type MembershipPreview } from "../actions";
 import type { SaleCatalog, SalePlan } from "../catalog";
+import { classTimesOf } from "../class-time";
+import { ClassTimeSelect } from "./class-time-select";
 
 export type TrainerDefaults = Partial<Record<"group" | "personal", string>>;
+
+/** D-71: per trainer, the class time of the member's latest membership with them. */
+export type ClassTimeDefaults = Record<string, string>;
 
 /** BR-023: the program kind whose trainers a plan of this kind may take. */
 function trainerKind(kind: SalePlan["kind"]): "group" | "personal" {
@@ -48,6 +53,7 @@ export function MembershipFields({
   memberId,
   defaultPlanId,
   trainerDefaults = {},
+  classTimeDefaults = {},
   fieldErrors = {},
   idPrefix,
 }: {
@@ -55,13 +61,27 @@ export function MembershipFields({
   memberId: string | null;
   defaultPlanId?: string;
   trainerDefaults?: TrainerDefaults;
+  classTimeDefaults?: ClassTimeDefaults;
   fieldErrors?: Record<string, string>;
   idPrefix: string;
 }) {
+  // D-71: the member's earlier time with this trainer, while it is still scheduled.
+  function suggestedClassTime(trainer: string): string {
+    const earlier = classTimeDefaults[trainer];
+    return classTimesOf(catalog.classTimes, trainer).some(
+      (time) => time.starts_at === earlier,
+    )
+      ? earlier
+      : "";
+  }
+
   const initialPlan = catalog.plans.find((plan) => plan.id === defaultPlanId);
   const [planId, setPlanId] = useState(initialPlan?.id ?? "");
   const [trainerId, setTrainerId] = useState(
     initialPlan ? (trainerDefaults[trainerKind(initialPlan.kind)] ?? "") : "",
+  );
+  const [classTime, setClassTime] = useState(() =>
+    trainerId ? suggestedClassTime(trainerId) : "",
   );
   const [sessions, setSessions] = useState("");
   const [amount, setAmount] = useState("");
@@ -77,6 +97,11 @@ export function MembershipFields({
   const isPersonal = plan?.kind === "personal";
   const trainers = plan
     ? catalog.trainers.filter((trainer) => trainer[trainerKind(plan.kind)])
+    : [];
+  // D-71 (BR-058a): Grupni and G+T take one of the chosen trainer's class times.
+  const needsClassTime = Boolean(plan?.requires_trainer && plan.covers_group);
+  const classTimes = trainerId
+    ? classTimesOf(catalog.classTimes, trainerId)
     : [];
   const override = editingStart ? parseDateInput(startText) : null;
 
@@ -106,7 +131,7 @@ export function MembershipFields({
     const suggested = next
       ? trainerDefaults[trainerKind(next.kind)]
       : undefined;
-    setTrainerId(
+    chooseTrainer(
       suggested &&
         next &&
         catalog.trainers.some(
@@ -116,6 +141,11 @@ export function MembershipFields({
         ? suggested
         : "",
     );
+  }
+
+  function chooseTrainer(id: string) {
+    setTrainerId(id);
+    setClassTime(id ? suggestedClassTime(id) : "");
   }
 
   const amountValue = isPersonal
@@ -136,6 +166,11 @@ export function MembershipFields({
         type="hidden"
         name="requiresTrainer"
         value={String(plan?.requires_trainer ?? false)}
+      />
+      <input
+        type="hidden"
+        name="coversGroup"
+        value={String(plan?.covers_group ?? false)}
       />
 
       {/* 1. Vrsta članarine */}
@@ -176,7 +211,7 @@ export function MembershipFields({
             id={`${idPrefix}-trainer`}
             name="trainerId"
             value={trainerId}
-            onChange={(event) => setTrainerId(event.target.value)}
+            onChange={(event) => chooseTrainer(event.target.value)}
             aria-invalid={Boolean(fieldErrors.trainerId)}
             aria-describedby={`${idPrefix}-trainer-error`}
           >
@@ -193,6 +228,17 @@ export function MembershipFields({
             {fieldErrors.trainerId}
           </FieldError>
         </div>
+      ) : null}
+
+      {/* 2a. Fiksni termin: only the chosen trainer's active times (D-71, BR-058a) */}
+      {needsClassTime && trainerId ? (
+        <ClassTimeSelect
+          id={`${idPrefix}-class-time`}
+          options={classTimes}
+          value={classTime}
+          onChange={setClassTime}
+          error={fieldErrors.classTime}
+        />
       ) : null}
 
       {/* 3. Broj termina (Personalni only, BR-059) */}

@@ -115,6 +115,23 @@ test.beforeAll(async ({}, workerInfo) => {
       .select("trainer_id"),
     "Test assignments",
   );
+  // D-71: Tamara's group class, the fixed time a Grupni or G+T sale needs.
+  const groupProgram = programs.find((p) => p.kind === "group")!.id;
+  await must(
+    admin
+      .from("class_slots")
+      .insert(
+        [1, 3, 5].map((weekday) => ({
+          gym_id: gymId,
+          program_id: groupProgram,
+          trainer_id: trainer.tamara,
+          weekday,
+          starts_at: "19:00",
+        })),
+      )
+      .select("id"),
+    "Test class slots",
+  );
   const base = {
     gym_id: gymId,
     duration_value: 1,
@@ -266,6 +283,8 @@ async function sell(
   planId: string,
   options: {
     trainer?: string;
+    /** D-71: the Fiksni termin a Grupni or G+T sale needs. */
+    classTime?: string;
     amount?: string;
     sessions?: string;
     method: "Gotovina" | "Platna kartica";
@@ -280,6 +299,8 @@ async function sell(
   await dialog.getByLabel("Vrsta članarine").selectOption(planId);
   if (options.trainer)
     await dialog.getByLabel("Trener").selectOption(options.trainer);
+  if (options.classTime)
+    await dialog.getByLabel("Fiksni termin").selectOption(options.classTime);
   if (options.sessions)
     await dialog.getByLabel("Broj termina").fill(options.sessions);
   if (options.amount)
@@ -322,10 +343,12 @@ test("the desk's day: four sales and a voided day pass (data for the owner's scr
   await sell(page, member["Mjesečni"], plan.mjesecna, { method: "Gotovina" });
   await sell(page, member["Grupni"], plan.grupni, {
     trainer: trainer.tamara,
+    classTime: "19:00:00",
     method: "Platna kartica",
   });
   await sell(page, member["Kombinovani"], plan.gt, {
     trainer: trainer.tamara,
+    classTime: "19:00:00",
     method: "Platna kartica",
   });
   await sell(page, member["Personalni"], plan.personalni, {

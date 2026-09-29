@@ -122,7 +122,7 @@ An `admin` sees everything an owner sees (D-58).
 **Buttons:** [Nova članarina] [Izgubljena kartica] [Ručna prijava] or [Ručna odjava] (depending on whether a visit is open) [Uredi podatke]. The owner also sees [Anonimiziraj].
 
 **Tabs:**
-- `Članarine`: plan, trainer, Od, Važi do, status, and remaining sessions per limited type. [Produži] on each non-voided membership.
+- `Članarine`: plan, trainer, Od, Važi do, status, and remaining sessions per limited type. [Produži] on each non-voided membership. [Promijeni termin] beside it on each group membership (covers group, has a trainer) that is neither voided nor expired (D-71, BR-058a): a dialog `Promijeni termin` showing the plan, the trainer and `Trenutni termin: <termin>` (or `nije upisan`), the `Fiksni termin` select with that trainer's active times, and [Sačuvaj] [Otkaži]. On success the toast `Termin sačuvan.` Nothing is charged.
 - `Uplate`: owners see everything. Others see today's non-back-dated payments. Columns: date, kind, plan, amount, method, entered by, and status (Poništeno).
 - `Dolasci`: as in US-07.2.
 
@@ -134,6 +134,7 @@ An `admin` sees everything an owner sees (D-58).
 **Fields, in order:**
 1. `Vrsta članarine`: a select with the name and price (Personalni shows "iznos po dogovoru").
 2. `Trener`: shown if required, filtered by BR-023.
+2a. `Fiksni termin` (D-71, BR-058a): for plans that cover group training and require a trainer, shown once a trainer is chosen. A select (`Izaberite termin`) of only that trainer's active class times, e.g. `Uto, čet, sub · 08:00`. If the trainer has none, the select is replaced by `Trener nema nijedan aktivan termin u rasporedu, pa se članarina ne može prodati. Vlasnik ili menadžer dodaje ili aktivira časove u Podešavanja → Treneri i raspored.` and the sale cannot be saved.
 3. `Broj termina`: Personalni only, 1–50.
 4. `Iznos (€)`:
    - read-only for list-price plans (the owner sees an edit pencil);
@@ -239,7 +240,7 @@ An `admin` sees everything an owner sees (D-58).
 
 **Tab rules:**
 - Dolazak: requires a member, check-in and check-out times, the type, and the trainer/slot when needed.
-- Članarina: works like S-08, with an editable start date and payment date.
+- Članarina: works like S-08 (the `Fiksni termin` of D-71 included), with an editable start date and payment date.
 
 **Banner:** `Naknadni unos – ne ulazi u smjenu.`
 

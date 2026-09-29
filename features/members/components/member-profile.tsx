@@ -17,7 +17,11 @@ import { MoneyButton } from "@/components/common/money-button";
 import { Button } from "@/components/ui/button";
 import { Table, TableWrapper, Td, Th } from "@/components/ui/table";
 import type { SaleCatalog } from "@/features/memberships/catalog";
-import type { TrainerDefaults } from "@/features/memberships/components/membership-fields";
+import { ClassTimeDialog } from "@/features/memberships/components/class-time-dialog";
+import type {
+  ClassTimeDefaults,
+  TrainerDefaults,
+} from "@/features/memberships/components/membership-fields";
 import { SellDialog } from "@/features/memberships/components/sell-dialog";
 import { beginCheckIn, checkOut } from "@/features/reception/actions";
 import { useCheckInFlow } from "@/features/reception/components/check-in-flow";
@@ -43,6 +47,8 @@ export type ProfileMembership = {
   plan_is_active: boolean;
   trainer_id: string | null;
   trainer_name: string | null;
+  /** D-71: the fixed class time of a group membership, "08:00:00". */
+  class_time: string | null;
   start_date: string;
   end_date: string;
   status: keyof typeof me.memberships.status;
@@ -146,6 +152,29 @@ function trainerDefaultsOf(memberships: ProfileMembership[]): TrainerDefaults {
   return defaults;
 }
 
+/** D-71: per trainer, the fixed class time of the member's latest membership with them. */
+function classTimeDefaultsOf(
+  memberships: ProfileMembership[],
+): ClassTimeDefaults {
+  const defaults: ClassTimeDefaults = {};
+  const latestFirst = [...memberships].sort((a, b) =>
+    a.start_date < b.start_date ? 1 : -1,
+  );
+  for (const { trainer_id, class_time } of latestFirst)
+    if (trainer_id && class_time) defaults[trainer_id] ??= class_time;
+  return defaults;
+}
+
+/** D-71: a group membership's time can change until it is voided or has expired. */
+function classTimeChangeable(membership: ProfileMembership): boolean {
+  return (
+    membership.covers_group &&
+    membership.trainer_id !== null &&
+    membership.status !== "voided" &&
+    membership.status !== "expired"
+  );
+}
+
 /** S-07 (US-07.2): the member, their card, and the three history tabs. */
 export function MemberProfile({
   member,
@@ -179,6 +208,8 @@ export function MemberProfile({
   const [dialog, setDialog] = useState<
     "edit" | "anonymize" | "lostCard" | null
   >(null);
+  const [changingClassTime, setChangingClassTime] =
+    useState<ProfileMembership | null>(null);
   const readOnly = member.is_anonymized;
   const router = useRouter();
   const toast = useToast();
@@ -196,6 +227,7 @@ export function MemberProfile({
   }
   const fullName = `${member.first_name} ${member.last_name}`;
   const trainerDefaults = trainerDefaultsOf(memberships);
+  const classTimeDefaults = classTimeDefaultsOf(memberships);
   const visitPages = Math.max(1, Math.ceil(visitTotal / visitsPerPage));
 
   const tabs: { id: ProfileTab; label: string }[] = [
@@ -383,24 +415,38 @@ export function MemberProfile({
                     <Td>{me.memberships.status[membership.status]}</Td>
                     <Td>{remainingText(membership)}</Td>
                     <Td className="text-right">
-                      {/* US-08.2: [Produži] on every membership that is not voided. */}
-                      {membership.status !== "voided" && !readOnly ? (
-                        <MoneyButton
-                          type="button"
-                          size="sm"
-                          variant="outline"
-                          aria-label={`${me.members.renew} ${membership.plan_name}`}
-                          onClick={() =>
-                            setSelling({
-                              planId: membership.plan_is_active
-                                ? membership.plan_id
-                                : undefined,
-                            })
-                          }
-                        >
-                          {me.members.renew}
-                        </MoneyButton>
-                      ) : null}
+                      <div className="flex justify-end gap-2">
+                        {/* D-71: [Promijeni termin] beside [Produži], no new sale. */}
+                        {classTimeChangeable(membership) && !readOnly ? (
+                          <Button
+                            type="button"
+                            size="sm"
+                            variant="outline"
+                            aria-label={`${me.memberships.changeClassTime} ${membership.plan_name}`}
+                            onClick={() => setChangingClassTime(membership)}
+                          >
+                            {me.memberships.changeClassTime}
+                          </Button>
+                        ) : null}
+                        {/* US-08.2: [Produži] on every membership that is not voided. */}
+                        {membership.status !== "voided" && !readOnly ? (
+                          <MoneyButton
+                            type="button"
+                            size="sm"
+                            variant="outline"
+                            aria-label={`${me.members.renew} ${membership.plan_name}`}
+                            onClick={() =>
+                              setSelling({
+                                planId: membership.plan_is_active
+                                  ? membership.plan_id
+                                  : undefined,
+                              })
+                            }
+                          >
+                            {me.members.renew}
+                          </MoneyButton>
+                        ) : null}
+                      </div>
                     </Td>
                   </tr>
                 ))
@@ -577,6 +623,18 @@ export function MemberProfile({
         catalog={catalog}
         defaultPlanId={selling?.planId}
         trainerDefaults={trainerDefaults}
+        classTimeDefaults={classTimeDefaults}
+      />
+      <ClassTimeDialog
+        open={changingClassTime !== null}
+        onOpenChange={(open) => !open && setChangingClassTime(null)}
+        memberId={member.id}
+        membership={
+          changingClassTime?.trainer_id
+            ? { ...changingClassTime, trainer_id: changingClassTime.trainer_id }
+            : null
+        }
+        classTimes={catalog.classTimes}
       />
       <EditMemberDialog
         open={dialog === "edit"}

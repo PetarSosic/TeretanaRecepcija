@@ -45,6 +45,7 @@ Use these terms **exactly** in the documents, code and UI.
 | Program | `program` | Program | A kind of training trainers can be assigned to (e.g. "Grupni trening"). Kind `group` or `personal`. |
 | Trainer assignment | `trainer_program` | Dodjela trenera | A link saying a trainer runs a program. |
 | Class slot | `class_slot` | Čas (u rasporedu) | A weekly scheduled group class: program + trainer + weekday + start time. |
+| Fixed class time | `class_time` | Fiksni termin | The group class a member attends, stored on a Grupni or G+T membership (D-71, BR-058a): one start time of the membership's trainer, together with every weekday that trainer's active group classes start then. Shown as `Uto, čet, sub · 08:00`. |
 
 ## Visits
 | Term | Code | UI label | Definition |
@@ -116,7 +117,7 @@ Use these terms **exactly** in the documents, code and UI.
 | Avoid | Use instead |
 |---|---|
 | "Kartica" alone | "Članska kartica" (member card) or "Platna kartica" (payment method) |
-| "Termin" for a visit | "Dolazak". "Termin" means only a session unit. |
+| "Termin" for a visit | "Dolazak". "Termin" alone means a session unit. The member's group class is "Fiksni termin" (D-71), shortened to "termin" only in S-07's [Promijeni termin] and its dialog. |
 | "Paket" | "Vrsta članarine" (plan) or "Članarina" (membership) |
 | "Zalihe", "Storage" in UI | "Magacin" |
 | "Admin" | "Vlasnik" (owner) |

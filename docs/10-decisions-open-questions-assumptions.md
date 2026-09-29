@@ -63,6 +63,7 @@ These are decisions made by Mihajlo (M) or the gym owner (O) during specificatio
 | D-19 | With several covering memberships, the receptionist chooses. | M |
 | D-F7 | …with the earliest-ending one preselected. | M |
 | D-20 | "3x nedeljno" is a label only. | M |
+| D-71 | Selling a plan that covers group training (Grupni, G+T) records the member's **fixed class time** (`Fiksni termin`), chosen after the trainer in S-05, S-08 and S-22 (BR-058a). The select offers only the chosen trainer's active group times, one entry per start time with every weekday it is held (`Uto, čet, sub · 08:00`). A trainer with no active time cannot be sold. The time is stored on the membership (`memberships.class_time`, migration 0030); any role may change it later from S-07 ([Promijeni termin] beside [Produži]) to another time of the same trainer, with no new sale, and the change is audited. [Produži] proposes the previous time. What the stored time is used for beyond S-07 (a column on the profile, the check-in default, a list of members per class) is to be decided later. Decided 29.09.2026. | O |
 | D-21 | The nearest class slot is preselected and can be changed. | M |
 | D-22 | Revenue goes to the membership's trainer; the session count goes to the visit's trainer. | M |
 | D-23 | One group program "Grupni trening" shared by Milena, Julija and Tamara. | M |

@@ -615,6 +615,16 @@ export const me = {
     card: "Platna kartica",
     submit: "Naplati i sačuvaj",
     saved: "Članarina sačuvana.",
+    // D-71: the group member's fixed class time.
+    classTime: "Fiksni termin",
+    classTimePlaceholder: "Izaberite termin",
+    noClassTimes:
+      "Trener nema nijedan aktivan termin u rasporedu, pa se članarina ne može prodati. Vlasnik ili menadžer dodaje ili aktivira časove u Podešavanja → Treneri i raspored.",
+    weekdaysShort: ["pon", "uto", "sri", "čet", "pet", "sub", "ned"],
+    changeClassTime: "Promijeni termin",
+    currentClassTime: "Trenutni termin: {value}",
+    classTimeNone: "nije upisan",
+    classTimeSaved: "Termin sačuvan.",
     // BR-052 reason texts that the preview shows before the RPC stores them; the
     // database writes the same words (migration 0012).
     reasonToday: "Počinje danas",
@@ -882,6 +892,7 @@ export const me = {
       member_id: "Član",
       plan_id: "Plan",
       trainer_id: "Trener",
+      class_time: "Fiksni termin",
       category_id: "Kategorija",
       product_id: "Proizvod",
       member_number: "Broj člana",
@@ -1014,6 +1025,9 @@ export const me = {
     E_MEMBER_HAS_OPEN_VISIT: "Član je već u teretani.",
     E_TRAINER_REQUIRED: "Izaberite trenera.",
     E_TRAINER_NOT_ASSIGNED: "Trener nije dodijeljen ovom programu.",
+    E_CLASS_TIME_REQUIRED: "Izaberite fiksni termin.",
+    E_CLASS_TIME_INVALID:
+      "Izabrani termin nije među aktivnim terminima ovog trenera.",
     E_AMOUNT_BELOW_MIN: "Iznos ne može biti manji od {min} €.",
     E_AMOUNT_LOCKED: "Samo vlasnik može mijenjati iznos.",
     E_RECORD_NOT_EDITABLE:

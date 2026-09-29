@@ -229,6 +229,7 @@ create table memberships (
   member_id              uuid not null references members(id),
   plan_id                uuid not null references plans(id),
   trainer_id             uuid references trainers(id),
+  class_time             time,                             -- D-71, BR-058a: Fiksni termin
   start_date             date not null,
   end_date               date not null,                    -- last valid day, inclusive (BR-051)
   start_reason           text not null,                    -- BR-052 reason text
@@ -247,7 +248,8 @@ create table memberships (
   void_reason            text,
   check (end_date >= start_date),
   check (is_backdated = (shift_id is null)),
-  check ((voided_at is null) = (void_reason is null))
+  check ((voided_at is null) = (void_reason is null)),
+  check (class_time is null or (covers_group and trainer_id is not null))  -- D-71
 );
 create index memberships_member_idx on memberships (member_id, end_date desc);
 
@@ -473,11 +475,12 @@ All RPCs are `security definer`. Each one:
 | `scan_card(p_code text)` → json `{result, member, open_visit, options, candidates, unpaid_count}` | all | BR-070–073 (check-out happens inside, unless the guard applies) |
 | `check_in(p_member uuid, p_type visit_type, p_membership uuid, p_trainer uuid, p_slot uuid, p_manual bool)` → json | all | BR-071–079 |
 | `check_out(p_visit uuid, p_confirmed bool)` → json | all | BR-072 |
-| `register_member(p_card_code, p_first, p_last, p_phone, p_email, p_dob, p_plan, p_trainer, p_amount, p_sessions, p_method, p_check_in bool)` → json | all | BR-033, BR-040–043, BR-050–060 |
+| `register_member(p_card_code, p_first, p_last, p_phone, p_email, p_dob, p_plan, p_trainer, p_amount, p_sessions, p_method, p_check_in bool, p_class_time time default null)` → json | all | BR-033, BR-040–043, BR-050–060, BR-058a |
 | `find_duplicates(p_phone, p_email)` → rows | all | BR-043 |
 | `update_member(p_member, …)` | all | BR-045 |
 | `anonymize_member(p_member)` | owner | BR-046 |
-| `sell_membership(p_member, p_plan, p_trainer, p_amount, p_sessions, p_method, p_start_override date default null)` | all (override: owner) | BR-050–060, BR-092 |
+| `sell_membership(p_member, p_plan, p_trainer, p_amount, p_sessions, p_method, p_start_override date default null, p_class_time time default null)` | all (override: owner) | BR-050–060, BR-058a, BR-092 |
+| `set_membership_class_time(p_membership uuid, p_class_time time)` → membership | all | BR-058a (D-71) |
 | `sell_day_passes(p_qty, p_method)` | all | BR-100 |
 | `replace_card(p_member, p_new_code, p_method)` | all | BR-034 |
 | `correct_payment(p_payment, p_method, p_note, p_amount default null)` | all (amount: owner) | BR-094 |
@@ -488,7 +491,7 @@ All RPCs are `security definer`. Each one:
 | `stock_in(p_product, p_qty, p_unit_cost, p_from_till bool)` | all | BR-141 |
 | `stock_sale(p_product, p_qty, p_method)` | all | BR-142 |
 | `correct_sale(p_movement, p_method)`, `void_stock_movement(p_movement, p_reason)` | per BR-094 and BR-095 | |
-| `backdated_visit(…)`, `backdated_membership(…)`, `backdated_day_passes(…)`, `backdated_card_fee(…)` | owner | BR-120 |
+| `backdated_visit(…)`, `backdated_membership(…, p_class_time time default null)`, `backdated_day_passes(…)`, `backdated_card_fee(…)` | owner | BR-120, BR-058a |
 | `generate_card_batch(p_qty)` → batch | owner, manager | BR-030, BR-036 |
 | `upsert_trainer`, `upsert_program`, `set_trainer_program`, `upsert_class_slot` | owner, manager | BR-023–026 |
 | `set_trainer_fee(p_trainer, p_fee, p_group_share_pct)`, `upsert_plan` (incl. finance), `upsert_product`, `upsert_expense_category`, `update_gym_settings` | owner | BR-004, BR-131, BR-140, D-62 |
