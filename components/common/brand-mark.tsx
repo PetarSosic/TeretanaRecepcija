@@ -7,7 +7,7 @@ import {
 import { cn } from "@/lib/utils";
 
 /**
- * D-71: the KP mark. It always sits next to the gym name, which carries the meaning,
+ * D-73: the KP mark. It always sits next to the gym name, which carries the meaning,
  * so the mark itself is decorative. Size it by height; the width follows.
  */
 export function BrandMark({ className }: { className?: string }) {

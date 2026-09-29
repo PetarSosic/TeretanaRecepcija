@@ -268,7 +268,7 @@ export const me = {
     download: "Preuzmi PDF",
     empty: "Nema generisanih serija.",
     nameLabel: "Ime i prezime:",
-    // D-71: printed under the gym name on every card.
+    // D-73: printed under the gym name on every card.
     handle: "@kpfitness.me",
     pdfTitle: "KP Fitness – kartice",
   },

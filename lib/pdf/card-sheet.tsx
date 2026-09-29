@@ -33,7 +33,7 @@ import { me } from "@/lib/i18n/me";
  * S-28 card sheet: A4 portrait, ten cards per page in two columns of five, each
  * 85.6 × 54 mm — the ID-1 size — with thin grey cut lines.
  *
- * D-71 gives the card the gym's look: a cream card inside a bronze frame with soft
+ * D-73 gives the card the gym's look: a cream card inside a bronze frame with soft
  * waves, the KP mark beside the gym name and handle, the QR code on the right and the
  * name line along the bottom. Doc 08 §7 asks for embedded fonts with full Latin
  * Extended support so č ć š ž đ render: EB Garamond for the gym name and the name
@@ -210,7 +210,7 @@ function CutLines({ count }: { count: number }) {
   );
 }
 
-/** D-71: the cream card, its soft waves and the bronze frame. */
+/** D-73: the cream card, its soft waves and the bronze frame. */
 function CardBackground() {
   const left = FRAME_INSET;
   const top = FRAME_INSET;
@@ -270,7 +270,7 @@ function CardBackground() {
   );
 }
 
-/** D-71: the KP mark in the bronze of the gym's printed logo. */
+/** D-73: the KP mark in the bronze of the gym's printed logo. */
 function KpMark() {
   return (
     <Svg

@@ -4,7 +4,7 @@ Routes are in English; every visible text is in Montenegrin (ijekavica). Text in
 
 ## 1. Global layout and patterns
 - **Header:**
-  - the KP mark and the gym name (D-71);
+  - the KP mark and the gym name (D-73);
   - navigation (role-based, §2);
   - shift badge `Smjena: <ime> od <HH:mm>`, or `Nema otvorene smjene` in grey;
   - user menu with Promijeni lozinku and Odjava.
@@ -288,7 +288,7 @@ An `admin` sees everything an owner sees (D-58).
 
 **Print PDF layout:**
 - A4 portrait, 10 cards (2 columns × 5 rows), each 85.6 × 54 mm, with thin grey dashed cut lines.
-- **Look (D-71):** a cream card with soft beige waves on the right, inside a thin bronze frame with rounded corners.
+- **Look (D-73):** a cream card with soft beige waves on the right, inside a thin bronze frame with rounded corners.
 - **Card content:**
   - at the top left: the KP mark (the gym logo without the FITNESS lettering; a logo uploaded on S-27 takes its place), a thin vertical divider, then the gym name in a serif and `@kpfitness.me` under it;
   - QR code of 30 × 30 mm on the right, in a thin bronze frame (error correction M, quiet zone ≥ 2 modules, dark brown on near-white);

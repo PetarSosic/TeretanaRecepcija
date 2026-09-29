@@ -1,5 +1,5 @@
 /**
- * D-71: the KP Fitness mark — the K and P monogram of the gym's logo, without the
+ * D-73: the KP Fitness mark — the K and P monogram of the gym's logo, without the
  * FITNESS lettering, since the gym name is always written beside it. One path, so the
  * app header, the sign-in screen, the favicon and the card sheet (S-28) draw the same
  * shape at any size.

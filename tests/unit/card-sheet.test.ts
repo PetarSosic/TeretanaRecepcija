@@ -65,7 +65,7 @@ describe("S-28: the card sheet", () => {
     expect(A4_HEIGHT - sheetHeight).toBeCloseTo(2 * 13.5 * MM, 0);
   });
 
-  it("D-71: prints the gym name, the handle, the code and the name label", async () => {
+  it("D-73: prints the gym name, the handle, the code and the name label", async () => {
     const pdf = await renderCardSheet({
       codes: ["4801234567"],
       gymName: "KP Fitness",

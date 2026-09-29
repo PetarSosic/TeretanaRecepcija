@@ -7,7 +7,7 @@ import {
   type TestStaff,
 } from "./fixtures";
 
-// Temporary: screenshots of the KP mark on S-01 and in the header (D-71).
+// Temporary: screenshots of the KP mark on S-01 and in the header (D-73).
 const SHOTS =
   "C:/Users/Mihajlo/AppData/Local/Temp/claude/C--Users-Mihajlo-Desktop-Projekti-TeretanaRecepcija/3702e9a2-ddd4-485e-8b2b-05dbef20bcce/scratchpad";
 const PASSWORD = "brendlozinka1";
