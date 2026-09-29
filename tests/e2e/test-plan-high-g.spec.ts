@@ -102,6 +102,20 @@ test.beforeAll(async ({}, workerInfo) => {
       .select("trainer_id"),
     "Test assignment",
   );
+  // D-71 (BR-058a): a group plan is sold only with a fixed class time of the trainer.
+  await must(
+    admin
+      .from("class_slots")
+      .insert({
+        gym_id: gymId,
+        program_id: program.id,
+        trainer_id: tamara,
+        weekday: 1,
+        starts_at: "19:00",
+      })
+      .select("id"),
+    "Test class slot",
+  );
   const base = {
     gym_id: gymId,
     duration_value: 1,
@@ -335,7 +349,11 @@ async function sell(
     dialog.getByLabel("Vrsta članarine"),
   );
   await dialog.getByLabel("Vrsta članarine").selectOption(planId);
-  if (trainer) await dialog.getByLabel("Trener").selectOption(trainer);
+  if (trainer) {
+    await dialog.getByLabel("Trener").selectOption(trainer);
+    // D-71: the trainer's one class time, after the "Izaberite termin" placeholder.
+    await dialog.getByLabel("Fiksni termin").selectOption({ index: 1 });
+  }
   await dialog.getByText(method, { exact: true }).click();
   await dialog.getByRole("button", { name: "Naplati i sačuvaj" }).click();
   await expect(page.getByText("Članarina sačuvana.").first()).toBeVisible();
