@@ -56,7 +56,6 @@ const SCREENS = [
   { path: "/finance/audit", name: "S-21 Dnevnik", role: "owner" },
   { path: "/finance/backdated", name: "S-22 Naknadni unos", role: "owner" },
   { path: "/settings/plans", name: "S-25 Planovi", role: "owner" },
-  { path: "/settings/products", name: "S-26 Proizvodi", role: "owner" },
   { path: "/settings/gym", name: "S-27 Podešavanja", role: "owner" },
 ] as const;
 

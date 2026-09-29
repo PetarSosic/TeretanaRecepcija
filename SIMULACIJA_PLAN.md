@@ -128,7 +128,7 @@ Logo.
 - [ ] Dnevna karta nema trajanje.
 - [ ] Deaktiviraj „Godišnja“ (vraća se u C2).
 
-**A4 · `/settings/products`** → [Dodaj proizvod]: Izotonik (nabavna i prodajna cijena).
+**A4 · `/storage`** → [Dodaj proizvod]: Izotonik (nabavna i prodajna cijena). (D-76: ekran Proizvodi je ukinut.)
 - [ ] Voda i Izotonik su u tabeli.
 
 **A5 · `/settings/trainers`**

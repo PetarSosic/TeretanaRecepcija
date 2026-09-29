@@ -87,7 +87,8 @@ These are decisions made by Mihajlo (M) or the gym owner (O) during specificatio
 ### Storage and expenses
 | ID | Decision | By |
 |---|---|---|
-| D-32 | The owner manages products and prices. | M |
+| D-32 | ~~The owner manages products and prices.~~ **Superseded by D-76 on 29.09.2026.** | M |
+| D-76 | Products are added and edited on **S-13 Magacin** by every role but the receptionist: the owner, the admin and the manager get [Dodaj proizvod] beside the title and [Uredi] on each row (name, purchase and sale price, active), and find deactivated products under [Prikaži neaktivne] to bring them back. The separate screen S-26 Proizvodi (`/settings/products`) and its Podešavanja item are removed, since they showed the same products. The manager now has the owner's product rights, including changing a sale price (P-42, BR-140); `upsert_product` allows the manager (migration 0034). A receptionist still sees, sells and receives products (P-40, P-41). Supersedes D-32. Decided 29.09.2026. | O |
 | D-33 | The receptionist enters the purchase price from the invoice but cannot change the sale price. | M |
 | D-34 | Sales that would make stock negative are blocked. | M |
 | D-35 | A stock-in creates the "Roba za prodaju" expense; profit = income − expenses. | M |

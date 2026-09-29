@@ -184,11 +184,9 @@ select throws_ok(
   'E_FORBIDDEN',
   'BR-026: a manager cannot set a trainer fee'
 );
-select throws_ok(
+select lives_ok(
   $$select upsert_product(null, 'pgTAP Voda', 0.30::numeric, 1.50::numeric, true)$$,
-  'P0001',
-  'E_FORBIDDEN',
-  'BR-140: a manager cannot add a product'
+  'BR-140 (D-76): a manager may add a product'
 );
 
 -- D-62: the trainer group share overrides the plan percentage ------------------

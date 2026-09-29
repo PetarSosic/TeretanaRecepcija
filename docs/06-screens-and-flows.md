@@ -26,13 +26,13 @@ Routes are in English; every visible text is in Montenegrin (ijekavica). Text in
 | Članovi | `/members` | ✓ | ✓ | ✓ |
 | Treneri | `/trainers` | ✓ | ✓ | ✓ (D-72) |
 | Uplate danas | `/payments/today` | ✓ | ✓ | ✓ |
-| Magacin | `/storage` | ✓ | ✓ | ✓ |
+| Magacin | `/storage` | ✓ (adds and edits products, D-76) | ✓ (adds and edits products, D-76) | ✓ |
 | Zaključi smjenu | `/shift/close` | ✗ | ✗ | ✓ |
 | Statistika dolazaka | `/stats/visits` | ✓ | ✓ | ✗ |
 | Finansije | `/finance/*` | ✓ | ✗ | ✗ |
 | Podešavanja | `/settings/*` | ✓ (all) | ✓ (Korisnici, Treneri i raspored, Kartice) | ✗ |
 
-The Podešavanja item for S-24 is labelled `Treneri i raspored`, the screen's title, so it is not confused with the top-level `Treneri` (S-29, D-72).
+The Podešavanja item for S-24 is labelled `Treneri i raspored`, the screen's title, so it is not confused with the top-level `Treneri` (S-29, D-72). Podešavanja has no `Proizvodi` item any more: products are added and edited on Magacin (D-76).
 
 An `admin` sees everything an owner sees (D-58).
 
@@ -180,9 +180,12 @@ An `admin` sees everything an owner sees (D-58).
 
 ## S-13 Magacin — `/storage`
 - **Table:** Proizvod, Stanje, Nabavna cijena, Prodajna cijena, and actions [Prodaja] [Nova roba]. Active products only.
+- **Products (D-76, P-42), for every role but the receptionist:**
+  - [Dodaj proizvod] beside the title, and [Uredi] on each row. Both open the product dialog: Naziv, Nabavna cijena (€), Prodajna cijena (€), Aktivan, with the info text `Promjena cijene važi samo za nove prodaje.` (BR-004, BR-140).
+  - Under the table, when any product is inactive, [Prikaži neaktivne (N)] shows the table `Neaktivni proizvodi` (Proizvod, Nabavna cijena, Prodajna cijena, [Uredi]). Ticking Aktivan there brings a product back. The button then reads [Sakrij neaktivne (N)].
 - **Prodaja dialog:** quantity (max = stock), `Ukupno`, and the method buttons.
 - **Nova roba dialog:** quantity, `Nabavna cijena po komadu (sa fakture)` (minimum €0.01; validation: `Nabavna cijena mora biti najmanje 0,01 €.`), the choice `Plaćanje: Iz kase / Van kase`, and `Ukupno`.
-- **Empty text:** `Nema proizvoda. Vlasnik dodaje proizvode u Podešavanjima.`
+- **Empty text:** `Nema proizvoda. Dodaje ih vlasnik ili menadžer.`
 
 ## S-14 Close shift — `/shift/close` (receptionist)
 **Summary cards (BR-115):**
@@ -267,9 +270,8 @@ An `admin` sees everything an owner sees (D-58).
 - **Editing:** name, price, duration, coverage, limits, gym fixed amount, share %, trainer required, active, sort order.
 - **Info text:** `Promjena cijene važi samo za nove prodaje.`
 
-## S-26 Products — `/settings/products` (owner)
-- **Table:** name, current purchase price, sale price, active.
-- **Button:** [Dodaj proizvod].
+## S-26 Products — removed (D-76)
+The screen `/settings/products` and its Podešavanja item are gone. It showed the same products as S-13 with [Dodaj proizvod] and [Uredi], and those now live on S-13. The route answers 404 for every role.
 
 ## S-27 Gym settings — `/settings/gym` (owner)
 **Fields:**

@@ -511,7 +511,8 @@ All RPCs are `security definer`. Each one:
 | `backdated_visit(…)`, `backdated_membership(…, p_class_time time default null)`, `backdated_day_passes(…)`, `backdated_card_fee(…)` | owner | BR-120, BR-058a |
 | `generate_card_batch(p_qty)` → batch | owner, manager | BR-030, BR-036 |
 | `upsert_trainer`, `upsert_program`, `set_trainer_program`, `upsert_class_slot` | owner, manager | BR-023–026 |
-| `set_trainer_fee(p_trainer, p_fee, p_group_share_pct)`, `upsert_plan` (incl. finance), `upsert_product`, `upsert_expense_category`, `update_gym_settings` | owner | BR-004, BR-131, BR-140, D-62 |
+| `set_trainer_fee(p_trainer, p_fee, p_group_share_pct)`, `upsert_plan` (incl. finance), `upsert_expense_category`, `update_gym_settings` | owner | BR-004, BR-131, BR-140, D-62 |
+| `upsert_product` | owner, manager (D-76) | BR-140, P-42 |
 | `job_nightly(p_gym)` → shift ids to report | service role only | BR-082, BR-116 |
 | `job_auto_checkout()` → number of visits closed, for every gym | pg_cron and service role only | BR-082a (D-74) |
 | `job_expiring_memberships(p_gym)` → rows | service role only | BR-160 |

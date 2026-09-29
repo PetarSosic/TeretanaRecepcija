@@ -154,7 +154,8 @@ Covered by US-04.4, BR-078 and BR-079.
 - AC3: Stock-in with "Iz kase" reduces expected cash (E18).
 - AC4: Stock-in with a zero or negative purchase price is rejected by both the form and the RPC, without creating a stock movement or an expense. The minimum purchase price is €0.01 (D-55).
 
-**US-15.2** As the owner, I manage products (S-26) and see stock value and bar profit (S-20).
+**US-15.2** As the owner, I manage products and see stock value and bar profit (S-20).
+- AC1 (D-76): The owner, the admin and the manager add products with [Dodaj proizvod] and edit them with [Uredi] on S-13 Magacin, and bring back deactivated ones under [Prikaži neaktivne]. A receptionist sees neither. There is no separate products screen.
 
 ## F-16 Shift close and report
 **US-16.1** As a receptionist, I close my shift (BR-114) on S-14.

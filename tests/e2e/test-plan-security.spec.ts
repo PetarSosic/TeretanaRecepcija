@@ -364,7 +364,8 @@ test("SEC-01: HTML and script stay text in every field, screen and the shift PDF
     "/payments/today",
     `/members/${memberId}?tab=uplate`,
     "/settings/plans",
-    "/settings/products",
+    // D-76: products are listed and edited on S-13 Magacin.
+    "/storage",
     "/settings/gym",
     "/settings/trainers",
     "/settings/users",
@@ -385,7 +386,7 @@ test("SEC-01: HTML and script stay text in every field, screen and the shift PDF
     script: true,
   });
   expect(seen["/settings/plans"].img).toBe(true);
-  expect(seen["/settings/products"].script).toBe(true);
+  expect(seen["/storage"].script).toBe(true);
   expect(seen["/settings/gym"].img).toBe(true);
   expect(seen["/settings/trainers"].script).toBe(true);
   expect(seen["/settings/users"].img).toBe(true);

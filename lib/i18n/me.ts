@@ -194,8 +194,7 @@ export const me = {
     kindGym: "Teretana",
     kindCombo: "Grupni + teretana",
     kindDayPass: "Dnevna karta",
-    // S-26 Proizvodi
-    productsTitle: "Proizvodi",
+    // Product dialog on S-13 Magacin (D-76; S-26 Proizvodi is gone)
     addProduct: "Dodaj proizvod",
     editProduct: "Uredi proizvod",
     productName: "Naziv",
@@ -550,7 +549,11 @@ export const me = {
     columnSalePrice: "Prodajna cijena",
     sale: "Prodaja",
     stockIn: "Nova roba",
-    empty: "Nema proizvoda. Vlasnik dodaje proizvode u Podešavanjima.",
+    // D-76: products are added here, by every role but the receptionist.
+    empty: "Nema proizvoda. Dodaje ih vlasnik ili menadžer.",
+    showInactive: "Prikaži neaktivne ({count})",
+    hideInactive: "Sakrij neaktivne ({count})",
+    inactiveTitle: "Neaktivni proizvodi",
     quantity: "Količina",
     quantityInvalid: "Unesite količinu od 1 do {max}.",
     total: "Ukupno: {amount}",

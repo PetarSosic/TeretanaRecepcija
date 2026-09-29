@@ -43,7 +43,7 @@
 | **Magacin** | | | | | |
 | P-40 | View products, stock level, purchase and sale price | ✓ | ✓ | ✓ | BR-144 |
 | P-41 | Stock-in (enter the invoice purchase price); sale | ✓ | ✓ | ✓ | BR-141, BR-142 |
-| P-42 | Add or edit products, change the sale price | ✓ | ✗ | ✗ | BR-140 |
+| P-42 | Add or edit products, change the sale price (on S-13 Magacin) | ✓ | ✓ (D-76) | ✗ | BR-140, D-76 |
 | P-43 | Void a stock-in | ✓ | ✗ | ✗ | BR-095 |
 | P-44 | Stock value, bar profit, sales history beyond today | ✓ | ✗ | ✗ | BR-144 |
 | **Statistics and finance** | | | | | |

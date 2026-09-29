@@ -434,7 +434,7 @@ Every rule has an ID. Code comments and tests must reference these IDs, e.g. `//
 
 ## 13. Magacin (bar storage)
 - **BR-140 (products):**
-  - managed by the owner only;
+  - managed by the owner, the admin and the manager, on S-13 Magacin (D-76); never by a receptionist;
   - name 2–50 characters, unique;
   - sale price > 0;
   - current purchase price ≥ 0;

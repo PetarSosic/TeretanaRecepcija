@@ -175,7 +175,7 @@ Poništene stavke ostaju u Dnevniku izmjena — tako i treba (BR-095).
 | `/members/[id]` | S-07 Profil člana | sve uloge (RLS filtrira uplate) |
 | `/trainers` | S-29 Treneri (D-72) | sve uloge (iznose vide samo admin i vlasnik) |
 | `/payments/today` | S-12 Uplate danas | sve uloge (troškove filtrira RLS) |
-| `/storage` | S-13 Magacin | sve uloge |
+| `/storage` | S-13 Magacin | sve uloge ([Dodaj proizvod], [Uredi] i neaktivni: admin, vlasnik, menadžer, D-76) |
 | `/shift/gate` | S-02 Otvorena smjena | samo recepcioner |
 | `/shift/close` | S-14 Zaključi smjenu | samo recepcioner |
 | `/stats/visits` | S-15 Statistika dolazaka | admin, vlasnik, menadžer |
@@ -190,7 +190,7 @@ Poništene stavke ostaju u Dnevniku izmjena — tako i treba (BR-095).
 | `/settings/trainers` | S-24 Treneri i raspored | admin, vlasnik, menadžer |
 | `/settings/cards` | S-28 Kartice | admin, vlasnik, menadžer |
 | `/settings/plans` | S-25 Planovi | admin, vlasnik |
-| `/settings/products` | S-26 Proizvodi | admin, vlasnik |
+| `/settings/products` | ukinuto (D-76), 404 za sve uloge | — |
 | `/settings/gym` | S-27 Podešavanja teretane | admin, vlasnik |
 | `POST /api/jobs/[job]` | četiri posla | samo `x-cron-secret` |
 | `GET /api/pdf/shift/[id]` | PDF izvještaja smjene | admin, vlasnik |
@@ -560,7 +560,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Koraci:** redom otvorite svaku rutu iz kolone i zabilježite šta se desi.
 - **Test podaci:** `/finance`, `/finance/expenses`, `/finance/trainers`, `/finance/shifts`,
   `/finance/storage`, `/finance/audit`, `/finance/backdated`, `/settings/users`,
-  `/settings/trainers`, `/settings/cards`, `/settings/plans`, `/settings/products`,
+  `/settings/trainers`, `/settings/cards`, `/settings/plans`, `/settings/products` (ukinuto, D-76),
   `/settings/gym`, `/stats/visits`
 - **Očekivani rezultat:** **sve** navedene rute daju 404. Dozvoljene su samo `/reception`,
   `/members`, `/members/<id>`, `/payments/today`, `/storage`, `/shift/close`, `/shift/gate`.
@@ -573,7 +573,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Koraci:** kao PERM-01.
 - **Test podaci:** iste rute
 - **Očekivani rezultat:** 404 za svih **sedam** `/finance/...` ruta, za `/settings/plans`,
-  `/settings/products`, `/settings/gym`, `/shift/close` i `/shift/gate`.
+  `/settings/products` (ukinuto, D-76), `/settings/gym`, `/shift/close` i `/shift/gate`.
   Dozvoljeno: `/reception`, `/members`, `/payments/today`, `/storage`, `/stats/visits`,
   `/settings/users`, `/settings/trainers`, `/settings/cards`.
 - **Gdje provjeriti:** UI
@@ -597,7 +597,8 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** recepcioner: Recepcija, Članovi, Treneri, Uplate danas, Magacin,
   Zaključi smjenu. Menadžer: + Statistika dolazaka, Podešavanja (Korisnici, Treneri i raspored,
   Kartice). Vlasnik/Administrator: + Finansije i Podešavanja (Korisnici, Treneri i raspored,
-  Kartice, Planovi, Proizvodi, Podešavanja teretane); nema „Zaključi smjenu“.
+  Kartice, Planovi, Podešavanja teretane); nema „Zaključi smjenu“.
+  *29.09.2026 (D-76): stavka „Proizvodi“ je izbačena iz Podešavanja — ponoviti test.*
   *29.09.2026 (D-72): dodata stavka „Treneri“, a „Treneri“ u Podešavanjima preimenovana u
   „Treneri i raspored“ — ponoviti test.*
 - **Gdje provjeriti:** UI
@@ -1866,10 +1867,11 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 ### [STO-12] Prazan magacin
 - **Prioritet:** Nisko
 - **Uloga / preduslovi:** svi proizvodi neaktivni
-- **Koraci:** deaktivirajte `Voda` u `/settings/products` i otvorite `/storage`.
+- **Koraci:** na `/storage` [Uredi] kod `Voda` → isključite „Aktivan“ → [Sačuvaj] (D-76).
 - **Test podaci:** —
-- **Očekivani rezultat:** „Nema proizvoda. Vlasnik dodaje proizvode u Podešavanjima.“
-  Vratite proizvod u aktivno stanje.
+- **Očekivani rezultat:** „Nema proizvoda. Dodaje ih vlasnik ili menadžer.“ i dugme „Prikaži neaktivne (1)“.
+  Vratite proizvod u aktivno stanje (Prikaži neaktivne → [Uredi] → „Aktivan“).
+  > **Ponoviti (D-76):** ekran Proizvodi je ukinut, a tekst praznog magacina je promijenjen.
 - **Gdje provjeriti:** UI
 - [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-extra.spec.ts`: jedini proizvod deaktiviran kroz `/settings/products` → `/storage` prikazuje „Nema proizvoda. Vlasnik dodaje proizvode u Podešavanjima.“ Proizvod vraćen u aktivno stanje.
 
@@ -2154,15 +2156,22 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Gdje provjeriti:** UI
 - [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-extra.spec.ts`: `Studentska` deaktivirana kroz UI → u tabeli ostaje sa „Aktivan: Ne“; u prodaji članarine ne nudi se (ni neaktivna dnevna karta); postojeća članarina tog plana nepromijenjena u bazi i vidljiva na profilu. [Produži] na toj članarini otvara prodaju bez preselekcije (nudi samo aktivne planove).
 
-### [SET-16] Proizvodi
+### [SET-16] Proizvodi na Magacinu (D-76)
 - **Prioritet:** Visoko
-- **Uloga / preduslovi:** Vlasnik
-- **Koraci:** `/settings/products` → [Dodaj proizvod] → `Izotonik`, nabavna `0,60`, prodajna `2,00`.
+- **Uloga / preduslovi:** Vlasnik; zatim Menadžer i Recepcioner
+- **Koraci:** `/storage` → [Dodaj proizvod] → `Izotonik`, nabavna `0,60`, prodajna `2,00`.
+  Kao menadžer: [Uredi] na `Izotonik` → prodajna `2,80`, isključite „Aktivan“ → [Sačuvaj], pa
+  [Prikaži neaktivne (1)] → [Uredi] → uključite „Aktivan“. Kao recepcioner otvorite `/storage`.
   Probajte prodajnu `0`, negativnu nabavnu, naziv od 1 i 51 znaka.
 - **Test podaci:** kao gore
 - **Očekivani rezultat:** prodajna `0` daje „Prodajna cijena mora biti veća od 0.“; negativne
   vrijednosti i slova daju „Unesite iznos, na primjer 79 ili 79,50.“; naziv van 2–50 znakova daje
   „Unesite naziv proizvoda (2–50 znakova).“ Novi proizvod se odmah vidi na `/storage`.
+  Menadžer mijenja cijenu i aktivnost; deaktivirani proizvod nestaje iz tabele i vraća se iz
+  „Neaktivni proizvodi“. Recepcioner nema [Dodaj proizvod], [Uredi] ni „Prikaži neaktivne“.
+  > **Ponoviti (D-76):** automatski: `settings.spec.ts` (vlasnik dodaje, menadžer uređuje i vraća,
+  > recepcioner bez dugmadi), `test-plan-high-e.spec.ts` (granice), DB `0018_product_editors`
+  > (8 tvrdnji) i izmijenjen `0003_catalog`. Sve prošlo 29.09.2026.
 - **Gdje provjeriti:** UI; `/storage`
 - [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-high-e.spec.ts`: prodajna `0` → „Prodajna cijena mora biti veća od 0.“; nabavna `-1` i `abc` → „Unesite iznos, na primjer 79 ili 79,50.“; naziv od 1 i 51 znaka → „Unesite naziv proizvoda (2–50 znakova).“; „Izotonik“ 0,60/2,00 se odmah vidi na `/storage`. Raniji dokaz (22.09.): E2E settings.spec.ts: dodavanje proizvoda i cijena. Izmjena i deaktivacija nisu potpuno izvršene.
 

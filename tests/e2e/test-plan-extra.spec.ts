@@ -408,7 +408,7 @@ test("PERM-04: each role's menu lists only what it may open", async ({
   browser,
 }, testInfo) => {
   test.skip(testInfo.project.name !== "desktop", "the menu is md+ only");
-  // D-72: Treneri (S-29) is on every role's menu.
+  // D-72: Treneri (S-29) is on every role's menu. D-76: Proizvodi is gone.
   const desk = ["Recepcija", "Članovi", "Treneri", "Uplate danas", "Magacin"];
 
   const ana = await signedIn(browser, staff.ana);
@@ -433,7 +433,6 @@ test("PERM-04: each role's menu lists only what it may open", async ({
         "Treneri i raspored",
         "Kartice",
         "Planovi",
-        "Proizvodi",
         "Podešavanja teretane",
       ],
     });
@@ -795,19 +794,19 @@ test("STO-12: with every product inactive the storage screen says so", async ({
 }) => {
   test.skip(test.info().project.name !== "desktop");
   await signIn(page, staff.owner);
-  await page.goto("/settings/products");
-  await page
-    .getByRole("row", { name: /E2E Voda/ })
-    .getByRole("button", { name: "Uredi" })
-    .click();
+  // D-76: the product is deactivated on Magacin itself.
+  await page.goto("/storage");
+  await page.getByRole("button", { name: "Uredi E2E Voda" }).click();
   const dialog = page.getByRole("dialog");
   await dialog.getByLabel("Aktivan").uncheck();
   await dialog.getByRole("button", { name: "Sačuvaj" }).click();
   await expect(dialog).toBeHidden();
 
-  await page.goto("/storage");
   await expect(
-    page.getByText("Nema proizvoda. Vlasnik dodaje proizvode u Podešavanjima."),
+    page.getByText("Nema proizvoda. Dodaje ih vlasnik ili menadžer."),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Prikaži neaktivne (1)" }),
   ).toBeVisible();
 
   await adminClient()

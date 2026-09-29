@@ -3,6 +3,7 @@ import {
   StorageScreen,
   type StorageProduct,
 } from "@/features/storage/components/storage-screen";
+import type { EditableProduct } from "@/features/storage/components/product-editor";
 import { requireStaff } from "@/lib/auth";
 import { me } from "@/lib/i18n/me";
 import { createClient } from "@/lib/supabase/server";
@@ -13,12 +14,36 @@ export const metadata: Metadata = {
 
 // S-13. P-40 and P-41: every role sees the active products and records sales and
 // stock-ins. storage_products (0016) carries no stock value or profit (BR-144).
+// D-76 (P-42): every role but the receptionist also adds and edits products here, and
+// sees the deactivated ones, which only they can bring back.
 export default async function StoragePage() {
-  await requireStaff();
+  const staff = await requireStaff();
+  const canEdit = staff.role !== "receptionist";
   const supabase = await createClient();
-  const { data, error } = await supabase
-    .rpc("storage_products")
-    .select("id, name, stock, current_purchase_price::text, sale_price::text");
+  const [{ data, error }, { data: inactive }] = await Promise.all([
+    supabase
+      .rpc("storage_products")
+      .select(
+        "id, name, stock, current_purchase_price::text, sale_price::text",
+      ),
+    canEdit
+      ? supabase
+          .from("products")
+          // BR-003: both prices as text.
+          .select(
+            "id, name, current_purchase_price::text, sale_price::text, is_active",
+          )
+          .eq("is_active", false)
+          .order("name")
+          .returns<EditableProduct[]>()
+      : Promise.resolve({ data: null }),
+  ]);
   if (error) console.error(`storage_products: ${error.message}`);
-  return <StorageScreen products={(data ?? []) as StorageProduct[]} />;
+  return (
+    <StorageScreen
+      products={(data ?? []) as StorageProduct[]}
+      inactive={inactive ?? []}
+      canEdit={canEdit}
+    />
+  );
 }

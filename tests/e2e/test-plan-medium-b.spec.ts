@@ -471,7 +471,8 @@ test("E2E-08: a new price, a new product — old sales keep 79 €, the new one 
   await expect(owner.getByRole("dialog")).toBeHidden();
   await expect(owner.getByRole("row", { name: /^E2E Mjesečna Teretana/ })).toContainText("89,00 €");
   // 2. Izotonik 0,60 / 2,00 and twelve of them in storage.
-  await owner.goto("/settings/products");
+  // D-76: products are added on Magacin.
+  await owner.goto("/storage");
   await owner.getByRole("button", { name: "Dodaj proizvod" }).click();
   await owner.getByLabel("Naziv").fill("E2E Izotonik");
   await owner.getByLabel("Nabavna cijena (€)").fill("0,60");
@@ -899,7 +900,6 @@ test("§5.2 and N-24: every screen at 375 px with a full month of data — no si
     "/settings/trainers",
     "/settings/cards",
     "/settings/plans",
-    "/settings/products",
     "/settings/gym",
   ];
   const wide: string[] = [];

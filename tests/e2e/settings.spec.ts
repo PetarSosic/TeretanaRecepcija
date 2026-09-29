@@ -143,7 +143,6 @@ test("P-60 to P-63: a receptionist cannot open settings", async ({ page }) => {
     "/settings/users",
     "/settings/trainers",
     "/settings/plans",
-    "/settings/products",
     "/settings/gym",
   ]) {
     await page.goto(route);
@@ -172,9 +171,9 @@ test("BR-004: the owner changes a plan price and the screen says it affects new 
   await expect(page.getByRole("cell", { name: "85,00 €" })).toBeVisible();
 });
 
-test("BR-140: the owner adds a product", async ({ page }) => {
+test("BR-140 (D-76): the owner adds a product on Magacin", async ({ page }) => {
   await signIn(page, owner);
-  await page.goto("/settings/products");
+  await page.goto("/storage");
 
   await page.getByRole("button", { name: "Dodaj proizvod" }).click();
   await page.getByLabel("Naziv").fill("E2E Izotonik");
@@ -182,8 +181,55 @@ test("BR-140: the owner adds a product", async ({ page }) => {
   await page.getByLabel("Prodajna cijena (€)").fill("2,50");
   await page.getByRole("button", { name: "Sačuvaj" }).click();
   await expect(page.getByText("Sačuvano.")).toBeVisible();
-  await expect(page.getByRole("cell", { name: "E2E Izotonik" })).toBeVisible();
+  await expect(
+    page.getByRole("cell", { name: "E2E Izotonik", exact: true }),
+  ).toBeVisible();
   await expect(page.getByRole("cell", { name: "2,50 €" })).toBeVisible();
+});
+
+test("P-42 (D-76): the manager edits and deactivates a product, then brings it back", async ({
+  page,
+}) => {
+  await signIn(page, manager);
+  await page.goto("/storage");
+
+  await page.getByRole("button", { name: "Uredi E2E Izotonik" }).click();
+  await page.getByLabel("Prodajna cijena (€)").fill("2,80");
+  await page.getByLabel("Aktivan").uncheck();
+  await page.getByRole("button", { name: "Sačuvaj" }).click();
+  await expect(page.getByText("Sačuvano.")).toBeVisible();
+  await expect(
+    page.getByRole("cell", { name: "E2E Izotonik", exact: true }),
+  ).toHaveCount(0);
+
+  // The deactivated product waits under the table, and [Uredi] activates it again.
+  await page.getByRole("button", { name: "Prikaži neaktivne (1)" }).click();
+  const inactive = page.getByRole("table", { name: "Neaktivni proizvodi" });
+  await expect(inactive.getByRole("cell", { name: "2,80 €" })).toBeVisible();
+  await inactive.getByRole("button", { name: "Uredi E2E Izotonik" }).click();
+  await page.getByLabel("Aktivan").check();
+  await page.getByRole("button", { name: "Sačuvaj" }).click();
+  await expect(page.getByText("Sačuvano.").first()).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Prodaja E2E Izotonik" }),
+  ).toBeVisible();
+});
+
+test("P-42 (D-76): a receptionist sees Magacin without adding or editing", async ({
+  page,
+}) => {
+  await signIn(page, receptionist);
+  await page.goto("/storage");
+  await expect(
+    page.getByRole("button", { name: "Nova roba E2E Izotonik" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Dodaj proizvod" }),
+  ).toHaveCount(0);
+  await expect(page.getByRole("button", { name: /^Uredi / })).toHaveCount(0);
+  await expect(
+    page.getByRole("button", { name: /Prikaži neaktivne/ }),
+  ).toHaveCount(0);
 });
 
 test("BR-012 and BR-131: the owner edits gym settings and a category", async ({

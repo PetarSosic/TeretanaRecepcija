@@ -24,7 +24,8 @@ import {
 
 const TRAINERS_PATH = "/settings/trainers";
 const PLANS_PATH = "/settings/plans";
-const PRODUCTS_PATH = "/settings/products";
+// D-76: products are edited on S-13 Magacin; S-26 is gone.
+const STORAGE_PATH = "/storage";
 const GYM_PATH = "/settings/gym";
 
 /**
@@ -183,7 +184,7 @@ export async function saveClassSlot(
   );
 }
 
-// S-25, S-26, S-27: owner and admin only (P-61 to P-63) -----------------------------
+// S-25, S-27: owner and admin only (P-61 to P-63) ----------------------------------
 export async function savePlan(
   _state: ActionState,
   formData: FormData,
@@ -231,6 +232,7 @@ export async function savePlan(
   );
 }
 
+// S-13 (D-76): products, for every role but the receptionist (P-42) ---------------
 export async function saveProduct(
   _state: ActionState,
   formData: FormData,
@@ -252,7 +254,7 @@ export async function saveProduct(
         p_sale_price: value.salePrice,
         p_is_active: value.isActive,
       }),
-    [PRODUCTS_PATH],
+    [STORAGE_PATH],
   );
 }
 

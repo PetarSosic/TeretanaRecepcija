@@ -571,7 +571,8 @@ test("SET-16: products — add, bounds, and at once on /storage", async ({
   browser,
 }) => {
   const page = await signedIn(browser, staff.owner);
-  await page.goto("/settings/products");
+  // D-76: products are added on Magacin.
+  await page.goto("/storage");
   async function product(name: string, purchase: string, sale: string) {
     await page.getByRole("button", { name: "Dodaj proizvod" }).click();
     const dialog = page.getByRole("dialog");

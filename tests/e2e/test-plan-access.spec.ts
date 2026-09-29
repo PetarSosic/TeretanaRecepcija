@@ -325,7 +325,6 @@ test("PERM-01/02/03: the route matrix, member profile and shift screens included
         "/settings/trainers",
         "/settings/cards",
         "/settings/plans",
-        "/settings/products",
         "/settings/gym",
         "/stats/visits",
       ],
@@ -343,7 +342,6 @@ test("PERM-01/02/03: the route matrix, member profile and shift screens included
       [
         ...FINANCE,
         "/settings/plans",
-        "/settings/products",
         "/settings/gym",
         "/shift/close",
         "/shift/gate",
@@ -361,10 +359,10 @@ test("PERM-01/02/03: the route matrix, member profile and shift screens included
           "/settings/trainers",
           "/settings/cards",
           "/settings/plans",
-          "/settings/products",
           "/settings/gym",
         ],
-        ["/shift/close", "/shift/gate"],
+        // D-76: S-26 Proizvodi is gone for every role.
+        ["/shift/close", "/shift/gate", "/settings/products"],
       ],
     ),
   ];

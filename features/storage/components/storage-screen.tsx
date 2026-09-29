@@ -28,6 +28,7 @@ import { formatMoney, parseMoneyInput } from "@/lib/format";
 import { me } from "@/lib/i18n/me";
 import { cn } from "@/lib/utils";
 import { receiveStock, sellProduct } from "../actions";
+import { ProductDialog, type EditableProduct } from "./product-editor";
 
 export type StorageProduct = {
   id: string;
@@ -53,19 +54,45 @@ function times(price: string, quantity: number): string | null {
 
 type Dialogs = { kind: "sale" | "stockIn"; product: StorageProduct } | null;
 
+/** An active product as the edit dialog needs it. */
+function editable(product: StorageProduct): EditableProduct {
+  return { ...product, is_active: true };
+}
+
 /**
  * S-13 (F-15). BR-144: every role sees the product, its stock level and both prices;
  * nothing here reveals stock value or profit, which are the owner's (S-20).
+ *
+ * D-76: S-26 Proizvodi is gone. Every role but the receptionist (`canEdit`) adds and
+ * edits products here, and finds the deactivated ones under the table to bring back.
  */
-export function StorageScreen({ products }: { products: StorageProduct[] }) {
+export function StorageScreen({
+  products,
+  inactive,
+  canEdit,
+}: {
+  products: StorageProduct[];
+  inactive: EditableProduct[];
+  canEdit: boolean;
+}) {
   const [dialog, setDialog] = useState<Dialogs>(null);
   const close = useCallback(() => setDialog(null), []);
+  // "new" for [Dodaj proizvod], a product for [Uredi].
+  const [editing, setEditing] = useState<EditableProduct | "new" | null>(null);
+  const [showInactive, setShowInactive] = useState(false);
 
   return (
     <>
-      <h1 className="mb-6 text-2xl font-semibold tracking-tight">
-        {me.storage.title}
-      </h1>
+      <div className="mb-6 flex items-center justify-between gap-4">
+        <h1 className="text-2xl font-semibold tracking-tight">
+          {me.storage.title}
+        </h1>
+        {canEdit ? (
+          <Button onClick={() => setEditing("new")}>
+            {me.settings.addProduct}
+          </Button>
+        ) : null}
+      </div>
       <TableWrapper className="rounded-2xl border bg-card">
         <Table>
           <thead>
@@ -126,6 +153,17 @@ export function StorageScreen({ products }: { products: StorageProduct[] }) {
                       >
                         {me.storage.stockIn}
                       </Button>
+                      {canEdit ? (
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="outline"
+                          aria-label={`${me.users.edit} ${product.name}`}
+                          onClick={() => setEditing(editable(product))}
+                        >
+                          {me.users.edit}
+                        </Button>
+                      ) : null}
                     </div>
                   </Td>
                 </tr>
@@ -134,6 +172,75 @@ export function StorageScreen({ products }: { products: StorageProduct[] }) {
           </tbody>
         </Table>
       </TableWrapper>
+
+      {canEdit && inactive.length > 0 ? (
+        <div className="mt-6 grid gap-3">
+          <div>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              aria-expanded={showInactive}
+              onClick={() => setShowInactive((shown) => !shown)}
+            >
+              {(showInactive
+                ? me.storage.hideInactive
+                : me.storage.showInactive
+              ).replace("{count}", String(inactive.length))}
+            </Button>
+          </div>
+          {showInactive ? (
+            <TableWrapper className="rounded-2xl border bg-card">
+              <Table aria-label={me.storage.inactiveTitle}>
+                <thead>
+                  <tr>
+                    <Th>{me.storage.columnProduct}</Th>
+                    <Th className="text-right">
+                      {me.storage.columnPurchasePrice}
+                    </Th>
+                    <Th className="text-right">{me.storage.columnSalePrice}</Th>
+                    <Th>
+                      <span className="sr-only">{me.users.actions}</span>
+                    </Th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {inactive.map((product) => (
+                    <tr key={product.id} className="text-muted-foreground">
+                      <Td className="font-medium">{product.name}</Td>
+                      <Td className="text-right tabular-nums whitespace-nowrap">
+                        {formatMoney(product.current_purchase_price)}
+                      </Td>
+                      <Td className="text-right tabular-nums whitespace-nowrap">
+                        {formatMoney(product.sale_price)}
+                      </Td>
+                      <Td className="text-right">
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="outline"
+                          aria-label={`${me.users.edit} ${product.name}`}
+                          onClick={() => setEditing(product)}
+                        >
+                          {me.users.edit}
+                        </Button>
+                      </Td>
+                    </tr>
+                  ))}
+                </tbody>
+              </Table>
+            </TableWrapper>
+          ) : null}
+        </div>
+      ) : null}
+
+      {canEdit ? (
+        <ProductDialog
+          product={editing === "new" ? null : editing}
+          open={editing !== null}
+          onOpenChange={(open) => !open && setEditing(null)}
+        />
+      ) : null}
 
       {dialog?.kind === "sale" ? (
         <SaleDialog product={dialog.product} onClose={close} />
@@ -266,9 +373,7 @@ function StockInDialog({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>{me.storage.stockIn}</DialogTitle>
-          <DialogDescription>
-            {product.name}
-          </DialogDescription>
+          <DialogDescription>{product.name}</DialogDescription>
         </DialogHeader>
         <form onSubmit={onSubmit} className="grid gap-4" noValidate>
           <input type="hidden" name="productId" value={product.id} />
