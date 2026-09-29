@@ -292,6 +292,52 @@ test("US-06.1: a receptionist registers a member with an empty card", async ({
   await expectNoHorizontalScroll(page);
 });
 
+test("D-79: the date of birth is typed as digits or picked by year and month", async ({
+  page,
+}) => {
+  await signIn(page, receptionist);
+  await page.goto("/members");
+  await page.getByRole("button", { name: "Novi član" }).click();
+  const dialog = page.getByRole("dialog", { name: "Novi član" });
+  const field = dialog.getByLabel("Datum rođenja", { exact: true });
+
+  // The dots come by themselves; one typed by habit is not doubled.
+  await field.pressSequentially("05031995");
+  await expect(field).toHaveValue("05.03.1995");
+  await field.fill("");
+  await field.pressSequentially("5.3.1995");
+  await expect(field).toHaveValue("5.3.1995");
+
+  // The calendar opens on the typed date; year and month come from lists.
+  await dialog.getByRole("button", { name: "Izaberi datum" }).click();
+  const calendar = dialog.getByRole("group", { name: "Izaberi datum" });
+  await expect(calendar.getByLabel("Godina", { exact: true })).toHaveValue(
+    "1995",
+  );
+  await expect(calendar.getByLabel("Mjesec", { exact: true })).toHaveValue("3");
+  await expect(
+    calendar.getByRole("button", { name: "05.03.1995" }),
+  ).toHaveAttribute("aria-pressed", "true");
+  await calendar.getByLabel("Godina", { exact: true }).selectOption("1988");
+  await calendar
+    .getByLabel("Mjesec", { exact: true })
+    .selectOption({ label: "novembar" });
+  await calendar.getByRole("button", { name: "Sljedeći mjesec" }).click();
+  await calendar.getByRole("button", { name: "24.12.1988" }).click();
+  await expect(field).toHaveValue("24.12.1988");
+  await expect(calendar).toBeHidden();
+
+  // Esc closes the calendar and leaves the registration dialog open.
+  await dialog.getByRole("button", { name: "Izaberi datum" }).click();
+  await expect(calendar).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(calendar).toBeHidden();
+  await expect(dialog).toBeVisible();
+  await expect(field).toHaveValue("24.12.1988");
+  await dialog.getByRole("button", { name: "Otkaži" }).click();
+  await expect(dialog).toBeHidden();
+});
+
 test("US-08.1 and E13: Personalni below the minimum is refused, then sold", async ({
   page,
 }) => {

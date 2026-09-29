@@ -415,17 +415,21 @@ test("MEM-06: date of birth formats and bounds", async ({ page }) => {
     }
   }
 
-  // The calendar button writes the chosen date as dd.mm.gggg.
+  // The calendar button writes the chosen date as dd.mm.gggg (D-79: year and month
+  // are picked from lists).
   await page.getByRole("button", { name: "Uredi podatke" }).click();
   const dialog = page.getByRole("dialog");
-  const picker = dialog.locator('input[type="date"]');
-  note(`MEM-06 date inputs in dialog: ${await picker.count()}`);
-  if (await picker.count()) {
-    await picker.first().fill("1994-07-08");
-    await expect(
-      dialog.getByLabel("Datum rođenja", { exact: true }),
-    ).toHaveValue("08.07.1994");
-  }
+  await dialog.getByRole("button", { name: "Izaberi datum" }).click();
+  const calendar = dialog.getByRole("group", { name: "Izaberi datum" });
+  await calendar.getByLabel("Godina", { exact: true }).selectOption("1994");
+  await calendar
+    .getByLabel("Mjesec", { exact: true })
+    .selectOption({ label: "jul" });
+  await calendar.getByRole("button", { name: "08.07.1994" }).click();
+  await expect(dialog.getByLabel("Datum rođenja", { exact: true })).toHaveValue(
+    "08.07.1994",
+  );
+  note("MEM-06 calendar wrote 08.07.1994");
   await page.keyboard.press("Escape");
 });
 

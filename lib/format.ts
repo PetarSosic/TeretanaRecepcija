@@ -76,6 +76,21 @@ export function formatDate(value: Date | string): string {
   return `${p.day}.${p.month}.${p.year}`;
 }
 
+/**
+ * BR-001: the gym's calendar date (yyyy-mm-dd) of an instant. A timestamp's own first
+ * ten characters are its UTC date, which is still yesterday until 01:00 or 02:00 in
+ * Podgorica.
+ */
+export function gymDateOf(value: Date | string): string {
+  const p = parts(instant(value), {
+    timeZone: GYM_TIME_ZONE,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  });
+  return `${p.year}-${p.month}-${p.day}`;
+}
+
 export function formatTime(value: Date | string): string {
   const p = parts(instant(value), {
     timeZone: GYM_TIME_ZONE,
@@ -122,6 +137,22 @@ export function parseDateInput(value: string): string | null {
     date.toISOString().slice(0, 10) === result
     ? result
     : null;
+}
+
+/**
+ * D-79: a date of birth is typed as digits alone. The dot follows a two-digit day or
+ * month by itself, a third digit in a row is split off, a dot typed out of habit after
+ * the automatic one is dropped, and eight pasted digits become dd.mm.yyyy. The caller
+ * applies it only to text inserted at the end, so deleting is never fought.
+ */
+export function typeDateInput(value: string): string {
+  if (/^\d{8}$/.test(value))
+    return `${value.slice(0, 2)}.${value.slice(2, 4)}.${value.slice(4)}`;
+  if (value.endsWith("..")) return value.slice(0, -1);
+  const split = /^(\d{2}|\d{1,2}\.\d{2})(\d)$/.exec(value);
+  if (split) return `${split[1]}.${split[2]}`;
+  if (/^(\d{2}|\d{1,2}\.\d{2})$/.test(value)) return `${value}.`;
+  return value;
 }
 
 export function formatDuration(seconds: number): string {

@@ -1,13 +1,10 @@
 "use client";
 
-import { useRef } from "react";
-import { CalendarDays } from "lucide-react";
 import { FieldError } from "@/components/common/form-message";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { formatDate, parseDateInput } from "@/lib/format";
 import { me } from "@/lib/i18n/me";
+import { DateOfBirthField } from "./date-of-birth-field";
 
 export type MemberValues = {
   firstName: string;
@@ -20,7 +17,7 @@ export type MemberValues = {
 
 /**
  * BR-040: the personal data of S-05 and of [Uredi podatke] on S-07. The date of birth
- * accepts typing dd.mm.yyyy and also offers the browser's date picker (S-05 item 2).
+ * accepts typing dd.mm.yyyy and also offers a calendar (S-05 item 2, D-79).
  */
 export function MemberFields({
   idPrefix,
@@ -34,9 +31,6 @@ export function MemberFields({
   /** BR-043: the duplicate check runs when the phone or email field loses focus. */
   onContactBlur?: () => void;
 }) {
-  const dateText = useRef<HTMLInputElement>(null);
-  const picker = useRef<HTMLInputElement>(null);
-
   const field = (
     name: keyof MemberValues,
     label: string,
@@ -72,50 +66,11 @@ export function MemberFields({
         autoComplete: "off",
         onBlur: onContactBlur,
       })}
-      <div className="grid gap-2 sm:col-span-2">
-        <Label htmlFor={`${idPrefix}-dateOfBirth`}>
-          {me.members.dateOfBirth}
-        </Label>
-        <div className="flex gap-2">
-          <Input
-            ref={dateText}
-            id={`${idPrefix}-dateOfBirth`}
-            name="dateOfBirth"
-            placeholder={me.members.datePlaceholder}
-            defaultValue={defaults?.dateOfBirth ?? ""}
-            autoComplete="off"
-            aria-invalid={Boolean(fieldErrors.dateOfBirth)}
-            aria-describedby={`${idPrefix}-dateOfBirth-error`}
-          />
-          <Button
-            type="button"
-            variant="outline"
-            size="icon"
-            aria-label={me.members.pickDate}
-            title={me.members.pickDate}
-            onClick={() => picker.current?.showPicker()}
-          >
-            <CalendarDays aria-hidden="true" />
-          </Button>
-          {/* The picker writes back into the typed field, which is what is submitted. */}
-          <input
-            ref={picker}
-            type="date"
-            tabIndex={-1}
-            aria-hidden="true"
-            className="sr-only"
-            min="1900-01-01"
-            onChange={(event) => {
-              const iso = parseDateInput(event.target.value);
-              if (iso && dateText.current)
-                dateText.current.value = formatDate(iso);
-            }}
-          />
-        </div>
-        <FieldError id={`${idPrefix}-dateOfBirth-error`}>
-          {fieldErrors.dateOfBirth}
-        </FieldError>
-      </div>
+      <DateOfBirthField
+        id={`${idPrefix}-dateOfBirth`}
+        defaultValue={defaults?.dateOfBirth ?? ""}
+        error={fieldErrors.dateOfBirth}
+      />
     </div>
   );
 }

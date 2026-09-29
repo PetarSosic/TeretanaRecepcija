@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { getStaff } from "@/lib/auth";
+import { gymDateOf } from "@/lib/format";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 
@@ -23,7 +24,11 @@ export async function GET(
     .select("id, report_path, started_at")
     .eq("id", id)
     .eq("gym_id", staff.gym_id)
-    .maybeSingle<{ id: string; report_path: string | null; started_at: string }>();
+    .maybeSingle<{
+      id: string;
+      report_path: string | null;
+      started_at: string;
+    }>();
   if (!shift?.report_path) return new NextResponse(null, { status: 404 });
 
   const file = await createAdminClient()
@@ -32,7 +37,8 @@ export async function GET(
   if (file.error || !file.data) return new NextResponse(null, { status: 404 });
 
   const bytes = Buffer.from(await file.data.arrayBuffer());
-  const day = shift.started_at.slice(0, 10);
+  // BR-001: the gym's date, so a shift opened after midnight is not named yesterday.
+  const day = gymDateOf(shift.started_at);
   return new NextResponse(new Uint8Array(bytes), {
     headers: {
       "Content-Type": "application/pdf",

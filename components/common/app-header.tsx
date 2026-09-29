@@ -55,15 +55,23 @@ export function AppHeader({
 
   return (
     <header className="border-b bg-card">
-      <div className="mx-auto flex max-w-7xl items-center gap-4 px-4 py-3 sm:px-6">
-        <Link href="/" className="flex items-center gap-2 font-semibold">
+      <div className="flex items-center gap-4 px-4 py-3 sm:px-6">
+        <Link
+          href="/"
+          className="flex shrink-0 items-center gap-2 font-semibold whitespace-nowrap"
+        >
           <BrandMark className="h-7" />
           <span className="hidden sm:inline">{gymName}</span>
         </Link>
 
+        {/* Doc 06 §1: every label stays on one line. The header spans the whole
+            window, not the page's max-w-7xl, so the owner's and admin's eight items,
+            the shift badge and the user menu fit side by side from 1280 px up (doc
+            08 §9: reception runs at 1366 px). Narrower screens get the menu button
+            instead of a menu that wraps. */}
         {links.length ? (
-          <nav aria-label={me.nav.menu} className="hidden flex-1 md:block">
-            <ul className="flex items-center gap-1">
+          <nav aria-label={me.nav.menu} className="hidden flex-1 xl:block">
+            <ul className="flex items-center gap-0.5">
               {links.map((item) =>
                 item.children ? (
                   <li key={item.href}>
@@ -75,7 +83,7 @@ export function AppHeader({
                       href={item.href}
                       aria-current={isCurrent(item.href) ? "page" : undefined}
                       className={cn(
-                        "rounded-lg px-3 py-2 text-sm hover:bg-muted",
+                        "rounded-lg px-2.5 py-2 text-sm whitespace-nowrap hover:bg-muted",
                         isCurrent(item.href) && "bg-muted font-medium",
                       )}
                     >
@@ -89,7 +97,9 @@ export function AppHeader({
         ) : null}
 
         {/* Doc 08 §9: at 375 px the badge and the name give way (truncate) rather
-            than push the page sideways; min-w-0 is what lets flex items shrink. */}
+            than push the page sideways; min-w-0 is what lets flex items shrink. Beside
+            the full menu the badge keeps its whole text and only the user's own name
+            is shortened. */}
         <div className="ml-auto flex min-w-0 items-center justify-end gap-2">
           <ShiftBadge openShift={openShift} />
           {links.length ? (
@@ -101,6 +111,7 @@ export function AppHeader({
                 variant="outline"
                 size="sm"
                 aria-label={me.nav.account}
+                title={fullName}
                 className="min-w-0 shrink"
               >
                 <span className="max-w-32 min-w-0 truncate">{fullName}</span>
@@ -188,11 +199,16 @@ function ShiftBadge({
         {me.shift.none}
       </span>
     );
+  const text = me.shift.badge
+    .replace("{name}", openShift.staffName)
+    .replace("{time}", formatTime(openShift.startedAt));
+  // Only a narrow screen shortens the badge with "…"; the whole text stays in the tooltip.
   return (
-    <span className="max-w-36 min-w-0 truncate rounded-lg bg-muted px-2 py-1 text-xs sm:max-w-none sm:px-3 sm:py-1.5 sm:text-sm">
-      {me.shift.badge
-        .replace("{name}", openShift.staffName)
-        .replace("{time}", formatTime(openShift.startedAt))}
+    <span
+      title={text}
+      className="max-w-36 min-w-0 truncate rounded-lg bg-muted px-2 py-1 text-xs sm:max-w-none sm:px-3 sm:py-1.5 sm:text-sm xl:shrink-0"
+    >
+      {text}
     </span>
   );
 }
@@ -206,7 +222,7 @@ function MobileNav({
 }) {
   return (
     <DropdownMenu.Root>
-      <DropdownMenu.Trigger asChild className="md:hidden">
+      <DropdownMenu.Trigger asChild className="xl:hidden">
         <Button variant="outline" size="icon" aria-label={me.nav.openMenu}>
           <Menu aria-hidden="true" />
         </Button>
@@ -215,7 +231,7 @@ function MobileNav({
         <DropdownMenu.Content
           align="end"
           sideOffset={6}
-          className="z-50 min-w-52 rounded-lg border bg-card p-1 shadow-md md:hidden"
+          className="z-50 min-w-52 rounded-lg border bg-card p-1 shadow-md xl:hidden"
         >
           {navigation
             .flatMap((item) => item.children ?? [item])
@@ -251,7 +267,7 @@ function SubMenu({
         <button
           type="button"
           className={cn(
-            "flex items-center gap-1 rounded-lg px-3 py-2 text-sm hover:bg-muted",
+            "flex items-center gap-1 rounded-lg px-2.5 py-2 text-sm whitespace-nowrap hover:bg-muted",
             open && "bg-muted font-medium",
           )}
         >

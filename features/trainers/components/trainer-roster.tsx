@@ -8,13 +8,16 @@ import type { RosterGroup, RosterTrainer } from "../roster";
 
 const t = me.trainerRoster;
 
-function groupHeading(group: RosterGroup) {
-  const parts = [
-    group.startsAt === null
-      ? t.noClassTime
-      : classTimeLabel({ starts_at: group.startsAt, weekdays: group.weekdays }),
-    t.memberCount.replace("{count}", String(group.rows.length)),
-  ];
+/** The class time that opens a group's header row (`Uto, čet, sub · 08:00`). */
+function groupTime(group: RosterGroup) {
+  return group.startsAt === null
+    ? t.noClassTime
+    : classTimeLabel({ starts_at: group.startsAt, weekdays: group.weekdays });
+}
+
+/** The counts that follow the class time in the header row. */
+function groupCounts(group: RosterGroup) {
+  const parts = [t.memberCount.replace("{count}", String(group.rows.length))];
   if (group.heldToday)
     parts.push(
       t.attended
@@ -77,7 +80,10 @@ export function TrainerRoster({
                   <tbody key={group.key} data-testid="roster-group">
                     <tr className="bg-muted/60">
                       <Td colSpan={columns} className="font-medium">
-                        {groupHeading(group)}
+                        {/* D-78: the class time is bold, so each class stands out. */}
+                        <span className="font-bold">{groupTime(group)}</span>
+                        {" · "}
+                        {groupCounts(group)}
                         {group.startsAt === null ? (
                           <span className="block text-xs font-normal text-muted-foreground">
                             {t.noClassTimeHint}

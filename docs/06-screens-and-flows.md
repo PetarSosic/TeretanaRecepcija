@@ -5,7 +5,7 @@ Routes are in English; every visible text is in Montenegrin (ijekavica). Text in
 ## 1. Global layout and patterns
 - **Header:**
   - the KP mark and the gym name (D-73);
-  - navigation (role-based, §2);
+  - navigation (role-based, §2), every item on one line. The header spans the whole window, so the owner's full menu, the shift badge and the user menu fit side by side from 1280 px; narrower screens show the menu button (`Otvori meni`) instead;
   - shift badge `Smjena: <ime> od <HH:mm>`, or `Nema otvorene smjene` in grey;
   - user menu with Promijeni lozinku and Odjava.
 - **Loading:** show skeleton placeholders if data takes > 300 ms. Buttons show a spinner and are disabled while saving.
@@ -101,7 +101,7 @@ An `admin` sees everything an owner sees (D-58).
 ## S-05 Registration dialog (from S-03 or S-06)
 **Sections:**
 1. `Kartica`: the card code (read-only when the dialog was opened by a scan; otherwise a scan field showing `Skenirajte praznu karticu`).
-2. `Podaci o članu`: Ime, Prezime, Telefon, Email, Datum rođenja (date picker, and typing `dd.mm.yyyy` is also accepted).
+2. `Podaci o članu`: Ime, Prezime, Telefon, Email, Datum rođenja. The date is typed as `dd.mm.yyyy`; typing digits alone is enough, as the dots are added automatically. The calendar button opens a calendar in which `Godina` and `Mjesec` are picked from lists, then the day (D-79).
 3. `Članarina`: the same fields as S-08, without the member selector.
 4. `Prijavi odmah`: a checkbox, on by default.
 5. The duplicate warning (BR-043) appears inline when the phone or email field loses focus.
@@ -263,7 +263,7 @@ An `admin` sees everything an owner sees (D-58).
 1. `Treneri`: name, active, and (owner only) `Naknada teretani po personalnom klijentu (€)` (empty = nije definisano) and `Udio za grupne (%)` (empty = važi procenat sa plana, D-62).
 2. `Programi`: name, kind, active.
 3. `Dodjela`: a matrix of trainers (rows) × programs (columns) with checkboxes.
-4. `Raspored`: a weekly table (Mon–Sun) of slots, with [Dodaj čas] (program, trainer, day, time) and [Deaktiviraj].
+4. `Raspored`: a weekly table (Mon–Sun) of slots, with [Dodaj čas] (program, trainer, day, time) and [Deaktiviraj]. Above it, the `Trener` select (`Svi treneri` or one trainer with classes in the schedule) shows only that trainer's classes (D-77).
 
 ## S-25 Plans — `/settings/plans` (owner)
 - **Table:** all plans (including inactive).
@@ -301,7 +301,7 @@ The screen `/settings/products` and its Podešavanja item are gone. It showed th
 
 ## S-29 Trainers — `/trainers` (all roles, D-72)
 - **Title:** `Treneri`, with the line `Članovi sa grupnom članarinom koja važi danas, po treneru i fiksnom terminu.`
-- **Content (BR-027):** one table per trainer, trainers by name. Inside it, one header row per fixed class time, earliest first (`Uto, čet, sub · 08:00 · Članova: 7`), followed by its members; `Termin nije upisan` comes last, with the hint `Članarine prodate prije uvođenja fiksnog termina. Termin se upisuje na profilu člana → [Promijeni termin].` A class time without members shows `Nema upisanih članova.`
+- **Content (BR-027):** one table per trainer, trainers by name. Inside it, one header row per fixed class time, earliest first (`Uto, čet, sub · 08:00 · Članova: 7`), followed by its members. The class time at the start of the header row (`Uto, čet, sub · 08:00`, or `Termin nije upisan`) is bold (D-78). `Termin nije upisan` comes last, with the hint `Članarine prodate prije uvođenja fiksnog termina. Termin se upisuje na profilu člana → [Promijeni termin].` A class time without members shows `Nema upisanih članova.`
 - **Columns:** `#` (row number within the class time), `Član` (`#<broj> <ime i prezime>`, a link to S-07), `Vrsta` (the plan name), `Datum uplate`, `Danas`, and for the owner and admin only `Cijena po članu (€)`.
 - **Today:** for a class time held today the header adds `Došlo danas: <n> / <m>`, and `Danas` shows each member's check-in time (`HH:mm`) or `—`. Under the members, the line `Prijavljeni na čas, a nisu na spisku:` lists the others who checked in to it, each as `#<broj> <ime i prezime> (HH:mm)`, adding `neplaćen dolazak` for an unpaid visit. For a class time not held today, `Danas` stays empty.
 - **Owner and admin:** the trainer's table ends with the row `UKUPNO – <trener>` and the sum of `Cijena po članu (€)`.

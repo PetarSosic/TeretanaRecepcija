@@ -6,6 +6,7 @@ import {
   formatDateTime,
   formatDuration,
   formatMoney,
+  gymDateOf,
   parseMoneyInput,
   sumMoney,
 } from "@/lib/format";
@@ -16,6 +17,15 @@ describe("BR-001/002 dates and durations", () => {
   });
   it("uses Podgorica's date across UTC midnight", () => {
     expect(formatDateTime("2026-01-01T23:30:00Z")).toBe("02.01.2026 00:30");
+  });
+  it("gives the gym's date of a timestamp, not its UTC date (PDF file names)", () => {
+    // 00:20 on 30.09 in Podgorica (CEST) is still 29.09 in UTC.
+    expect(gymDateOf("2026-09-29T22:20:00+00:00")).toBe("2026-09-30");
+    expect(gymDateOf("2026-09-29T21:59:00Z")).toBe("2026-09-29");
+    // Winter (CET): one hour ahead of UTC.
+    expect(gymDateOf("2026-01-01T23:30:00Z")).toBe("2026-01-02");
+    expect(gymDateOf("2026-01-01T22:30:00Z")).toBe("2026-01-01");
+    expect(() => gymDateOf("2026-09-29T22:20:00")).toThrow();
   });
   it("handles the daylight-saving jump", () => {
     expect(formatTime("2026-03-29T00:30:00Z")).toBe("01:30");

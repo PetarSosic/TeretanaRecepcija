@@ -1185,8 +1185,12 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   | **sutrašnji datum** | mora biti odbijeno (vidi SUSPECT-06 — provjerite koju poruku dobijete) |
   | `15/03/1995` | odbijeno |
   | prazno | odbijeno |
-- **Očekivani rezultat:** kako je u tablici. Dugme sa ikonicom kalendara otvara biranje datuma i
-  upisuje izabrani datum u polje u obliku `dd.mm.gggg`.
+- **Očekivani rezultat:** kako je u tablici. Dugme sa ikonicom kalendara otvara kalendar u kojem
+  se „Godina“ i „Mjesec“ biraju sa liste, pa dan, i upisuje izabrani datum u polje u obliku
+  `dd.mm.gggg`. Kucanje samih cifara (`15031995`) daje `15.03.1995` (D-79).
+  > **Ponoviti (D-79):** automatski: `members.spec.ts` (cifre bez tačaka, kalendar, Esc zatvara
+  > samo kalendar), `test-plan-forms.spec.ts` (kalendar u „Uredi podatke“) i unit
+  > `members.test.ts` (`typeDateInput`). Sve prošlo 30.09.2026, i u produkcijskom buildu.
 - **Gdje provjeriti:** UI
 - [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-forms.spec.ts` (dijalog „Uredi podatke“, ista provjera kao „Novi član“): prihvaćeni `15.03.1995`, `1.3.1995`, `01.01.1900`, `29.02.2024` i sačuvani tačno; odbijeni `31.12.1899`, `31.02.2000`, `29.02.2023`, sutrašnji datum, `15/03/1995` i prazno — svi sa „Unesite datum rođenja (dd.mm.gggg), od 01.01.1900 do danas.“ (i sutrašnji; SUSPECT-06 se ovdje ne javlja). Kalendar upisuje izabrani datum kao `08.07.1994`. Raniji dokaz (22.09.): Unit members.test.ts provjerava oba formata, nepostojeće datume i donju granicu. Gornja granica i poruka server akcije nisu ponovo testirane uživo.
 
@@ -1559,10 +1563,10 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   „—“. Ispod stoji „Prijavljeni na čas, a nisu na spisku: #4 … (HH:mm, neplaćen dolazak)“, a na
   kraju „Termin nije upisan · Članova: 1“. Kod Tamare nema „Došlo danas“. Recepcioner ne vidi
   „Cijena po članu (€)“ ni „UKUPNO“. 3) Vlasnik vidi i kolonu „Cijena po članu (€)“ i red
-  „UKUPNO – Milena“ sa zbirom (69 + 99 + 69 = 237,00 €).
+  „UKUPNO – Milena“ sa zbirom (69 + 99 + 69 = 237,00 €). Vrijeme termina na početku zaglavlja
+  („<dani> · 08:00“) je podebljano (D-78).
 - **Gdje provjeriti:** UI; `trainer_roster()`, `fin_roster_prices()`
-- [ ] Prošlo  [ ] Palo  Napomena: automatski: `trainer-roster.spec.ts`, DB `0015_trainer_roster`,
-  unit `trainer-roster.test.ts`. Još nije pokrenuto.
+- [x] Prošlo  [ ] Palo  Napomena: **30.09.2026 — PROŠLO.** `trainer-roster.spec.ts` (oba projekta), DB `0015_trainer_roster` (28 tvrdnji), unit `trainer-roster.test.ts`. Zaglavlja, „—“, „Prijavljeni na čas, a nisu na spisku“, „Termin nije upisan“, bez iznosa za recepcionera, 237,00 € za vlasnika; vrijeme termina podebljano (`font-weight: 700`, D-78).
 
 ---
 
@@ -2232,6 +2236,18 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Gdje provjeriti:** UI
 - [x] Prošlo  [ ] Palo  Napomena: **22.09.2026 — PROŠLO.** E2E jobs.spec.ts: nije napravljena, neuspješna i uspješna posljednja kopija na S-27.
 
+### [SET-21] Raspored jednog trenera (D-77)
+- **Prioritet:** Srednje
+- **Uloga / preduslovi:** Vlasnik ili menadžer; u rasporedu Milena ima dva časa, a Tamara jedan
+- **Koraci:** `/settings/trainers` → sekcija „Raspored“ → u polju „Trener“ izaberite `Tamara`,
+  pa `Milena`, pa `Svi treneri`.
+- **Test podaci:** —
+- **Očekivani rezultat:** lista nudi `Svi treneri` i trenere koji imaju čas u rasporedu, po imenu.
+  Uz `Tamara` tabela ima samo njen čas, uz `Milena` samo njena dva, a uz `Svi treneri` sva tri.
+  [Dodaj čas] i [Deaktiviraj] rade kao i bez filtera.
+- **Gdje provjeriti:** UI
+- [x] Prošlo  [ ] Palo  Napomena: **30.09.2026 — PROŠLO.** `trainer-roster.spec.ts` (oba projekta, dev server i produkcijski build): lista nudi `Svi treneri`, `E2E Milena`, `E2E Tamara`; Tamara → 1 red (19:00), Milena → 2 reda, `Svi treneri` → 3.
+
 ---
 
 ### 3.11 CARD — kartice (S-28, BR-030 do BR-036)
@@ -2833,6 +2849,18 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   radi, grafikoni ostaju čitljivi, dnevnik izmjena pokazuje poruku o ograničenju od 200 zapisa.
 - **Gdje provjeriti:** UI; Network tab (vrijeme odgovora)
 - [x] Prošlo  [ ] Palo  Napomena: **24.09.2026 — PROŠLO.** `test-plan-medium-b.spec.ts`: 233 člana, 301 dolazak u mjesecu i preko 200 izmjena danas, produkcijski build protiv hostovane baze. `/members` 0,72 s („Strana 1 od 10“, 25 redova), sljedeća strana 0,84 s, pretraga „Član217“ 0,81 s (nalazi #217 i #218, čiji telefon sadrži 217); `/stats/visits` 0,65 s; `/finance/audit` 0,72 s, sa 200 redova i porukom „Prikazano je prvih 200 izmjena. Suzite period da vidite ostale.“ Grafikoni su čitljivi (snimci). Raniji dokaz (22.09.): perf:scan sa 3.000 članova/150.000 dolazaka, 300 skenova: server p95 34,9 ms; round-trip p95 72,3 ms. Priprema 50,5 s, rollback. UI pretraga/straničenje sa velikim skupom nisu mjereni.
+
+### [UX-07] Meni ostaje u jednom redu dok je smjena otvorena
+- **Prioritet:** Srednje
+- **Uloga / preduslovi:** Vlasnik ili admin; recepcioner ima otvorenu smjenu
+- **Koraci:** otvorite bilo koju stranicu na 1366×768 i na širem ekranu, pa suzite prozor ispod
+  1280 px.
+- **Test podaci:** —
+- **Očekivani rezultat:** sve stavke menija („Uplate danas“, „Statistika dolazaka“…) su u jednom
+  redu, a „Smjena: <ime> od <HH:mm>“ i ime naloga se vide cijeli. Ispod 1280 px meni se otvara
+  dugmetom „Otvori meni“.
+- **Gdje provjeriti:** UI (zaglavlje)
+- [x] Prošlo  [ ] Palo  Napomena: **30.09.2026 — PROŠLO.** `shifts.spec.ts` (vlasnik uz smjenu recepcionera, 1366 px): 8 stavki u jednom redu, nijedna viša od 40 px, oznaka smjene cijela; na 1100 px meni skriven, „Otvori meni“ vidljiv. Mjerenje sa vlasnikom „Matija Vojinović“ i adminom: vidi 9.14.
 
 ---
 
@@ -3850,6 +3878,40 @@ README (Supabase, korak 5).
 | E2E `password-reset`, `admin`, `auth` (dev server, oba projekta) | **28/28** (novi `password-reset.spec.ts`: D-69, AUTH-15, AUTH-16, neaktivan nalog) |
 | Hostovani Supabase: token iz pravog PKCE mejla u drugom „pregledaču“ | `verifyOtp` otvara sesiju za pravog korisnika; drugi pokušaj `otp_expired` |
 | Test podaci | privremeni nalozi i teretane obrisani; nula `@resend.dev` korisnika, nula `E2E` teretana |
+
+### 9.14 Dopuna — meni, raspored, termin, datum rođenja (D-77–D-79, N-30), 29.–30.09.2026
+
+**Meni u dva reda dok je smjena otvorena — popravljeno (doc 06 §1, UX-07).** Zapažanje iz 9.10
+(„Uplate danas“ i „Statistika dolazaka“ u dva reda na 1366 px) ponovo je prijavio vlasnik sa
+snimkom ekrana: uz oznaku „Smjena: … od HH:mm“ vlasnikovih i adminovih osam stavki, oznaka i
+dugme naloga nisu stali u 1232 px koliko ostavlja `max-w-7xl`. Sada nijedna stavka ne prelazi u
+drugi red, zaglavlje je široko koliko prozor (sadržaj stranice ostaje `max-w-7xl`), a ispod
+1280 px meni se otvara dugmetom „Otvori meni“. Uz pun meni oznaka smjene se nikad ne skraćuje;
+ako mjesta ipak ponestane, skraćuje se samo ime na dugmetu naloga (cijelo je u opisu na prelaz
+mišem). Izmjereno: vlasnik „Matija Vojinović“ i smjena „Test Recepcija“ na 1366 px — sve cijelo,
+35 px rezerve; admin na 1280 px — sve cijelo.
+
+**N-30 — naziv PDF-a nosio je UTC datum — popravljeno.** `/api/pdf/shift/<id>` i
+`/api/pdf/cards/<batchId>` su datum u nazivu fajla uzimali kao prvih deset znakova vremenske
+oznake, tj. UTC datum. Između ponoći i 02:00 (ljeti) ili 01:00 (zimi) fajl je dobijao jučerašnji
+datum (`smjena-2026-09-29.pdf` za smjenu otvorenu 30.09. u 00:20). Otkriveno jer je cijeli E2E
+paket pušten poslije ponoći: E2E-01 i CARD-02 su pali, a testovi su bili u pravu. Sada se datum
+uzima u zoni teretane (`gymDateOf` u `lib/format.ts`, BR-001). Pretraga koda nije našla drugo
+mjesto sa istim obrascem. Regresija: unit `format.test.ts`, E2E-01, CARD-02.
+
+**D-77, D-78, D-79 (zahtjev vlasnika 29.09.2026):** filter „Trener“ u rasporedu na S-24
+(SET-21), podebljano vrijeme termina u zaglavljima na S-29 (MSHIP-19), datum rođenja koji se
+kuca samim ciframa i kalendar sa listama „Godina“ i „Mjesec“ umjesto preglednikovog, koji je
+listao mjesec po mjesec od danas (MEM-06).
+
+| Provjera 30.09.2026 | Rezultat |
+|---|---|
+| `npm run lint`, `npm run typecheck` | PROŠLO |
+| `npm run test` | **20 fajlova PROŠLO** (1 preskočen). U prvom pokretanju `tests/integration/backup.test.ts` je pao pri radu sa hostovanom bazom (nijedna tvrdnja nije pala) i ostavio teretanu „E2E backup-…“ — obrisana; tri sljedeća pokretanja čista |
+| `npm run test:db` | **19/19 fajlova** |
+| Cijeli E2E na dev serveru, oba projekta | **313 prošlo**, 3 palo, 3 nije pokrenuto (serijski nastavci palih), 153 preskočeno. Pali: E2E-01 i CARD-02 (N-30, prije popravke) i UX-04 (dugme Next.js dev alata, vidi 9.12) |
+| Produkcijski build (`E2E_PRODUCTION=1`): flows, high-d, medium-b, shifts, trainer-roster, members, forms | **57/57** (27 preskočeno — mobilne varijante), uključujući E2E-01, CARD-02 i UX-04 |
+| Zaostale `E2E` teretane u bazi | 0 |
 
 *Kraj plana. Novi rezultati upisani su uz slučajeve; neoznačeni kvadratići nisu automatski prolaz.*
 

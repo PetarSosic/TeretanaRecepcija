@@ -488,7 +488,7 @@ function AssignmentToggle({
   );
 }
 
-/** BR-022 and BR-024: the weekly schedule, Monday first. */
+/** BR-022 and BR-024: the weekly schedule, Monday first; D-77: one trainer's at a time. */
 function ScheduleSection({
   slots,
   trainers,
@@ -501,7 +501,16 @@ function ScheduleSection({
   assignments: Assignment[];
 }) {
   const [creating, setCreating] = useState(false);
+  // D-77: "" shows every trainer's classes.
+  const [trainerId, setTrainerId] = useState("");
   const trainerName = new Map(trainers.map((t) => [t.id, t.full_name]));
+  // Only trainers who have a class in the schedule, active or not, by name.
+  const withSlots = trainers.filter((trainer) =>
+    slots.some((slot) => slot.trainer_id === trainer.id),
+  );
+  const shown = trainerId
+    ? slots.filter((slot) => slot.trainer_id === trainerId)
+    : slots;
 
   return (
     <section>
@@ -513,6 +522,23 @@ function ScheduleSection({
           </Button>
         }
       />
+      {withSlots.length ? (
+        <div className="mb-3 grid max-w-xs gap-1.5">
+          <Label htmlFor="schedule-trainer">{me.settings.slotTrainer}</Label>
+          <Select
+            id="schedule-trainer"
+            value={trainerId}
+            onChange={(event) => setTrainerId(event.target.value)}
+          >
+            <option value="">{me.settings.allTrainers}</option>
+            {withSlots.map((trainer) => (
+              <option key={trainer.id} value={trainer.id}>
+                {trainer.full_name}
+              </option>
+            ))}
+          </Select>
+        </div>
+      ) : null}
       <TableWrapper className="rounded-2xl border bg-card">
         <Table>
           <thead>
@@ -527,14 +553,14 @@ function ScheduleSection({
             </tr>
           </thead>
           <tbody>
-            {slots.length === 0 ? (
+            {shown.length === 0 ? (
               <tr>
                 <Td colSpan={5} className="text-muted-foreground">
                   {me.settings.noSlots}
                 </Td>
               </tr>
             ) : (
-              slots.map((slot) => (
+              shown.map((slot) => (
                 <tr key={slot.id}>
                   <Td>{me.settings.weekdays[slot.weekday - 1]}</Td>
                   <Td>{formatClockTime(slot.starts_at)}</Td>

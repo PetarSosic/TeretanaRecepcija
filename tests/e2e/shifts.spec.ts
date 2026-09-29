@@ -182,3 +182,39 @@ test("BR-112: an owner login neither opens nor closes a shift", async ({
   ).toBeVisible();
   expect(await openShifts()).toHaveLength(before.length);
 });
+
+test("Doc 06 §1: beside an open shift the owner's menu stays on one line", async ({
+  page,
+}, testInfo) => {
+  test.skip(
+    testInfo.project.name !== "desktop",
+    "the full menu is a desktop one",
+  );
+  await signIn(page, owner);
+  const menu = page.getByRole("navigation", { name: "Meni" });
+  const items = menu.getByRole("listitem");
+  await expect(items).toHaveCount(8);
+  // Every label on one line (a wrapped one is two lines tall), all in one row.
+  const boxes = await items.evaluateAll((elements) =>
+    elements.map((element) => {
+      const box = element.getBoundingClientRect();
+      return { middle: box.top + box.height / 2, height: box.height };
+    }),
+  );
+  for (const box of boxes) {
+    expect(box.height).toBeLessThanOrEqual(40);
+    expect(Math.abs(box.middle - boxes[0].middle)).toBeLessThanOrEqual(1);
+  }
+  // The badge keeps its whole text beside the full menu.
+  const badge = page.getByText(/^Smjena: E2E Bojana od \d{2}:\d{2}$/);
+  await expect(badge).toBeVisible();
+  expect(
+    await badge.evaluate(
+      (element) => element.scrollWidth <= element.clientWidth,
+    ),
+  ).toBe(true);
+  // Below 1280 px the menu button takes the menu's place.
+  await page.setViewportSize({ width: 1100, height: 768 });
+  await expect(menu).toBeHidden();
+  await expect(page.getByRole("button", { name: "Otvori meni" })).toBeVisible();
+});

@@ -321,6 +321,12 @@ test("D-72: reception sees each trainer's classes, today's check-ins and who is 
   await expect(milena).toContainText(
     `${label([dayAfter(0), dayAfter(2)], "08:00")} · Članova: 2 · Došlo danas: 1 / 2`,
   );
+  // D-78: the class time is the bold part of its header row.
+  await expect(
+    milena.getByText(label([dayAfter(0), dayAfter(2)], "08:00"), {
+      exact: true,
+    }),
+  ).toHaveCSS("font-weight", "700");
   await expect(milena.getByRole("row", { name: /#1 Ena Lista/ })).toContainText(
     /E2E Grupni.*\d{2}:\d{2}/,
   );
@@ -365,4 +371,36 @@ test("D-72: the owner also sees each price and the trainer's total", async ({
   await expect(page.getByRole("region", { name: "E2E Tamara" })).toContainText(
     "69,00 €",
   );
+});
+
+test("D-77: the schedule on Treneri i raspored can show one trainer's classes", async ({
+  page,
+}) => {
+  await signIn(page, owner);
+  await page.goto("/settings/trainers");
+  const schedule = page.locator("section").filter({
+    has: page.getByRole("heading", { name: "Raspored", exact: true }),
+  });
+  const rows = schedule.locator("tbody tr");
+  await expect(rows).toHaveCount(3);
+  const filter = schedule.getByLabel("Trener", { exact: true });
+  // Only trainers with a class in the schedule, by name.
+  await expect(filter.locator("option")).toHaveText([
+    "Svi treneri",
+    "E2E Milena",
+    "E2E Tamara",
+  ]);
+
+  await filter.selectOption({ label: "E2E Tamara" });
+  await expect(rows).toHaveCount(1);
+  await expect(rows.first()).toContainText("19:00");
+  await expect(rows.first()).toContainText("E2E Tamara");
+
+  await filter.selectOption({ label: "E2E Milena" });
+  await expect(rows).toHaveCount(2);
+  for (const row of await rows.all())
+    await expect(row).toContainText("E2E Milena");
+
+  await filter.selectOption({ label: "Svi treneri" });
+  await expect(rows).toHaveCount(3);
 });

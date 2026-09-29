@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { memberFieldsSchema, registerSchema } from "@/features/members/schemas";
 import { saleFieldsSchema } from "@/features/memberships/schemas";
-import { parseDateInput } from "@/lib/format";
+import { parseDateInput, typeDateInput } from "@/lib/format";
 import { me } from "@/lib/i18n/me";
 import { parseCardCode } from "@/lib/scan";
 
@@ -35,6 +35,34 @@ describe("parseDateInput (S-05, BR-002)", () => {
     expect(parseDateInput("29.02.2028")).toBe("2028-02-29");
     expect(parseDateInput("1995/03/05")).toBeNull();
     expect(parseDateInput("")).toBeNull();
+  });
+});
+
+/** Types the text one key at a time, as the field applies typeDateInput after each. */
+function typed(keys: string) {
+  return [...keys].reduce((value, key) => typeDateInput(value + key), "");
+}
+
+describe("typeDateInput (S-05, D-79)", () => {
+  it("adds the dots while digits alone are typed", () => {
+    expect(typed("15031990")).toBe("15.03.1990");
+    expect(typed("1503")).toBe("15.03.");
+    expect(parseDateInput(typed("05031995"))).toBe("1995-03-05");
+  });
+  it("keeps dots typed by hand, without doubling them", () => {
+    expect(typed("1.3.1990")).toBe("1.3.1990");
+    expect(typed("15.03.1990")).toBe("15.03.1990");
+    expect(typed("1.03.1990")).toBe("1.03.1990");
+  });
+  it("splits a third digit in a row and eight pasted digits", () => {
+    expect(typeDateInput("150")).toBe("15.0");
+    expect(typeDateInput("15.031")).toBe("15.03.1");
+    expect(typeDateInput("15031990")).toBe("15.03.1990");
+  });
+  it("leaves anything else as it is", () => {
+    expect(typeDateInput("1")).toBe("1");
+    expect(typeDateInput("1995-03-05")).toBe("1995-03-05");
+    expect(typeDateInput("15.03.199")).toBe("15.03.199");
   });
 });
 
@@ -82,7 +110,11 @@ describe("memberFieldsSchema (BR-040, BR-041)", () => {
       ["Ana", "👍🏽", "lastName", me.members.lastNameEmoji],
       ["Ana", "Kafa☕", "lastName", me.members.lastNameEmoji],
     ] as const) {
-      const result = memberFieldsSchema.safeParse({ ...member, firstName, lastName });
+      const result = memberFieldsSchema.safeParse({
+        ...member,
+        firstName,
+        lastName,
+      });
       expect(result.success, `${firstName} ${lastName}`).toBe(false);
       expect(result.error?.issues[0]).toMatchObject({ path: [field], message });
     }
@@ -94,7 +126,8 @@ describe("memberFieldsSchema (BR-040, BR-041)", () => {
       ["Jovan ©", "Jovanović"],
     ])
       expect(
-        memberFieldsSchema.safeParse({ ...member, firstName, lastName }).success,
+        memberFieldsSchema.safeParse({ ...member, firstName, lastName })
+          .success,
         `${firstName} ${lastName}`,
       ).toBe(true);
   });

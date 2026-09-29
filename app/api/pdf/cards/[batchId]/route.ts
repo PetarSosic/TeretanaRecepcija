@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { renderCardSheet } from "@/lib/pdf/card-sheet";
 import { getStaff } from "@/lib/auth";
+import { gymDateOf } from "@/lib/format";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 
@@ -66,7 +67,8 @@ export async function GET(
     logo,
   });
 
-  const day = batch.created_at.slice(0, 10);
+  // BR-001: the gym's date, so a sheet made after midnight is not named yesterday.
+  const day = gymDateOf(batch.created_at);
   return new NextResponse(new Uint8Array(pdf), {
     headers: {
       "Content-Type": "application/pdf",

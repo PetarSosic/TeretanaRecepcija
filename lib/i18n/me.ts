@@ -160,6 +160,8 @@ export const me = {
     slotDay: "Dan",
     slotTime: "Vrijeme",
     noSlots: "Nema časova.",
+    // D-77: the schedule filtered to one trainer.
+    allTrainers: "Svi treneri",
     weekdays: [
       "Ponedjeljak",
       "Utorak",
@@ -331,6 +333,11 @@ export const me = {
     dateOfBirth: "Datum rođenja",
     datePlaceholder: "dd.mm.gggg",
     pickDate: "Izaberi datum",
+    // D-79: the date of birth calendar.
+    calendarMonth: "Mjesec",
+    calendarYear: "Godina",
+    previousMonth: "Prethodni mjesec",
+    nextMonth: "Sljedeći mjesec",
     sectionMembership: "Članarina",
     duplicateWarning: "Već postoji član sa istim telefonom ili emailom:",
     openExisting: "Otvori postojećeg",
