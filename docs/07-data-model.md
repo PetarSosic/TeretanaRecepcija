@@ -434,7 +434,20 @@ create table audit_log (
   changed_at timestamptz not null default now()
 );
 create index audit_gym_time_idx on audit_log (gym_id, changed_at desc);
+
+-- D-75: sign-in counters. Not the gym's data: in schema `private`, which the Data API does
+-- not serve, no role but the service role and the functions may use, and the weekly
+-- backup (BR-163, `public` only) never exports.
+create schema private;
+create table private.login_throttle (
+  key          text primary key,                  -- 'login:<auth email>' or 'ip:<address>'
+  attempts     smallint not null default 0,       -- in this 15-minute window, successes taken back
+  window_start timestamptz not null default now(),
+  locked_until timestamptz
+);
 ```
+
+A lock of a staff login, and its unlock, are written to `audit_log` as an `update` of that `staff` row with the pseudo-column `login_locked_until` (D-75); the lock has `changed_by = null`, since nobody is signed in.
 
 **Audit triggers** (`insert`, `update`, `void`) are required on these tables:
 - `payments`, `memberships`, `stock_movements`, `expenses`;
@@ -470,6 +483,9 @@ All RPCs are `security definer`. Each one:
 | RPC | Allowed roles | Rules |
 |---|---|---|
 | `resolve_login_shift()` → `{state: 'opened'\|'resumed'\|'gate', shift}` | receptionist | BR-111 |
+| `login_attempt_begin(p_email text, p_ip text)` → `{allowed, minutes}`, `login_attempt_end(p_email text, p_ip text, p_ok bool)` | service role only (the sign-in action) | US-01.1 AC6, AC7 (D-75) |
+| `staff_login_locks()` → rows `(staff_id, locked_until)` of the caller's gym | admin, owner, manager | US-01.3 AC6 (D-75) |
+| `unlock_staff_login(p_staff uuid)` | admin; owner except for owner and admin accounts | P-08 (D-75) |
 | `take_over_shift(p_counted_cash numeric)` | receptionist | BR-111 |
 | `close_shift(p_shift uuid, p_counted_cash numeric)` → shift | receptionist (own), owner (any; cash optional) | BR-114, BR-115 |
 | `shift_summary(p_shift uuid)` → json | shift's receptionist, owner; manager: currently open shift only, aggregate totals only | BR-115, BR-117, D-54 |

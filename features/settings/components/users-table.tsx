@@ -20,12 +20,13 @@ import { Select } from "@/components/ui/select";
 import { Table, TableWrapper, Td, Th } from "@/components/ui/table";
 import { idleState } from "@/lib/action-state";
 import type { AppRole } from "@/lib/auth";
-import { formatDate } from "@/lib/format";
+import { formatDate, formatTime } from "@/lib/format";
 import { me } from "@/lib/i18n/me";
 import {
   createStaffUser,
   setStaffActive,
   setStaffPassword,
+  unlockStaffLogin,
   updateStaffUser,
 } from "../actions";
 
@@ -39,6 +40,8 @@ export type StaffRow = {
   created_at: string;
   /** D-59: present only when the signed-in user is an admin. */
   password?: string | null;
+  /** D-75: set while the login is locked after failed attempts. */
+  locked_until?: string | null;
 };
 
 /**
@@ -51,6 +54,16 @@ function mayManage(callerRole: AppRole, targetRole: AppRole) {
   return (
     callerRole === "admin" || callerRole === "owner" || callerRole === "manager"
   );
+}
+
+/**
+ * P-08 (D-75): the owner and the admin unlock a login; owner and admin accounts are
+ * the admin's alone, as for every other change to them (P-03).
+ */
+function mayUnlock(callerRole: AppRole, targetRole: AppRole) {
+  if (targetRole === "owner" || targetRole === "admin")
+    return callerRole === "admin";
+  return callerRole === "admin" || callerRole === "owner";
 }
 
 /** D-60: the caller's own row never offers deactivation. */
@@ -75,6 +88,13 @@ export function UsersTable({
   // Stable callbacks: the toast effect keys on the action state plus this handler.
   const closeEdit = useCallback(() => setEditing(null), []);
   const closeReset = useCallback(() => setResetting(null), []);
+  // D-75: [Otključaj] leaves the row once the lock is lifted, so its outcome is held
+  // here, where the toast outlives the button.
+  const [unlockState, unlockAction, unlocking] = useActionState(
+    unlockStaffLogin,
+    idleState,
+  );
+  useActionToast(unlockState);
 
   return (
     <>
@@ -116,7 +136,17 @@ export function UsersTable({
                   <Td className="font-medium">{row.full_name}</Td>
                   <Td>{row.username ?? row.email}</Td>
                   <Td>{me.roles[row.role]}</Td>
-                  <Td>{row.is_active ? me.users.yes : me.users.no}</Td>
+                  <Td>
+                    {row.is_active ? me.users.yes : me.users.no}
+                    {row.locked_until ? (
+                      <div className="text-sm font-medium text-destructive">
+                        {me.users.lockedUntil.replace(
+                          "{time}",
+                          formatTime(row.locked_until),
+                        )}
+                      </div>
+                    ) : null}
+                  </Td>
                   {showPasswords ? (
                     <Td>
                       <StoredPassword password={row.password} />
@@ -140,6 +170,13 @@ export function UsersTable({
                         >
                           {me.users.newPassword}
                         </Button>
+                        {row.locked_until && mayUnlock(callerRole, row.role) ? (
+                          <UnlockButton
+                            row={row}
+                            action={unlockAction}
+                            pending={unlocking}
+                          />
+                        ) : null}
                         {mayDeactivate(row, callerStaffId) ? (
                           <ActiveButton row={row} />
                         ) : null}
@@ -161,6 +198,25 @@ export function UsersTable({
       <EditDialog row={editing} onClose={closeEdit} />
       <PasswordDialog row={resetting} onClose={closeReset} />
     </>
+  );
+}
+
+function UnlockButton({
+  row,
+  action,
+  pending,
+}: {
+  row: StaffRow;
+  action: (formData: FormData) => void;
+  pending: boolean;
+}) {
+  return (
+    <form action={action}>
+      <input type="hidden" name="staffId" value={row.id} />
+      <Button type="submit" variant="outline" size="sm" disabled={pending}>
+        {me.users.unlock}
+      </Button>
+    </form>
   );
 }
 

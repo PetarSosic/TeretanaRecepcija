@@ -11,6 +11,8 @@ All features are **MVP**. Acceptance criteria (AC) are written so each one can b
 - AC3: Wrong credentials show `Pogrešno korisničko ime/email ili lozinka.` The message does not reveal which one was wrong.
 - AC4: A deactivated user cannot log in and sees the same message.
 - AC5: Every role signs in this way. Only the admin, and the seeded owner account, sign in with an email (D-57).
+- AC6: After 5 failed sign-ins in a row for the same username or email (within 15 minutes, with no successful sign-in between), that login is locked for 15 minutes (D-75). While it is locked, every attempt shows `Previše neuspješnih pokušaja prijave. Pokušajte ponovo za <N> min.`, and the password is not checked at all, so even the right one is refused. A username or email that belongs to nobody is counted and locked the same way, so the message reveals no account (AC3). The failed attempts themselves still show the AC3 message, with no count of attempts left.
+- AC7: After 30 failed sign-ins in 15 minutes from one client address, every sign-in from that address is refused for 15 minutes with the AC6 message (D-75).
 
 **US-01.2** As the admin, I log in with my email, and I can reset a forgotten password by email (D-57, D-58).
 - AC1: "Zaboravljena lozinka?" sends a reset link only to an account that has an email, which is the admin and the seeded owner account.
@@ -23,6 +25,7 @@ All features are **MVP**. Acceptance criteria (AC) are written so each one can b
 - AC3: A user created with a temporary password must set a new password at first login (S-01b) before any other screen.
 - AC4: Owners and managers can set a new temporary password for receptionists and managers. Only an admin can do it for owners and admins. The admin can additionally read every stored staff password (P-06, D-59).
 - AC5: Deactivating a user bans them in Supabase Auth. Their next request redirects to login. Nobody may deactivate their own account, and the last active owner or admin cannot be deactivated (P-07, D-60).
+- AC6: A login locked by US-01.1 AC6 shows `Zaključan do <HH:mm>` on S-23. The owner and the admin can lift the lock early with [Otključaj], which also clears the failed attempts; for owner and admin accounts only the admin can. Both the lock and the unlock are recorded in Dnevnik izmjena (P-08, D-75).
 
 **US-01.4** As any user, I change my own password from the user menu.
 - AC1: The current password is required, the new one must be ≥ 8 characters, and a success toast appears. S-01b after a first login (AS-18) or a reset link (D-69) does not ask for it.

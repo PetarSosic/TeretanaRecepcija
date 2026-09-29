@@ -1,5 +1,6 @@
 "use server";
 
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import {
   getStaff,
@@ -9,6 +10,7 @@ import {
   usernameEmail,
   type AppRole,
 } from "@/lib/auth";
+import { clientIp } from "@/lib/client-ip";
 import { me } from "@/lib/i18n/me";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { storeStaffPassword } from "@/lib/staff-credentials";
@@ -48,17 +50,38 @@ export async function loginWithUsernameOrEmail(
     return { error: me.login.failed };
   }
 
+  // D-75 (US-01.1 AC6, AC7): a locked login or address is refused before the password
+  // is checked at all, so a lock cannot be used to test passwords either.
+  const admin = createAdminClient();
+  const ip = clientIp(await headers());
+  const { data: gate, error: gateError } = await admin.rpc(
+    "login_attempt_begin",
+    { p_email: email, p_ip: ip },
+  );
+  if (gateError || !gate) {
+    console.error(`login_attempt_begin: ${gateError?.message ?? "no answer"}`);
+    return { error: me.errors.unexpected };
+  }
+  const { allowed, minutes } = gate as { allowed: boolean; minutes?: number };
+  if (!allowed)
+    return { error: me.login.locked.replace("{minutes}", String(minutes)) };
+
   const supabase = await createClient();
   const { error } = await supabase.auth.signInWithPassword({ email, password });
-  if (error) return { error: me.login.failed };
+  if (error) {
+    await endLoginAttempt(email, ip, false);
+    return { error: me.login.failed };
+  }
 
   // Doc 04 §2 point 5: a deactivated account must not reach any screen, even if its
   // Auth ban has not been applied.
   const staff = await getStaff();
   if (!staff) {
     await supabase.auth.signOut();
+    await endLoginAttempt(email, ip, false);
     return { error: me.login.failed };
   }
+  await endLoginAttempt(email, ip, true);
 
   if (staff.must_change_password) redirect("/change-password");
 
@@ -69,6 +92,20 @@ export async function loginWithUsernameOrEmail(
   }
 
   redirect(homeRoute(staff.role));
+}
+
+/**
+ * D-75: the outcome of an attempt counted by login_attempt_begin. A failure here is only
+ * logged: the answer to the user is already decided, and at worst the attempt stays
+ * counted as a failure.
+ */
+async function endLoginAttempt(email: string, ip: string | null, ok: boolean) {
+  const { error } = await createAdminClient().rpc("login_attempt_end", {
+    p_email: email,
+    p_ip: ip,
+    p_ok: ok,
+  });
+  if (error) console.error(`login_attempt_end: ${error.message}`);
 }
 
 /**

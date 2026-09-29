@@ -112,6 +112,12 @@ Resend: shift report emails · expiry reminders
 > ASSUMPTION (AS-18): Accounts created with a temporary password must change it at first login.
 
 - **Password rules:** at least 8 characters. Supabase's built-in login rate limiting stays enabled.
+- **Sign-in limits (D-75, US-01.1 AC6, AC7):** Supabase's limit counts by the caller's IP address, and the caller is our server, so it protects no single login. The sign-in action therefore:
+  1. works out the Auth email and the client address (the first `x-forwarded-for` entry, which Vercel sets itself; none for a loopback or missing address);
+  2. calls `login_attempt_begin` with the service role, and answers a refusal with the lock message without calling Supabase Auth;
+  3. signs in, and reports the outcome with `login_attempt_end` (a deactivated account counts as a failure).
+
+  An attempt is counted when it begins, so parallel tries cannot pass the limit. The limits are fixed: 5 failures in a row per login, 30 per address, both within 15 minutes, and a lock lasts 15 minutes.
 
 ## 5. Errors
 RPCs raise `P0001` with the message `E_<CODE>`. `lib/errors.ts` maps each code to the UI text:

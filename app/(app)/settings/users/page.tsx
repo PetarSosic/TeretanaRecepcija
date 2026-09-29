@@ -22,22 +22,30 @@ export default async function UsersPage() {
   // staff_credentials returns rows for an admin alone (D-59) — a manager or owner
   // asking for it gets nothing back, not someone else's password.
   const supabase = await createClient();
-  const [{ data: rows }, { data: credentials }] = await Promise.all([
-    supabase
-      .from("staff")
-      .select("id, full_name, username, email, role, is_active, created_at")
-      .order("created_at", { ascending: true })
-      .returns<StaffRow[]>(),
-    staff.role === "admin"
-      ? supabase
-          .from("staff_credentials")
-          .select("staff_id, password")
-          .returns<{ staff_id: string; password: string }[]>()
-      : Promise.resolve({ data: null }),
-  ]);
+  const [{ data: rows }, { data: credentials }, { data: locks }] =
+    await Promise.all([
+      supabase
+        .from("staff")
+        .select("id, full_name, username, email, role, is_active, created_at")
+        .order("created_at", { ascending: true })
+        .returns<StaffRow[]>(),
+      staff.role === "admin"
+        ? supabase
+            .from("staff_credentials")
+            .select("staff_id, password")
+            .returns<{ staff_id: string; password: string }[]>()
+        : Promise.resolve({ data: null }),
+      // D-75: which logins are locked after failed attempts, and until when.
+      supabase.rpc("staff_login_locks"),
+    ]);
 
   const passwords = new Map(
     (credentials ?? []).map((row) => [row.staff_id, row.password]),
+  );
+  const lockedUntil = new Map(
+    ((locks ?? []) as { staff_id: string; locked_until: string }[]).map(
+      (row) => [row.staff_id, row.locked_until],
+    ),
   );
 
   return (
@@ -45,6 +53,7 @@ export default async function UsersPage() {
       rows={(rows ?? []).map((row) => ({
         ...row,
         password: passwords.get(row.id) ?? null,
+        locked_until: lockedUntil.get(row.id) ?? null,
       }))}
       callerRole={staff.role}
       callerStaffId={staff.id}

@@ -43,7 +43,7 @@ An `admin` sees everything an owner sees (D-58).
 ## S-01 Login — `/login`
 - **Fields:** `Korisničko ime ili email`, `Lozinka`.
 - **Buttons:** [Prijavi se], and a link `Zaboravljena lozinka?`.
-- **Errors:** as in US-01.1 and US-01.2.
+- **Errors:** as in US-01.1 and US-01.2. A locked login or address shows `Previše neuspješnih pokušaja prijave. Pokušajte ponovo za <N> min.` (US-01.1 AC6, AC7, D-75).
 - **After login:** a receptionist goes through the shift logic (BR-111), which leads to S-02 or `/reception`.
 - **Info messages:** `?closed=1` shows `Smjena je zaključena.`; `?auto=1` shows `Smjena je automatski zaključena.`
 
@@ -251,7 +251,8 @@ An `admin` sees everything an owner sees (D-58).
 ## S-23 Users — `/settings/users` (admin, owner, manager)
 - **Table:** Ime, Korisničko ime/Email, Uloga, Aktivan, Kreiran.
 - **Admin only (D-59):** one more column, `Lozinka`, showing each account's stored password. Each row hides it behind a [Prikaži] toggle so the screen cannot be read over someone's shoulder, and it is never rendered for any other role.
-- **Actions:** [Novi korisnik] [Uredi] [Nova lozinka] [Deaktiviraj/Aktiviraj], limited per P-03, P-04 and P-07. A row the caller may not manage shows no actions, and [Deaktiviraj] is not offered for the caller's own row or for the last active owner or admin.
+- **Locked login (D-75):** a login locked after failed sign-ins shows `Zaključan do <HH:mm>` in red under Aktivan, for every role that sees S-23. The owner and the admin also get [Otključaj] on that row (P-08), which shows `Nalog je otključan.`
+- **Actions:** [Novi korisnik] [Uredi] [Nova lozinka] [Otključaj] [Deaktiviraj/Aktiviraj], limited per P-03, P-04, P-07 and P-08. A row the caller may not manage shows no actions, and [Deaktiviraj] is not offered for the caller's own row or for the last active owner or admin.
 - **New user form:** Uloga, Ime i prezime, Korisničko ime, Privremena lozinka. The Administrator role asks for Email instead of Korisničko ime (D-57), and only an admin may choose Vlasnik or Administrator.
 
 ## S-24 Trainers and schedule — `/settings/trainers` (owner, manager)

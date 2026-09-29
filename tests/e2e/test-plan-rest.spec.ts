@@ -396,10 +396,13 @@ test("AUTH-04: an unknown account gets the wrong-password message, word for word
   page,
 }) => {
   const timings: Record<string, number[]> = {};
+  // D-75: an unknown login is counted like any other and locked after 5 failures, so
+  // each run makes up its own, or a rerun within 15 minutes would meet the lock.
+  const run = suffix();
   for (const [label, identifier] of [
     ["pogrešna lozinka", staff.ana.identifier],
-    ["nepostojeće ime", "ne.postoji"],
-    ["nepostojeći email", "nepostojeci@primjer.com"],
+    ["nepostojeće ime", `ne.postoji.${run}`],
+    ["nepostojeći email", `nepostojeci.${run}@primjer.com`],
   ] as const) {
     timings[label] = [];
     for (let round = 0; round < 3; round++) {

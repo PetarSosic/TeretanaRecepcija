@@ -226,3 +226,36 @@ describe("auditChanges (N-21)", () => {
     expect([...ids.trainers]).toEqual(["t1"]);
   });
 });
+
+describe("sign-in locks in Dnevnik izmjena (D-75)", () => {
+  it("shows a lock of a staff login as the account's change, with the gym's time", () => {
+    const lock = row(
+      "staff",
+      "update",
+      { full_name: "Ana Anić", login_locked_until: null },
+      {
+        full_name: "Ana Anić",
+        login_locked_until: "2026-09-29T15:20:00+00:00",
+      },
+    );
+    expect(lines(lock)).toEqual([
+      "Prijava zaključana do: — → 29.09.2026 17:20",
+    ]);
+    expect(auditSubject(lock, lookups)).toBe("Ana Anić");
+  });
+
+  it("shows the unlock the other way round", () => {
+    const unlock = row(
+      "staff",
+      "update",
+      {
+        full_name: "Ana Anić",
+        login_locked_until: "2026-09-29T15:20:00+00:00",
+      },
+      { full_name: "Ana Anić", login_locked_until: null },
+    );
+    expect(lines(unlock)).toEqual([
+      "Prijava zaključana do: 29.09.2026 17:20 → —",
+    ]);
+  });
+});

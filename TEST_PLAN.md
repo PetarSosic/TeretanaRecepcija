@@ -284,6 +284,9 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Test podaci:** `ne.postoji` / `bilosta123`
 - **Očekivani rezultat:** ista poruka kao u AUTH-03, riječ u riječ. Ništa ne smije da nagovijesti
   da nalog ne postoji, ni vrijeme odgovora ne smije biti bitno različito.
+  > **Ponoviti (D-75):** od D-75 se i nepostojeće ime zaključava poslije 5 promašaja, pa ručno
+  > ne probajte isto ime više od 5 puta u 15 min. Automatski test sada svaki put pravi novo
+  > nepostojeće ime i email.
 - **Gdje provjeriti:** UI; Network tab (status i tijelo odgovora isti kao kod pogrešne lozinke)
 - [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO uz napomenu.** `test-plan-rest.spec.ts`: pogrešna lozinka postojećeg naloga, nepostojeće korisničko ime `ne.postoji` i nepostojeći email daju riječ u riječ „Pogrešno korisničko ime/email ili lozinka.“ i ostaju na `/login`. Medijan vremena (3 pokušaja, dev server): 327 ms za postojeći nalog, 220/225 ms za nepostojeće — razlika od ~0,1 s dolazi iz Supabase Auth provjere lozinke; nije mjereno na produkciji (§9.8). Raniji dokaz (22.09.): UI: nepostojeće korisničko ime i email daju istu neutralnu poruku. Nisu mjerena vremena odgovora radi detekcije naloga.
 
@@ -508,6 +511,41 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   aplikacija se ne ruši i stranica ostaje upotrebljiva.
 - **Gdje provjeriti:** UI, Network tab
 - [x] Prošlo  [ ] Palo  Napomena: **22.09.2026 — PROŠLO.** Dodatne UI provjere u Chromeu, na odvojenim test nalozima; izvršeni unosi, preusmjerenja i očekivane poruke iz ovog slučaja. AUTH-09: testiran vlasnik.
+
+### [AUTH-25] Pet pogrešnih lozinki zaključava prijavu na 15 min (D-75)
+- **Prioritet:** Kritično
+- **Uloga / preduslovi:** testni recepcioner čiju lozinku znate
+- **Koraci:** 1) Pet puta zaredom se prijavite tim korisničkim imenom i pogrešnom lozinkom.
+  2) Šesti put upišite tačnu lozinku. 3) Probajte isto ime velikim slovima.
+  4) Za nepostojeće ime (npr. `ne.postoji.<datum>`) ponovite korak 1 i probajte šesti put.
+- **Test podaci:** —
+- **Očekivani rezultat:** 1) Svaki put samo „Pogrešno korisničko ime/email ili lozinka.“, bez
+  broja preostalih pokušaja. 2–3) „Previše neuspješnih pokušaja prijave. Pokušajte ponovo za 15 min.“
+  i ostajete na prijavi, iako je lozinka tačna. 4) Ista poruka o zaključavanju, pa se ne vidi da
+  nalog ne postoji. Posle 15 min tačna lozinka ponovo radi.
+- **Gdje provjeriti:** UI; Dnevnik izmjena (`/finance/audit`): „Prijava zaključana do: — → <datum vrijeme>“
+- [x] Prošlo  [ ] Palo  Napomena: **29.09.2026 — PROŠLO.** `login-lockout.spec.ts` (AUTH-25):
+  pet puta „Pogrešno korisničko ime/email ili lozinka.“, zatim poruka o zaključavanju i uz tačnu
+  lozinku, i za ime velikim slovima. DB `0017_login_throttle` (37 tvrdnji: 5 zaredom, velika slova
+  i razmaci, nepostojeći nalog, paralelni pokušaji, uspjeh briše brojač, prozor od 15 min, istek
+  zaključavanja, 30 promašaja sa jedne adrese, prava, backup).
+
+### [AUTH-26] Otključavanje na ekranu Korisnici (D-75, P-08)
+- **Prioritet:** Visoko
+- **Uloga / preduslovi:** recepcioner zaključan kao u AUTH-25; zatim menadžer, vlasnik i admin
+- **Koraci:** 1) Kao menadžer otvorite `/settings/users`. 2) Kao vlasnik isto, pa [Otključaj] kod
+  recepcionera. 3) Prijavite se kao recepcioner tačnom lozinkom. 4) Zaključajte drugog vlasnika i
+  pogledajte `/settings/users` kao vlasnik, pa kao admin.
+- **Test podaci:** —
+- **Očekivani rezultat:** 1) Kod recepcionera crveno „Zaključan do HH:mm“, bez dugmeta
+  [Otključaj]. 2) „Nalog je otključan.“, a oznaka nestaje. 3) Prijava prolazi odmah. 4) Vlasnik vidi
+  oznaku kod drugog vlasnika, ali nema [Otključaj]; admin ima. U Dnevniku izmjena je otključavanje
+  („Prijava zaključana do: <datum vrijeme> → —“) sa imenom onoga ko je otključao.
+- **Gdje provjeriti:** UI; `/finance/audit`
+- [x] Prošlo  [ ] Palo  Napomena: **29.09.2026 — PROŠLO (nakon popravke).** `login-lockout.spec.ts`
+  (AUTH-26, koraci 1–3): prvo pokretanje je pokazalo da „Nalog je otključan.“ ne ostaje na ekranu,
+  jer je dugme [Otključaj] nestajalo sa zaključavanjem; poruka je premještena u tabelu i test
+  prolazi. Korak 4, druga teretana i dvostruki klik: DB `0017_login_throttle`.
 
 ---
 

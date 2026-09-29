@@ -9,12 +9,15 @@ import {
 } from "@/lib/auth";
 import { me } from "@/lib/i18n/me";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { rpcFailure } from "@/lib/rpc";
 import { storeStaffPassword } from "@/lib/staff-credentials";
+import { createClient } from "@/lib/supabase/server";
 import type { ActionState } from "@/lib/action-state";
 import {
   createStaffSchema,
   setActiveSchema,
   setPasswordSchema,
+  unlockSchema,
   updateStaffSchema,
 } from "./schemas";
 
@@ -268,4 +271,26 @@ export async function setStaffActive(
   return {
     success: parsed.data.active ? me.users.activated : me.users.deactivated,
   };
+}
+
+/**
+ * P-08 (D-75): [Otključaj] lifts a sign-in lock before its 15 minutes are up.
+ * unlock_staff_login decides who may: the owner and the admin, and for owner and admin
+ * accounts the admin alone (P-03).
+ */
+export async function unlockStaffLogin(
+  _state: ActionState,
+  formData: FormData,
+): Promise<ActionState> {
+  const parsed = unlockSchema.safeParse({ staffId: formData.get("staffId") });
+  if (!parsed.success) return { error: me.errors.unexpected };
+
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("unlock_staff_login", {
+    p_staff: parsed.data.staffId,
+  });
+  if (error) return rpcFailure(error);
+
+  revalidatePath(USERS_PATH);
+  return { success: me.users.unlocked };
 }

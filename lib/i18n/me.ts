@@ -43,6 +43,9 @@ export const me = {
     submit: "Prijavi se",
     forgot: "Zaboravljena lozinka?",
     failed: "Pogrešno korisničko ime/email ili lozinka.",
+    // D-75 (US-01.1 AC6, AC7): after 5 failures of a login or 30 from one address.
+    locked:
+      "Previše neuspješnih pokušaja prijave. Pokušajte ponovo za {minutes} min.",
     shiftClosed: "Smjena je zaključena.",
     shiftAutoClosed: "Smjena je automatski zaključena.",
     resetTitle: "Zaboravljena lozinka",
@@ -120,6 +123,10 @@ export const me = {
     showPassword: "Prikaži",
     hidePassword: "Sakrij",
     noPassword: "Nije sačuvana",
+    // D-75 and P-08: a login locked after failed attempts.
+    lockedUntil: "Zaključan do {time}",
+    unlock: "Otključaj",
+    unlocked: "Nalog je otključan.",
   },
   // S-24 to S-27 (doc 06).
   settings: {
@@ -887,6 +894,7 @@ export const me = {
       note: "Napomena",
       void_reason: "Razlog poništavanja",
       is_active: "Aktivan",
+      login_locked_until: "Prijava zaključana do",
       is_backdated: "Naknadni unos",
       paid_from_till: "Iz kase",
       member_id: "Član",

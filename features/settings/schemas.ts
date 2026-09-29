@@ -78,3 +78,8 @@ export const setActiveSchema = z.object({
   staffId: z.string().uuid(),
   active: z.boolean(),
 });
+
+// P-08 (D-75): [Otključaj] on S-23.
+export const unlockSchema = z.object({
+  staffId: z.string().uuid(),
+});

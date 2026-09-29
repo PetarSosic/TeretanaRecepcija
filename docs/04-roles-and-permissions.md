@@ -15,6 +15,7 @@
 | P-03 | Create, edit, deactivate owner and admin accounts | admin only | ✗ | ✗ | D-58 |
 | P-04 | Create, edit, deactivate manager and receptionist accounts; set their passwords | ✓ | ✓ | ✗ | AS-5 |
 | P-05 | Change own password | ✓ | ✓ | ✓ | |
+| P-08 | Unlock a login locked after failed sign-ins (S-23) | ✓ (owner and admin accounts: admin only) | ✗ (sees the lock) | ✗ | D-75 |
 | P-06 | Read any staff member's stored password | admin only | ✗ | ✗ | D-59 |
 | P-07 | Deactivate own account, or the last active owner or admin | ✗ for everyone | ✗ | ✗ | D-60 |
 | **Shifts** | | | | | |
