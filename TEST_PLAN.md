@@ -880,11 +880,13 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 ### [REC-08] Odjava skeniranjem i prikaz trajanja
 - **Prioritet:** Kritično
 - **Uloga / preduslovi:** član je u teretani duže od vrijednosti „Zaštita od duplog skeniranja“
-  (podrazumijevano 120 s)
+  (podrazumijevano 120 s), a kraće od 1 h 30 min (poslije toga ga sistem sam odjavljuje, REC-22)
 - **Koraci:** skenirajte karticu člana koji je unutra.
 - **Test podaci:** —
 - **Očekivani rezultat:** zeleni „toast“ sa tekstom „Odjavljen/a: <ime> – Xh Ymin“. Član nestaje
   iz liste „U teretani“.
+  > **Ponoviti (D-74):** automatski test sada pomjera ulaz 1 h 25 min unazad (ranije 1 h 35 min),
+  > da ga automatska odjava ne preduhitri.
 - **Gdje provjeriti:** UI
 - [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-reception.spec.ts`: unutar 120 s skeniranje pita „… prije N s. Odjaviti?“; [Ne] ostavlja člana unutra, [Odjavi] ga odjavljuje uz „Odjavljen/a: … – 0h 0min“. Član unutra 1 h 35 min se odjavljuje bez pitanja uz „Odjavljen/a: E2E Ana Anić – 1h 35min“ i nestaje iz liste. Raniji dokaz (22.09.): E2E reception.spec.ts i DB 0007 pokrivaju odjavu i zaštitu od duplog skena. Sve grane [Ne]/[Odjavi] i tačan prikaz trajanja nisu posebno upoređeni.
 
@@ -999,10 +1001,13 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Prioritet:** Srednje
 - **Uloga / preduslovi:** član prijavljen prije ponoći (moguće samo ako testirate kasno uveče ili
   naknadnim unosom, vidi FIN-16)
-- **Koraci:** prijavite člana kasno uveče, ostavite ga do poslije ponoći i odjavite.
+- **Koraci:** prijavite člana kasno uveče (poslije 23:00) i ostavite ga do poslije ponoći.
 - **Test podaci:** —
-- **Očekivani rezultat:** dolazak se broji u dan **kada je počeo**; trajanje je ispravno (prelazi
-  ponoć). Noćni posao u 23:00 ga automatski odjavljuje (vidi JOB-01), pa to provjerite prije 23:00.
+- **Očekivani rezultat:** dolazak se broji u dan **kada je počeo**; od D-74 sistem ga sam
+  odjavljuje 1 h 30 min poslije ulaza (BR-082a), npr. ulaz 23:10 → izlaz 00:40 sljedećeg dana.
+  Noćni posao u 23:00 odjavljuje samo ranije dolaske (vidi JOB-01).
+  > **Ponoviti (D-74):** automatski test sada provjerava automatsku odjavu u 00:40, ne odjavu
+  > skeniranjem ujutru, i preskače se prije 00:41.
 - **Gdje provjeriti:** profil člana → „Dolasci“; `/stats/visits`
 - [x] Prošlo  [ ] Palo  Napomena: **24.09.2026 — PROŠLO.** `test-plan-medium-a.spec.ts`: otvoren dolazak od juče u 23:10 (upisan direktno, jer noćni posao u 23:00 zatvara samo ranije dolaske), pa odjava skeniranjem ujutru: „Odjavljen/a: E2E Ponoć Kasni – 9h 53min“, tačno trajanje preko ponoći (±1 min). Profil → Dolasci: datum 23.09.2026, ulaz 23:10, izlaz današnje vrijeme. `/stats/visits` za 23.–24.09.: taj dolazak je u stupcu 23.09, dana kada je počeo. Raniji dokaz (22.09.): Unit format.test.ts i DB 0000/0001 provjeravaju lokalni datum/prelaz ponoći i trajanje. Stvarni noćni UI scenario nije izvršen.
 
@@ -1025,6 +1030,26 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   „Član je već u teretani.“ ili pitanje o odjavi. Nikada dva otvorena dolaska za istog člana.
 - **Gdje provjeriti:** UI; profil člana → „Dolasci“
 - [x] Prošlo  [ ] Palo  Napomena: **24.09.2026 — PROŠLO.** `test-plan-medium-a.spec.ts`: dva browsera na recepciji, ista kartica skenirana istovremeno (cifre u oba, pa Enter u oba), tri puta. Svaki put je evidentiran tačno jedan dolazak; drugi pult dobija pitanje „E2E Trka Dvojica je prijavljen/a prije 0 s. Odjaviti?“ (zaštita od duplog skeniranja), a Esc ostavlja člana unutra. Nikada dva otvorena dolaska; profil pokazuje tri dolaska. Raniji dokaz (22.09.): DB 0007 potvrđuje zabranu drugog otvorenog dolaska. Nije izvršena istovremena trka iz dva browsera.
+
+### [REC-22] Automatska odjava nakon 1 h 30 min i skeniranje poslije nje (D-74, BR-082a, BR-072a)
+- **Prioritet:** Visoko
+- **Uloga / preduslovi:** Recepcioner, otvorena smjena; član bez članarine (ili sa Mjesečnom).
+- **Koraci:** 1) Prijavite člana skeniranjem i ne odjavljujte ga. 2) Sačekajte 1 h 31 min
+  (ili u bazi pomjerite `checked_in_at` otvorenog dolaska 1 h 40 min unazad i sačekajte minut).
+  3) Pogledajte listu „U teretani“ i profil člana → „Dolasci“. 4) Do 60 min poslije automatske
+  odjave ponovo skenirajte karticu. 5) Za drugog člana ponovite 1–2, pa skenirajte karticu više
+  od 60 min poslije automatske odjave.
+- **Test podaci:** —
+- **Očekivani rezultat:** 2–3) Član nestaje sa liste najkasnije minut kasnije; na profilu je
+  izlaz tačno 1 h 30 min poslije ulaza. 4) „Odjavljen/a: <ime> – Xh Ymin“ sa trajanjem od
+  ulaza do skeniranja, bez dijaloga prijave; na profilu je i dalje jedan dolazak, a izlaz je
+  vrijeme skeniranja. 5) Obična nova prijava (drugi dolazak, za člana bez članarine žuto upozorenje).
+- **Gdje provjeriti:** UI; `visits.checked_out_at`, `auto_checkout`, `checked_out_by`
+- [x] Prošlo  [ ] Palo  Napomena: **29.09.2026 — PROŠLO.** `test-plan-reception.spec.ts` (REC-22):
+  dolazak od 1 h 40 min je automatski odjavljen u ulaz + 1 h 30 min, a skeniranje 10 min kasnije
+  daje „Odjavljen/a: E2E Auto Odjava – 1h 40min“, bez novog dolaska. DB `0016_auto_checkout`
+  (26 tvrdnji: tačno vrijeme odjave, granica od 1 h 30 min, ponovljeni posao, prava, skeniranje do
+  i poslije 60 min, poslije noćne odjave, [Odjavi] na već zatvorenom redu).
 
 ---
 

@@ -82,6 +82,7 @@ An `admin` sees everything an owner sees (D-58).
 **"U teretani" panel:**
 - rows showing name, #number, type badge, check-in time, and live duration;
 - an [Odjavi] button per row;
+- a member leaves the list 1 h 30 min after checking in, at the latest (BR-082a);
 - empty text: `Trenutno nema nikoga u teretani.`
 
 **Check-in dialogs:**

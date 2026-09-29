@@ -287,6 +287,7 @@ create table visits (
 create unique index visits_one_open_per_member on visits (member_id) where checked_out_at is null;
 create index visits_membership_idx on visits (membership_id, visit_type);
 create index visits_checkin_idx    on visits (gym_id, checked_in_at);
+create index visits_open_checkin_idx on visits (checked_in_at) where checked_out_at is null;  -- BR-082a job
 
 -- Money in ------------------------------------------------------------------------------------
 create table payments (
@@ -472,9 +473,9 @@ All RPCs are `security definer`. Each one:
 | `take_over_shift(p_counted_cash numeric)` | receptionist | BR-111 |
 | `close_shift(p_shift uuid, p_counted_cash numeric)` → shift | receptionist (own), owner (any; cash optional) | BR-114, BR-115 |
 | `shift_summary(p_shift uuid)` → json | shift's receptionist, owner; manager: currently open shift only, aggregate totals only | BR-115, BR-117, D-54 |
-| `scan_card(p_code text)` → json `{result, member, open_visit, options, candidates, unpaid_count}` | all | BR-070–073 (check-out happens inside, unless the guard applies) |
+| `scan_card(p_code text)` → json `{result, member, open_visit, options, candidates, unpaid_count}` | all | BR-070–073 (check-out happens inside, unless the guard applies), BR-072a |
 | `check_in(p_member uuid, p_type visit_type, p_membership uuid, p_trainer uuid, p_slot uuid, p_manual bool)` → json | all | BR-071–079 |
-| `check_out(p_visit uuid, p_confirmed bool)` → json | all | BR-072 |
+| `check_out(p_visit uuid, p_confirmed bool)` → json | all | BR-072, BR-072a |
 | `register_member(p_card_code, p_first, p_last, p_phone, p_email, p_dob, p_plan, p_trainer, p_amount, p_sessions, p_method, p_check_in bool, p_class_time time default null)` → json | all | BR-033, BR-040–043, BR-050–060, BR-058a |
 | `find_duplicates(p_phone, p_email)` → rows | all | BR-043 |
 | `update_member(p_member, …)` | all | BR-045 |
@@ -496,6 +497,7 @@ All RPCs are `security definer`. Each one:
 | `upsert_trainer`, `upsert_program`, `set_trainer_program`, `upsert_class_slot` | owner, manager | BR-023–026 |
 | `set_trainer_fee(p_trainer, p_fee, p_group_share_pct)`, `upsert_plan` (incl. finance), `upsert_product`, `upsert_expense_category`, `update_gym_settings` | owner | BR-004, BR-131, BR-140, D-62 |
 | `job_nightly(p_gym)` → shift ids to report | service role only | BR-082, BR-116 |
+| `job_auto_checkout()` → number of visits closed, for every gym | pg_cron and service role only | BR-082a (D-74) |
 | `job_expiring_memberships(p_gym)` → rows | service role only | BR-160 |
 | `job_backup_tables()` → table names in export order | service role only | BR-163 |
 

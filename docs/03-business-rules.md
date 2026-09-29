@@ -228,12 +228,18 @@ Every rule has an ID. Code comments and tests must reference these IDs, e.g. `//
 | Deactivated card | `Kartica je poništena. Pronađite člana pretragom.` |
 | Unassigned card | Opens registration (S-05) with this card attached. |
 | Active card, member has an open visit | Check-out (BR-072). |
+| Active card, no open visit, the member's last visit was checked out automatically at most 60 minutes ago | Leaving after an automatic check-out (BR-072a). |
 | Active card, no open visit | Check-in flow (BR-073 onward). |
 
 - **BR-071:** A member has at most one open visit.
 - **BR-072 (check-out):**
   - Set the check-out time to now and show `Odjavljen/a: <Ime Prezime> – <trajanje>`.
   - **Double-scan guard:** if the open visit started less than the configured number of seconds ago (default 120), ask first: `<Ime Prezime> je prijavljen/a prije <N> s. Odjaviti?` [Odjavi] [Ne].
+- **BR-072a (leaving after an automatic check-out, D-74):**
+  - Applies when the member has no open visit, their latest visit was checked out automatically (BR-082a or BR-082), and that check-out was at most 60 minutes ago.
+  - A scan of the card then does not start a check-in. The automatic check-out is replaced by a real one: `checked_out_at` = now, `checked_out_by` = the staff member, `auto_checkout = false`. The result is the same as BR-072: `Odjavljen/a: <Ime Prezime> – <trajanje>`, with the duration from the check-in.
+  - [Odjavi] in "U teretani" (BR-080) on a row the list still shows after the job closed it does the same.
+  - A scan more than 60 minutes after the automatic check-out is a new check-in (BR-073 onward). The 60 minutes are fixed.
 - **BR-073 (visit type):**
   - The options are **Teretana** plus every other type (Grupni, Personalni) covered by any of the member's memberships in the date range today, even if that type's sessions are used up.
   - If Teretana is the only option, the visit is a gym visit and no question is asked.
@@ -276,6 +282,10 @@ Every rule has an ID. Code comments and tests must reference these IDs, e.g. `//
 - **BR-082 (automatic check-out):**
   - At the automatic close time (default 23:00), every open visit gets `checked_out_at` = that time today and `auto_checkout = true`.
   - Automatic check-outs are excluded from visit-duration statistics.
+- **BR-082a (automatic check-out after 1 h 30 min, D-74):**
+  - Every open visit that began 1 h 30 min ago or earlier gets `checked_out_at` = check-in + 1 h 30 min and `auto_checkout = true`, and leaves "U teretani". The time is exact, whenever the job notices it.
+  - A database job does this every minute (BR-162). The 1 h 30 min is fixed, for every visit type.
+  - As with BR-082, these check-outs are excluded from visit-duration statistics, unless BR-072a turns one into a real check-out.
 - **BR-083 (back-dated visit, owner only):**
   - The owner enters member, date, check-in time, check-out time (> check-in), visit type, and trainer/slot when needed.
   - The membership is chosen per BR-074 as of that date.
@@ -509,6 +519,7 @@ Every rule has an ID. Code comments and tests must reference these IDs, e.g. `//
 | Job | Schedule (gym time) | Steps |
 |---|---|---|
 | Nightly | Daily at the automatic close time (default 23:00) | 1. BR-082 automatic check-out. 2. BR-116 automatic shift close. 3. Report and email (BR-117). |
+| Auto check-out | Every minute | BR-082a (D-74) |
 | Morning | Daily at 09:00 | BR-160 reminders |
 | Retry | Every 15 minutes | BR-118 failed shift emails |
 | Weekly backup | Every Sunday at 03:00 | BR-163 |
@@ -554,3 +565,5 @@ Every rule has an ID. Code comments and tests must reference these IDs, e.g. `//
 | E18 | Stock-in 24 × €0.35 "Iz kase" | Stock +24; purchase price €0.35; expense €8.40 paid from till; expected cash −€8.40 |
 | E19 | Receptionist B logs in while A's shift is open and takes over | A's shift closed as takeover; report emailed; B's shift opened |
 | E20 | Nightly job with 2 open visits and 1 open shift | Visits auto-checked-out at 23:00; shift closed as auto; job run again changes nothing |
+| E21 | Checked in at 17:10, never scanned out | Auto check-out recorded at 18:40; gone from "U teretani"; excluded from the average duration (BR-082a) |
+| E22 | Checked in at 17:10, auto check-out 18:40, card scanned at 19:05 | `Odjavljen/a: … – 1h 55min`; the visit ends at 19:05 as a real check-out; no new visit (BR-072a). A scan after 19:40 instead would be a new check-in. |

@@ -206,6 +206,8 @@ RPCs raise `P0001` with the message `E_<CODE>`. `lib/errors.ts` maps each code t
 | weekly-backup | Sunday, local time ≥ 03:00 | Export tables (service role) → CSVs + `manifest.json` → encrypted ZIP → upload to `backups` → delete all but the newest 8 → email → record in `backup_runs`. On failure, retry on later runs, up to 3 attempts that day. |
 | email-retry | Every run | Shifts with `email_status = 'failed'` and `email_attempts < 5`, last attempt ≥ 15 min ago |
 
+- **Automatic check-out (BR-082a, D-74)** needs no handler. A second pg_cron job, `kp-fitness-auto-checkout`, runs `job_auto_checkout()` in the database **every minute** for every gym. It needs no application URL, secret or gym clock, since it compares instants, and it is idempotent by nature.
+
 ## 9. Non-functional requirements
 **Performance:**
 - Scan result shown ≤ 1 s after Enter (p95) with ≥ 10 Mbit/s; the `scan_card` RPC takes ≤ 300 ms.

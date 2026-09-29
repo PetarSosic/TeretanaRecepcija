@@ -52,11 +52,11 @@ Use these terms **exactly** in the documents, code and UI.
 |---|---|---|---|
 | Visit | `visit` | Dolazak | One stay in the gym, from check-in to check-out. |
 | Check-in | `checked_in_at` | Prijava | Start of a visit (first scan or manual). |
-| Check-out | `checked_out_at` | Odjava | End of a visit (second scan, manual, or automatic at 23:00). |
+| Check-out | `checked_out_at` | Odjava | End of a visit (second scan, manual, or automatic after 1 h 30 min or at 23:00). |
 | Open visit | `checked_out_at is null` | U teretani | A visit without a check-out. A member has at most one. |
 | Unpaid visit | `is_unpaid = true` | Neplaćeni dolazak | A visit made without a covering membership. It stays flagged forever for history. |
 | Unlinked unpaid visit | `is_unpaid and membership_id is null` | — | An unpaid visit not yet covered by a later sale. Used for warning levels. |
-| Automatic check-out | `auto_checkout = true` | Automatska odjava | Check-out done by the 23:00 job. |
+| Automatic check-out | `auto_checkout = true` | Automatska odjava | Check-out done by the system: 1 h 30 min after check-in (BR-082a) or by the 23:00 job (BR-082). |
 | Manual check-in | `is_manual = true` | Ručna prijava | Check-in by searching a member instead of scanning. |
 
 ## Money

@@ -518,9 +518,15 @@ test("REC-21: two desks scan the same card at the same moment — one visit, nev
 test("REC-19: a visit that starts before midnight and ends after it", async ({
   browser,
 }) => {
+  // D-74: nobody stays checked in past 1 h 30 min (BR-082a), so a visit that began at
+  // 23:10 yesterday ends at 00:40 today, as an automatic check-out across midnight.
   const yesterday = gymDate(-1);
   const checkedIn = gymInstant(yesterday.iso, "23:10");
-  await must(
+  test.skip(
+    Date.now() - checkedIn.getTime() < 91 * 60_000,
+    "before 00:41 gym time the visit is not yet 1 h 30 min old",
+  );
+  const [visit] = await must(
     adminClient()
       .from("visits")
       .insert({
@@ -530,22 +536,24 @@ test("REC-19: a visit that starts before midnight and ends after it", async ({
         checked_in_at: checkedIn.toISOString(),
         checked_in_by: staff.ana.id,
       })
-      .select("id"),
+      .select("id")
+      .returns<{ id: string }[]>(),
     "Open visit from last night",
   );
-  const desk = await signedIn(browser, staff.ana);
-  await startWork(desk);
-  await scan(desk, card.ponoc);
-  const line = desk.getByText(/^Odjavljen\/a: E2E Ponoć Kasni – \d+h \d+min$/);
-  await expect(line).toBeVisible();
-  const shown = (await line.textContent())!;
-  const [, h, m] = shown.match(/(\d+)h (\d+)min/)!;
-  const minutes = Number(h) * 60 + Number(m);
-  const expected = Math.floor((Date.now() - checkedIn.getTime()) / 60_000);
-  note(`REC-19 checkout at ${gymTime(new Date())}: „${shown}“ (expected ≈ ${expected} min)`);
-  expect(Math.abs(minutes - expected)).toBeLessThanOrEqual(1);
-  const outAt = gymTime(new Date());
-  await desk.context().close();
+  // pg_cron may have closed it already; the job changes nothing a second time.
+  const job = await adminClient().rpc("job_auto_checkout");
+  expect(job.error).toBeNull();
+  const { data: closed } = await adminClient()
+    .from("visits")
+    .select("checked_out_at, auto_checkout")
+    .eq("id", visit.id)
+    .single<{ checked_out_at: string; auto_checkout: boolean }>();
+  note(`REC-19 automatic check-out: ${JSON.stringify(closed)}`);
+  expect(closed?.auto_checkout).toBe(true);
+  expect(new Date(closed!.checked_out_at).getTime()).toBe(
+    checkedIn.getTime() + 90 * 60_000,
+  );
+  expect(gymTime(new Date(closed!.checked_out_at))).toBe("00:40");
 
   // The visit belongs to the day it began, on the profile and in the statistics.
   const owner = await signedIn(browser, staff.owner);
@@ -553,9 +561,8 @@ test("REC-19: a visit that starts before midnight and ends after it", async ({
   const row = owner.locator("main tbody tr").first();
   await expect(row).toContainText(yesterday.display);
   await expect(row).toContainText("23:10");
-  const rowText = (await row.innerText()).replace(/\s+/g, " ");
-  note(`REC-19 profile row: ${rowText}`);
-  expect(rowText).toMatch(new RegExp(`${outAt.slice(0, 3)}\\d\\d`));
+  await expect(row).toContainText("00:40");
+  note(`REC-19 profile row: ${(await row.innerText()).replace(/\s+/g, " ")}`);
 
   await owner.goto(
     `/stats/visits?period=custom&from=${yesterday.iso}&to=${gymDate(0).iso}`,

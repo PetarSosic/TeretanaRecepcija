@@ -72,6 +72,10 @@ All features are **MVP**. Acceptance criteria (AC) are written so each one can b
 **US-04.5** As a receptionist, scanning the card again checks the member out (BR-072).
 - AC1: A toast shows the name and duration.
 - AC2: A scan within the double-scan guard time asks for confirmation first.
+- AC3: A scan at most 60 minutes after an automatic check-out checks the member out at that moment instead of in, with the same toast (BR-072a, D-74).
+
+**US-04.6** As the gym, a member who forgets to scan out leaves "U teretani" on their own (BR-082a, D-74).
+- AC1: 1 h 30 min after check-in the visit is checked out automatically, at check-in + 1 h 30 min, and the row leaves the list at the next refresh.
 
 ## F-05 Manual check-in/out and "U teretani"
 **US-05.1** As a receptionist, I check in a member who forgot their card by searching name, phone or number.

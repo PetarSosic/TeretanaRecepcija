@@ -22,8 +22,8 @@ const staff = {} as Record<
   TestStaff
 >;
 const plan = { mjesecna: "", combo: "" };
-const member = { ana: "", grupni: "", bozo: "", phone: "" };
-const card = { ana: "", grupni: "", bozo: "", voided: "" };
+const member = { ana: "", grupni: "", bozo: "", phone: "", auto: "" };
+const card = { ana: "", grupni: "", bozo: "", voided: "", auto: "" };
 let slotId: string;
 let slotTime: string;
 
@@ -193,6 +193,7 @@ test.beforeAll(async ({}, workerInfo) => {
           ["Grupni", "Klijent"],
           ["Božo", "Božović"],
           ["Telefon", "Probni"],
+          ["Auto", "Odjava"],
         ].map(([first, last], index) => ({
           gym_id: gymId,
           member_number: index + 1,
@@ -214,10 +215,11 @@ test.beforeAll(async ({}, workerInfo) => {
   member.grupni = byNumber(2);
   member.bozo = byNumber(3);
   member.phone = byNumber(4);
+  member.auto = byNumber(5);
   await must(
     admin
       .from("member_counters")
-      .insert({ gym_id: gymId, last_number: 4 })
+      .insert({ gym_id: gymId, last_number: 5 })
       .select("gym_id"),
     "Test member counter",
   );
@@ -260,7 +262,7 @@ test.beforeAll(async ({}, workerInfo) => {
   const batch = await must(
     admin
       .from("card_batches")
-      .insert({ gym_id: gymId, quantity: 4, created_by: staff.owner.id })
+      .insert({ gym_id: gymId, quantity: 5, created_by: staff.owner.id })
       .select("id")
       .single<{ id: string }>(),
     "Test batch",
@@ -269,6 +271,7 @@ test.beforeAll(async ({}, workerInfo) => {
   card.grupni = cardCode();
   card.bozo = cardCode();
   card.voided = cardCode();
+  card.auto = cardCode();
   const assigned = (code: string, memberId: string, status = "active") => ({
     gym_id: gymId,
     code,
@@ -285,6 +288,7 @@ test.beforeAll(async ({}, workerInfo) => {
         assigned(card.grupni, member.grupni),
         assigned(card.bozo, member.bozo),
         assigned(card.voided, member.phone, "deactivated"),
+        assigned(card.auto, member.auto),
       ])
       .select("id"),
     "Test cards",
@@ -483,23 +487,98 @@ test("REC-08 and REC-07: [Ne] keeps the member in; the second unpaid visit is re
 test("REC-08: a scan after the guard checks out with the real duration", async ({
   page,
 }) => {
-  // Ana has been in since REC-02; move her check-in back 1 h 35 min.
+  // Ana has been in since REC-02; move her check-in back 1 h 25 min, short of the
+  // automatic check-out at 1 h 30 min (BR-082a).
   await adminClient()
     .from("visits")
     .update({
-      checked_in_at: new Date(Date.now() - 95 * 60_000).toISOString(),
+      checked_in_at: new Date(Date.now() - 85 * 60_000).toISOString(),
     })
     .eq("member_id", member.ana)
     .is("checked_out_at", null);
   await openReception(page);
   await scan(page, card.ana);
   await expect(
-    page.getByText(/^Odjavljen\/a: E2E Ana Anić – 1h 35min$/),
+    page.getByText(/^Odjavljen\/a: E2E Ana Anić – 1h 25min$/),
   ).toBeVisible();
   await expect(page.getByRole("dialog")).toHaveCount(0);
   await expect(
     page.getByRole("button", { name: "Odjavi E2E Ana Anić" }),
   ).toHaveCount(0);
+});
+
+test("REC-22: out after 1 h 30 min by itself, and a scan soon after is the leaving (D-74)", async ({
+  page,
+}) => {
+  const admin = adminClient();
+  const checkedIn = new Date(Date.now() - 100 * 60_000);
+  const [visit] = await must(
+    admin
+      .from("visits")
+      .insert({
+        gym_id: gymId,
+        member_id: member.auto,
+        visit_type: "gym",
+        is_unpaid: true,
+        checked_in_at: checkedIn.toISOString(),
+        checked_in_by: staff.receptionist.id,
+      })
+      .select("id")
+      .returns<{ id: string }[]>(),
+    "Visit of 1 h 40 min",
+  );
+
+  // BR-082a: pg_cron runs the job every minute; running it here as well changes nothing
+  // it has already done.
+  const job = await admin.rpc("job_auto_checkout");
+  expect(job.error).toBeNull();
+  const { data: auto } = await admin
+    .from("visits")
+    .select("checked_out_at, auto_checkout, checked_out_by")
+    .eq("id", visit.id)
+    .single<{
+      checked_out_at: string;
+      auto_checkout: boolean;
+      checked_out_by: string | null;
+    }>();
+  expect(auto).toMatchObject({ auto_checkout: true, checked_out_by: null });
+  expect(new Date(auto!.checked_out_at).getTime()).toBe(
+    checkedIn.getTime() + 90 * 60_000,
+  );
+
+  await openReception(page);
+  await expect(
+    page.getByRole("button", { name: "Odjavi E2E Auto Odjava" }),
+  ).toHaveCount(0);
+
+  // BR-072a: ten minutes after the automatic check-out, the scan is the member leaving.
+  await scan(page, card.auto);
+  const line = page.getByText(/^Odjavljen\/a: E2E Auto Odjava – 1h 4[01]min$/);
+  await expect(line).toBeVisible();
+  note(`REC-22 toast: ${await line.textContent()}`);
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+
+  const { data: visits } = await admin
+    .from("visits")
+    .select("id, checked_out_at, auto_checkout, checked_out_by")
+    .eq("member_id", member.auto)
+    .returns<
+      {
+        id: string;
+        checked_out_at: string;
+        auto_checkout: boolean;
+        checked_out_by: string;
+      }[]
+    >();
+  expect(visits).toHaveLength(1);
+  expect(visits![0]).toMatchObject({
+    id: visit.id,
+    auto_checkout: false,
+    checked_out_by: staff.receptionist.id,
+  });
+  expect(Date.now() - new Date(visits![0].checked_out_at).getTime()).toBeLessThan(
+    60_000,
+  );
 });
 
 test("REC-11: unknown, voided and malformed cards give a status line, no dialog", async ({
