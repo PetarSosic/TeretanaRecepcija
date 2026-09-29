@@ -964,6 +964,29 @@ export const me = {
       unknown: "(nepoznato)",
     },
   },
+  // S-29 Treneri (D-72, BR-027).
+  trainerRoster: {
+    title: "Treneri",
+    intro:
+      "Članovi sa grupnom članarinom koja važi danas, po treneru i fiksnom terminu.",
+    row: "#",
+    member: "Član",
+    plan: "Vrsta",
+    paidOn: "Datum uplate",
+    today: "Danas",
+    price: "Cijena po članu (€)",
+    total: "UKUPNO – {trainer}",
+    memberCount: "Članova: {count}",
+    attended: "Došlo danas: {came} / {total}",
+    noClassTime: "Termin nije upisan",
+    noClassTimeHint:
+      "Članarine prodate prije uvođenja fiksnog termina. Termin se upisuje na profilu člana → [Promijeni termin].",
+    emptyTime: "Nema upisanih članova.",
+    notOnList: "Prijavljeni na čas, a nisu na spisku:",
+    unpaid: "neplaćen dolazak",
+    notCame: "—",
+    empty: "Nema grupnih termina ni članova sa grupnom članarinom.",
+  },
   // S-15 Statistika dolazaka (F-20).
   stats: {
     title: "Statistika dolazaka",

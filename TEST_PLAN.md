@@ -173,6 +173,7 @@ Poništene stavke ostaju u Dnevniku izmjena — tako i treba (BR-095).
 | `/reception` | S-03 Recepcija | sve uloge |
 | `/members` | S-06 Članovi | sve uloge |
 | `/members/[id]` | S-07 Profil člana | sve uloge (RLS filtrira uplate) |
+| `/trainers` | S-29 Treneri (D-72) | sve uloge (iznose vide samo admin i vlasnik) |
 | `/payments/today` | S-12 Uplate danas | sve uloge (troškove filtrira RLS) |
 | `/storage` | S-13 Magacin | sve uloge |
 | `/shift/gate` | S-02 Otvorena smjena | samo recepcioner |
@@ -245,8 +246,9 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   5. Kliknite [Prijavi se].
 - **Test podaci:** `matija.vojinovic@eurotehnikamn.me` + lozinka iz `.env.local`
 - **Očekivani rezultat:** preusmjerenje na `/finance`, u zaglavlju piše „KP Fitness“, ime i uloga
-  „Vlasnik“. U navigaciji: Recepcija, Članovi, Uplate danas, Magacin, Statistika dolazaka,
-  Finansije, Podešavanja. Nema stavke „Zaključi smjenu“.
+  „Vlasnik“. U navigaciji: Recepcija, Članovi, Treneri, Uplate danas, Magacin, Statistika
+  dolazaka, Finansije, Podešavanja. Nema stavke „Zaključi smjenu“. *29.09.2026 (D-72): dodata
+  stavka „Treneri“ — ponoviti test.*
 - **Gdje provjeriti:** UI
 - [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-access.spec.ts`: `/` vodi na `/login`; seed vlasnik (`matija.vojinovic@eurotehnikamn.me` + `SEED_OWNER_PASSWORD`) dolazi na `/finance`; zaglavlje „KP Fitness“, meni naloga „Vlasnik“; navigacija tačno Recepcija, Članovi, Uplate danas, Magacin, Statistika dolazaka, Finansije, Podešavanja (bez „Zaključi smjenu“). Samo čitanje; nalog odmah odjavljen. Raniji dokaz (22.09.): E2E admin.spec.ts: vlasnik sa korisničkim imenom dolazi na /finance; foundation.spec.ts: odjavljeni / ide na /login. Seed vlasnik sa emailom i kompletan meni nisu provjereni ovim testom.
 
@@ -554,10 +556,12 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Uloga / preduslovi:** sve četiri uloge redom
 - **Koraci:** za svaku ulogu prepišite stavke glavne navigacije i podmenija „Podešavanja“.
 - **Test podaci:** —
-- **Očekivani rezultat:** recepcioner: Recepcija, Članovi, Uplate danas, Magacin, Zaključi smjenu.
-  Menadžer: + Statistika dolazaka, Podešavanja (Korisnici, Treneri, Kartice).
-  Vlasnik/Administrator: + Finansije i Podešavanja (Korisnici, Treneri, Kartice, Planovi,
-  Proizvodi, Podešavanja teretane); nema „Zaključi smjenu“.
+- **Očekivani rezultat:** recepcioner: Recepcija, Članovi, Treneri, Uplate danas, Magacin,
+  Zaključi smjenu. Menadžer: + Statistika dolazaka, Podešavanja (Korisnici, Treneri i raspored,
+  Kartice). Vlasnik/Administrator: + Finansije i Podešavanja (Korisnici, Treneri i raspored,
+  Kartice, Planovi, Proizvodi, Podešavanja teretane); nema „Zaključi smjenu“.
+  *29.09.2026 (D-72): dodata stavka „Treneri“, a „Treneri“ u Podešavanjima preimenovana u
+  „Treneri i raspored“ — ponoviti test.*
 - **Gdje provjeriti:** UI
 - [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `tests/e2e/test-plan-extra.spec.ts`: glavni meni i podmeni „Podešavanja“ upoređeni za recepcionera, menadžera, vlasnika i administratora (1366 px). Tačno očekivane stavke i redoslijed; vlasnik/administrator nemaju „Zaključi smjenu“. Mobilni meni nije posebno prepisan.
 
@@ -1476,6 +1480,25 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - [x] Prošlo  [ ] Palo  Napomena: **29.09.2026 — PROŠLO.** `class-time.spec.ts` (oba projekta) i
   DB `0014_class_time` (36 tvrdnji: prodaja, registracija, naknadni unos, promjena, neaktivni čas i
   program, istekla, poništena i anonimizovana članarina, druga teretana, dnevnik, prava).
+
+### [MSHIP-19] Pregled trenera — ko je upisan u koji termin (D-72, BR-027)
+- **Prioritet:** Visoko
+- **Uloga / preduslovi:** Recepcioner, pa Vlasnik. Milena ima čas u 08:00 danas; kod nje su
+  upisani član 1 (Grupni) i član 2 (G+T) za 08:00 i član 3 bez termina (prodat prije D-71).
+  Tamara ima čas u 19:00, ali ne danas, i jednog člana. Član 1 je danas prijavljen na Milenin
+  čas u 08:00, a član 4 (bez članarine) takođe, kao neplaćen dolazak.
+- **Koraci:** 1) Kao recepcioner u meniju kliknite **Treneri**. 2) Pregledajte Milenu i Tamaru.
+  3) Prijavite se kao vlasnik i otvorite `/trainers`.
+- **Test podaci:** —
+- **Očekivani rezultat:** 1) Stranica „Treneri“ na `/trainers`. 2) Kod Milene zaglavlje termina
+  glasi „<dani> · 08:00 · Članova: 2 · Došlo danas: 1 / 2“. Član 1 ima vrijeme prijave, a član 2
+  „—“. Ispod stoji „Prijavljeni na čas, a nisu na spisku: #4 … (HH:mm, neplaćen dolazak)“, a na
+  kraju „Termin nije upisan · Članova: 1“. Kod Tamare nema „Došlo danas“. Recepcioner ne vidi
+  „Cijena po članu (€)“ ni „UKUPNO“. 3) Vlasnik vidi i kolonu „Cijena po članu (€)“ i red
+  „UKUPNO – Milena“ sa zbirom (69 + 99 + 69 = 237,00 €).
+- **Gdje provjeriti:** UI; `trainer_roster()`, `fin_roster_prices()`
+- [ ] Prošlo  [ ] Palo  Napomena: automatski: `trainer-roster.spec.ts`, DB `0015_trainer_roster`,
+  unit `trainer-roster.test.ts`. Još nije pokrenuto.
 
 ---
 

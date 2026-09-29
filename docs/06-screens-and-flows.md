@@ -24,12 +24,15 @@ Routes are in English; every visible text is in Montenegrin (ijekavica). Text in
 |---|---|---|---|---|
 | Recepcija | `/reception` | ✓ | ✓ | ✓ (home) |
 | Članovi | `/members` | ✓ | ✓ | ✓ |
+| Treneri | `/trainers` | ✓ | ✓ | ✓ (D-72) |
 | Uplate danas | `/payments/today` | ✓ | ✓ | ✓ |
 | Magacin | `/storage` | ✓ | ✓ | ✓ |
 | Zaključi smjenu | `/shift/close` | ✗ | ✗ | ✓ |
 | Statistika dolazaka | `/stats/visits` | ✓ | ✓ | ✗ |
 | Finansije | `/finance/*` | ✓ | ✗ | ✗ |
-| Podešavanja | `/settings/*` | ✓ (all) | ✓ (Korisnici, Treneri, Kartice) | ✗ |
+| Podešavanja | `/settings/*` | ✓ (all) | ✓ (Korisnici, Treneri i raspored, Kartice) | ✗ |
+
+The Podešavanja item for S-24 is labelled `Treneri i raspored`, the screen's title, so it is not confused with the top-level `Treneri` (S-29, D-72).
 
 An `admin` sees everything an owner sees (D-58).
 
@@ -291,3 +294,11 @@ An `admin` sees everything an owner sees (D-58).
   - QR code of 30 × 30 mm on the right, in a thin bronze frame (error correction M, quiet zone ≥ 2 modules, dark brown on near-white);
   - the code under the QR code in the pattern `123 456 7890` (12 pt, monospace);
   - the label `Ime i prezime:` with an empty line (≥ 50 mm) along the bottom.
+
+## S-29 Trainers — `/trainers` (all roles, D-72)
+- **Title:** `Treneri`, with the line `Članovi sa grupnom članarinom koja važi danas, po treneru i fiksnom terminu.`
+- **Content (BR-027):** one table per trainer, trainers by name. Inside it, one header row per fixed class time, earliest first (`Uto, čet, sub · 08:00 · Članova: 7`), followed by its members; `Termin nije upisan` comes last, with the hint `Članarine prodate prije uvođenja fiksnog termina. Termin se upisuje na profilu člana → [Promijeni termin].` A class time without members shows `Nema upisanih članova.`
+- **Columns:** `#` (row number within the class time), `Član` (`#<broj> <ime i prezime>`, a link to S-07), `Vrsta` (the plan name), `Datum uplate`, `Danas`, and for the owner and admin only `Cijena po članu (€)`.
+- **Today:** for a class time held today the header adds `Došlo danas: <n> / <m>`, and `Danas` shows each member's check-in time (`HH:mm`) or `—`. Under the members, the line `Prijavljeni na čas, a nisu na spisku:` lists the others who checked in to it, each as `#<broj> <ime i prezime> (HH:mm)`, adding `neplaćen dolazak` for an unpaid visit. For a class time not held today, `Danas` stays empty.
+- **Owner and admin:** the trainer's table ends with the row `UKUPNO – <trener>` and the sum of `Cijena po članu (€)`.
+- **Empty list:** `Nema grupnih termina ni članova sa grupnom članarinom.`

@@ -248,6 +248,7 @@ test("AUTH-01: the seeded owner signs in with the email and lands on Finansije",
   expect(await menu(page)).toEqual([
     "Recepcija",
     "Članovi",
+    "Treneri", // D-72
     "Uplate danas",
     "Magacin",
     "Statistika dolazaka",

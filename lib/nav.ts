@@ -21,6 +21,8 @@ const OWNERS: readonly AppRole[] = ["admin", "owner"];
 const ITEMS: readonly NavItem[] = [
   { label: me.nav.reception, href: "/reception", roles: ALL },
   { label: me.nav.members, href: "/members", roles: ALL },
+  // D-72: S-29, the trainer roster.
+  { label: me.nav.trainers, href: "/trainers", roles: ALL },
   { label: me.nav.paymentsToday, href: "/payments/today", roles: ALL },
   { label: me.nav.storage, href: "/storage", roles: ALL },
   { label: me.nav.closeShift, href: "/shift/close", roles: ["receptionist"] },
@@ -32,8 +34,9 @@ const ITEMS: readonly NavItem[] = [
     roles: STAFF_ABOVE_DESK,
     children: [
       { label: me.nav.users, href: "/settings/users", roles: STAFF_ABOVE_DESK },
+      // D-72: named after S-24's title, so it is not taken for S-29 Treneri.
       {
-        label: me.nav.trainers,
+        label: me.settings.trainersTitle,
         href: "/settings/trainers",
         roles: STAFF_ABOVE_DESK,
       },
@@ -53,6 +56,7 @@ const ITEMS: readonly NavItem[] = [
 const IMPLEMENTED = new Set([
   "/reception",
   "/members",
+  "/trainers",
   "/payments/today",
   "/storage",
   "/shift/close",

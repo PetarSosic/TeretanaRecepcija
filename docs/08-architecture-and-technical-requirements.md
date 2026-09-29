@@ -39,7 +39,7 @@ Resend: shift report emails · expiry reminders
 **Data-access rules:**
 1. Browser code never writes to tables. Every mutation is a server action that calls one RPC.
 2. The service-role key is used only in `lib/supabase/admin.ts`, and only in server actions for staff accounts, job route handlers and the seed script.
-3. Owner financial data is fetched only through `fin_*` functions from server components under `/finance`.
+3. Owner financial data is fetched only through `fin_*` functions from server components under `/finance`. The one exception is S-29 `/trainers` (D-72), which calls `fin_roster_prices` for the owner and admin only.
 
 ## 3. Folder structure
 ```
@@ -59,6 +59,7 @@ Resend: shift report emails · expiry reminders
 │   ├── (app)/shift/gate/page.tsx
 │   ├── (app)/shift/close/page.tsx
 │   ├── (app)/stats/visits/page.tsx
+│   ├── (app)/trainers/page.tsx    # S-29 (D-72)
 │   ├── (app)/finance/{page,expenses,trainers,shifts,storage,backdated,audit}/…
 │   ├── (app)/settings/{users,trainers,plans,products,gym,cards}/…
 │   └── api/

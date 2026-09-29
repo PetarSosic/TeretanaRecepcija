@@ -83,6 +83,13 @@ Every rule has an ID. Code comments and tests must reference these IDs, e.g. `//
   - does not change existing memberships, visits or reports;
   - removing an assignment has the same effect.
 - **BR-026:** Owners and managers manage trainers, programs, assignments and slots. Only the owner sees and edits trainer fees and share percentages.
+- **BR-027 (trainer roster, D-72):** S-29 lists, for every staff role, who is assigned to each trainer's fixed class times (BR-058a):
+  - A membership is listed when it covers group training, has a trainer, is not voided, its member is not anonymized, and gym today lies between its `start_date` and `end_date`. Used-up sessions do not remove it. A member with two such memberships for the same trainer and time is listed once.
+  - Memberships are grouped by trainer, then by fixed class time. Every active class time of every trainer is shown, even with no members. A membership whose time is no longer in the schedule keeps its group, labelled with the clock time alone. Memberships with no fixed class time (sold before D-71) are grouped last under `Termin nije upisan`.
+  - Each member shows the membership's plan and the `paid_on` of its payment.
+  - **Today:** a class time is held today when its trainer has an active slot at that time on today's weekday, or when someone checked in to such a slot today. For those class times each member shows the time of their first group check-in today to a slot of that trainer at that time, or `—`, and the header says `Došlo danas: <n> / <m>`. Group check-ins today to such a slot by members who are not on that list are shown under `Prijavljeni na čas, a nisu na spisku`, with `neplaćen dolazak` when the visit is unpaid. A group visit with no slot (`Bez časa iz rasporeda`) belongs to no class time.
+  - The owner and the admin also see each membership's payment amount as `Cijena po članu (€)`, and per trainer the line `UKUPNO – <trener>` with their sum (BR-003). Nobody else ever receives these amounts (BR-157).
+  - There is no limit on the number of members per class time.
 
 ## 4. Member cards
 - **BR-030 (code):**

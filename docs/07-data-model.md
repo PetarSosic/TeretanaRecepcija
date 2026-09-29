@@ -513,9 +513,12 @@ For managers, `shift_summary` must verify that the requested shift is the curren
 - `fin_storage(p_from, p_to)`;
 - `fin_shifts(p_from, p_to)`;
 - `fin_expiring(p_days)`;
-- `fin_unpaid_members()`.
+- `fin_unpaid_members()`;
+- `fin_roster_prices(p_memberships uuid[])` — the payment amount of each listed membership, for S-29's owner columns (BR-027, D-72).
 
 **Statistics** (owner, manager): `visit_stats(p_from, p_to)`.
+
+**Trainer roster** (all roles, D-72): `trainer_roster()` → json `{today, weekday, times, members, extras}`: every trainer's active group class times, the group memberships valid today with their fixed class time and today's check-in, and today's check-ins to a class by members not on its list (BR-027). It returns no amounts.
 
 ## 6. RLS — SELECT policies
 Writes: **none** for `authenticated`; everything goes through RPCs.

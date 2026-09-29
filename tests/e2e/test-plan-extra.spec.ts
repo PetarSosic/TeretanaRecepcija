@@ -408,7 +408,8 @@ test("PERM-04: each role's menu lists only what it may open", async ({
   browser,
 }, testInfo) => {
   test.skip(testInfo.project.name !== "desktop", "the menu is md+ only");
-  const desk = ["Recepcija", "Članovi", "Uplate danas", "Magacin"];
+  // D-72: Treneri (S-29) is on every role's menu.
+  const desk = ["Recepcija", "Članovi", "Treneri", "Uplate danas", "Magacin"];
 
   const ana = await signedIn(browser, staff.ana);
   await expect(ana).toHaveURL(/\/reception/);
@@ -420,7 +421,7 @@ test("PERM-04: each role's menu lists only what it may open", async ({
   const manager = await signedIn(browser, staff.manager);
   expect(await menuItems(manager)).toEqual({
     top: [...desk, "Statistika dolazaka", "Podešavanja"],
-    settings: ["Korisnici", "Treneri", "Kartice"],
+    settings: ["Korisnici", "Treneri i raspored", "Kartice"],
   });
 
   for (const who of [staff.owner, staff.admin]) {
@@ -429,7 +430,7 @@ test("PERM-04: each role's menu lists only what it may open", async ({
       top: [...desk, "Statistika dolazaka", "Finansije", "Podešavanja"],
       settings: [
         "Korisnici",
-        "Treneri",
+        "Treneri i raspored",
         "Kartice",
         "Planovi",
         "Proizvodi",
