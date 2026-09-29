@@ -198,6 +198,13 @@ Every rule has an ID. Code comments and tests must reference these IDs, e.g. `//
   - Grupni, G+T and Personalni require a trainer who meets BR-023.
   - The trainer's current fee is copied onto a Personalni membership at sale.
   - The trainer suggested by default is the trainer of the member's latest membership of the same plan kind.
+- **BR-058a (fixed class time, D-71):**
+  - A plan that covers group training and requires a trainer (seed: Grupni, G+T) also requires the member's **fixed class time** (`Fiksni termin`), chosen after the trainer, in S-05, S-08 and S-22.
+  - The choices are only the chosen trainer's active group class times: one entry per start time, listing every weekday on which that trainer has an active class slot at that time in an active program of kind `group` (e.g. `Uto, čet, sub · 08:00`). Inactive slots and programs are not offered (BR-025).
+  - A trainer with no active class time cannot be sold for such a plan. The form says `Trener nema nijedan aktivan termin u rasporedu, pa se članarina ne može prodati.` and the database refuses the sale.
+  - The time is stored on the membership beside its trainer. The time suggested by default is the time of the member's latest membership with the chosen trainer, if it is still active.
+  - Any staff role may change the fixed class time of a group membership that is neither voided nor expired, to another active time of **the same trainer**, from S-07 ([Promijeni termin]). The trainer, amount and payment do not change, no new sale is made, and the change is audited (BR-096).
+  - Memberships sold before D-71 have no fixed class time until one is set this way. What the stored time is used for beyond S-07 is not decided yet.
 - **BR-059 (amount):**
   - For plans with a list price, the amount equals the list price; only the owner can change it (at sale, or later via BR-094).
   - For Personalni, any staff role enters the amount. It must be ≥ the personal minimum price (BR-012), otherwise: `Iznos ne može biti manji od <min> €.`

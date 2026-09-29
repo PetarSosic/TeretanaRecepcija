@@ -4,7 +4,8 @@ import { revalidatePath } from "next/cache";
 import { requireStaff } from "@/lib/auth";
 import { gymToday } from "@/lib/gym-date";
 import { me } from "@/lib/i18n/me";
-import { fieldErrorsOf, rpcFailure } from "@/lib/rpc";
+import { getErrorMessage } from "@/lib/errors";
+import { fieldErrorsOf, rpcCode, rpcFailure } from "@/lib/rpc";
 import { deliverShiftReport } from "@/lib/shift-report";
 import { createClient } from "@/lib/supabase/server";
 import type { ActionState } from "@/lib/action-state";
@@ -168,6 +169,7 @@ export async function saveBackdatedMembership(
     memberId: formData.get("memberId") ?? "",
     planId: formData.get("planId") ?? "",
     trainerId: formData.get("trainerId") ?? "",
+    classTime: formData.get("classTime") ?? "",
     amount: formData.get("amount") ?? "",
     sessions: formData.get("sessions") ?? "",
     method: formData.get("method") ?? "",
@@ -190,8 +192,15 @@ export async function saveBackdatedMembership(
     p_method: parsed.data.method,
     p_paid_on: parsed.data.paidOn,
     p_start_date: parsed.data.startDate,
+    p_class_time: parsed.data.classTime,
   });
-  if (error) return rpcFailure(error);
+  if (error) {
+    // D-71: the class time has its own field, so its message goes under it.
+    const code = rpcCode(error);
+    if (code.startsWith("E_CLASS_TIME_"))
+      return { fieldErrors: { classTime: getErrorMessage(code) } };
+    return rpcFailure(error);
+  }
 
   revalidateFinance();
   revalidatePath("/members");

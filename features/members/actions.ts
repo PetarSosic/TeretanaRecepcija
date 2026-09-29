@@ -132,9 +132,12 @@ export async function registerMember(
     const code = rpcCode(error);
     if (code === "E_AMOUNT_BELOW_MIN")
       return rpcFailure(error, { min: await personalMinimumText() });
-    // The card is the one field the database can reject on its own (BR-070).
+    // The card is a field the database can reject on its own (BR-070).
     if (code.startsWith("E_CARD_"))
       return { fieldErrors: { cardCode: getErrorMessage(code) } };
+    // D-71: so is the fixed class time.
+    if (code.startsWith("E_CLASS_TIME_"))
+      return { fieldErrors: { classTime: getErrorMessage(code) } };
     return rpcFailure(error);
   }
 

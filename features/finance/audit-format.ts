@@ -128,7 +128,8 @@ export function auditValue(
     return (table === "plans" ? PLAN_KINDS : PAYMENT_KINDS)[text] ?? text;
   if (ENUMS[column]) return ENUMS[column][text] ?? text;
   if (column === "logo_path") return me.audit.values.logoSet;
-  if (column === "auto_close_time") return text.slice(0, 5);
+  if (column === "auto_close_time" || column === "class_time")
+    return text.slice(0, 5);
   try {
     if (MONEY.has(column)) return formatMoney(text);
     if (PERCENT.has(column)) return `${percent.format(Number(text))} %`;

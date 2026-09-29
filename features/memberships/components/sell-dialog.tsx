@@ -18,11 +18,16 @@ import {
 import { me } from "@/lib/i18n/me";
 import { sellMembership } from "../actions";
 import type { SaleCatalog } from "../catalog";
-import { MembershipFields, type TrainerDefaults } from "./membership-fields";
+import {
+  MembershipFields,
+  type ClassTimeDefaults,
+  type TrainerDefaults,
+} from "./membership-fields";
 
 /**
- * S-08, opened from the profile ([Nova članarina], or [Produži] with the same plan and
- * trainer preselected, US-08.2). [Naplati i sačuvaj] is a money action (BR-092).
+ * S-08, opened from the profile ([Nova članarina], or [Produži] with the same plan,
+ * trainer and fixed class time preselected, US-08.2 and D-71). [Naplati i sačuvaj] is a
+ * money action (BR-092).
  */
 export function SellDialog({
   open,
@@ -31,6 +36,7 @@ export function SellDialog({
   catalog,
   defaultPlanId,
   trainerDefaults,
+  classTimeDefaults,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -38,6 +44,7 @@ export function SellDialog({
   catalog: SaleCatalog;
   defaultPlanId?: string;
   trainerDefaults?: TrainerDefaults;
+  classTimeDefaults?: ClassTimeDefaults;
 }) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -55,6 +62,7 @@ export function SellDialog({
             catalog={catalog}
             defaultPlanId={defaultPlanId}
             trainerDefaults={trainerDefaults}
+            classTimeDefaults={classTimeDefaults}
             onDone={() => onOpenChange(false)}
           />
         ) : null}
@@ -68,12 +76,14 @@ function SellForm({
   catalog,
   defaultPlanId,
   trainerDefaults,
+  classTimeDefaults,
   onDone,
 }: {
   memberId: string;
   catalog: SaleCatalog;
   defaultPlanId?: string;
   trainerDefaults?: TrainerDefaults;
+  classTimeDefaults?: ClassTimeDefaults;
   onDone: () => void;
 }) {
   const [state, onSubmit, pending] = useFormAction(sellMembership);
@@ -90,6 +100,7 @@ function SellForm({
         memberId={memberId}
         defaultPlanId={defaultPlanId}
         trainerDefaults={trainerDefaults}
+        classTimeDefaults={classTimeDefaults}
         fieldErrors={state.fieldErrors}
       />
       <DialogFooter>

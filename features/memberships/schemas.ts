@@ -26,6 +26,13 @@ const optionalUuid = z.preprocess(
   z.string().uuid({ message: me.memberships.trainerPlaceholder }).nullable(),
 );
 
+/** D-71: a class start time as the schedule stores it, "08:00" or "08:00:00". */
+export const classTimeValue = z
+  .string()
+  .regex(/^([01]\d|2[0-3]):[0-5]\d(:[0-5]\d)?$/, {
+    message: me.errors.E_CLASS_TIME_REQUIRED,
+  });
+
 export const saleFieldsSchema = z
   .object({
     planId: z.string().uuid({ message: me.memberships.planRequired }),
@@ -34,7 +41,12 @@ export const saleFieldsSchema = z
       message: me.memberships.planRequired,
     }),
     requiresTrainer: z.enum(["true", "false"]).transform((v) => v === "true"),
+    coversGroup: z
+      .enum(["true", "false"])
+      .optional()
+      .transform((v) => v === "true"),
     trainerId: optionalUuid,
+    classTime: z.preprocess(emptyToNull, classTimeValue.nullable().optional()),
     sessions: z.preprocess(
       emptyToNull,
       z.coerce
@@ -72,6 +84,13 @@ export const saleFieldsSchema = z
         path: ["trainerId"],
         message: me.errors.E_TRAINER_REQUIRED,
       });
+    // D-71: Grupni and G+T also need the member's fixed class time.
+    if (value.requiresTrainer && value.coversGroup && !value.classTime)
+      context.addIssue({
+        code: "custom",
+        path: ["classTime"],
+        message: me.errors.E_CLASS_TIME_REQUIRED,
+      });
     // BR-059: Personalni has no list price, so its amount and sessions are entered.
     if (value.planKind === "personal") {
       if (value.amount === null)
@@ -94,3 +113,10 @@ export type SaleFields = z.infer<typeof saleFieldsSchema>;
 export const sellSchema = saleFieldsSchema.and(
   z.object({ memberId: z.string().uuid() }),
 );
+
+/** D-71: S-07 [Promijeni termin]. */
+export const classTimeChangeSchema = z.object({
+  memberId: z.string().uuid(),
+  membershipId: z.string().uuid(),
+  classTime: classTimeValue,
+});

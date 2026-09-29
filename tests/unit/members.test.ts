@@ -157,6 +157,40 @@ describe("saleFieldsSchema (S-08)", () => {
       me.memberships.methodRequired,
     );
   });
+  it("asks Grupni and G+T for the fixed class time (D-71)", () => {
+    const group = {
+      ...sale,
+      planKind: "group",
+      requiresTrainer: "true",
+      coversGroup: "true",
+      trainerId: "22222222-2222-4222-8222-222222222222",
+    };
+    const result = saleFieldsSchema.safeParse(group);
+    expect(
+      result.error?.issues.find((issue) => issue.path[0] === "classTime")
+        ?.message,
+    ).toBe(me.errors.E_CLASS_TIME_REQUIRED);
+    expect(
+      saleFieldsSchema.parse({ ...group, classTime: "08:00:00" }).classTime,
+    ).toBe("08:00:00");
+    expect(
+      saleFieldsSchema.safeParse({ ...group, classTime: "25:00" }).success,
+    ).toBe(false);
+  });
+  it("does not ask a gym plan or Personalni for a class time (D-71)", () => {
+    expect(saleFieldsSchema.parse(sale).classTime ?? null).toBeNull();
+    expect(
+      saleFieldsSchema.safeParse({
+        ...sale,
+        planKind: "personal",
+        requiresTrainer: "true",
+        coversGroup: "false",
+        trainerId: "22222222-2222-4222-8222-222222222222",
+        amount: "120",
+        sessions: "10",
+      }).success,
+    ).toBe(true);
+  });
 });
 
 describe("registerSchema (BR-033)", () => {

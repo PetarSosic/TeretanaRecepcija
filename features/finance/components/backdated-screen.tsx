@@ -17,6 +17,8 @@ import {
   saveBackdatedMembership,
   saveBackdatedVisit,
 } from "../actions";
+import { classTimesOf, type ClassTime } from "@/features/memberships/class-time";
+import { ClassTimeSelect } from "@/features/memberships/components/class-time-select";
 import { MemberPicker, type PickableMember } from "./member-picker";
 
 export type PlanOption = {
@@ -24,6 +26,7 @@ export type PlanOption = {
   name: string;
   kind: "gym" | "group" | "combo" | "personal" | "day_pass";
   requires_trainer: boolean;
+  covers_group: boolean;
   price: string | null;
 };
 
@@ -49,12 +52,14 @@ export function BackdatedScreen({
   plans,
   trainers,
   slots,
+  classTimes,
   today,
 }: {
   members: PickableMember[];
   plans: PlanOption[];
   trainers: TrainerOption[];
   slots: SlotOption[];
+  classTimes: ClassTime[];
   /** BR-001: gym_today, the newest date BR-120 allows. */
   today: string;
 }) {
@@ -99,6 +104,7 @@ export function BackdatedScreen({
           members={members}
           plans={plans}
           trainers={trainers}
+          classTimes={classTimes}
           today={today}
         />
       ) : null}
@@ -249,18 +255,24 @@ function MembershipForm({
   members,
   plans,
   trainers,
+  classTimes,
   today,
 }: {
   members: PickableMember[];
   plans: PlanOption[];
   trainers: TrainerOption[];
+  classTimes: ClassTime[];
   today: string;
 }) {
   const [state, onSubmit, pending] = useFormAction(saveBackdatedMembership);
   const [planId, setPlanId] = useState("");
+  const [trainerId, setTrainerId] = useState("");
+  const [classTime, setClassTime] = useState("");
   useActionToast(state);
   const errors = state.fieldErrors ?? {};
   const plan = plans.find((item) => item.id === planId);
+  // D-71 (BR-058a): Grupni and G+T take one of the chosen trainer's class times.
+  const needsClassTime = Boolean(plan?.requires_trainer && plan.covers_group);
 
   return (
     <form onSubmit={onSubmit} className="grid max-w-xl gap-4" noValidate>
@@ -289,7 +301,16 @@ function MembershipForm({
       {plan?.requires_trainer ? (
         <div className="grid gap-1.5">
           <Label htmlFor="membership-trainer">{me.finance.trainer}</Label>
-          <Select id="membership-trainer" name="trainerId" required>
+          <Select
+            id="membership-trainer"
+            name="trainerId"
+            value={trainerId}
+            onChange={(event) => {
+              setTrainerId(event.target.value);
+              setClassTime("");
+            }}
+            required
+          >
             <option value="">—</option>
             {trainers.map((trainer) => (
               <option key={trainer.id} value={trainer.id}>
@@ -299,6 +320,16 @@ function MembershipForm({
           </Select>
           <FieldError id="trainerId-error">{errors.trainerId}</FieldError>
         </div>
+      ) : null}
+
+      {needsClassTime && trainerId ? (
+        <ClassTimeSelect
+          id="membership-class-time"
+          options={classTimesOf(classTimes, trainerId)}
+          value={classTime}
+          onChange={setClassTime}
+          error={errors.classTime}
+        />
       ) : null}
 
       <div className="grid gap-4 sm:grid-cols-2">

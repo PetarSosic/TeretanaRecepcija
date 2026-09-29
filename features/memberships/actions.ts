@@ -3,12 +3,13 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { requireStaff } from "@/lib/auth";
+import { getErrorMessage } from "@/lib/errors";
 import { me } from "@/lib/i18n/me";
 import { fieldErrorsOf, rpcCode, rpcFailure } from "@/lib/rpc";
 import { createClient } from "@/lib/supabase/server";
 import type { ActionState } from "@/lib/action-state";
 import { personalMinimumText, saleArguments, saleFieldsFrom } from "./sale";
-import { sellSchema } from "./schemas";
+import { classTimeChangeSchema, sellSchema } from "./schemas";
 
 /** F-08: sell or renew a membership (BR-050 to BR-060, BR-092). */
 export async function sellMembership(
@@ -30,14 +31,46 @@ export async function sellMembership(
     p_start_override: parsed.data.startOverride,
   });
   if (error) {
-    if (rpcCode(error) === "E_AMOUNT_BELOW_MIN")
+    const code = rpcCode(error);
+    if (code === "E_AMOUNT_BELOW_MIN")
       return rpcFailure(error, { min: await personalMinimumText() });
+    // D-71: the class time has its own field, so its message goes under it.
+    if (code.startsWith("E_CLASS_TIME_"))
+      return { fieldErrors: { classTime: getErrorMessage(code) } };
     return rpcFailure(error);
   }
 
   revalidatePath(`/members/${parsed.data.memberId}`);
   revalidatePath("/members");
   return { success: me.memberships.saved };
+}
+
+/**
+ * D-71: S-07 [Promijeni termin]. Any role moves a group membership to another active
+ * time of its trainer; no money changes hands, so no shift is needed (BR-092).
+ */
+export async function changeClassTime(
+  _state: ActionState,
+  formData: FormData,
+): Promise<ActionState> {
+  await requireStaff();
+  const parsed = classTimeChangeSchema.safeParse({
+    memberId: formData.get("memberId"),
+    membershipId: formData.get("membershipId"),
+    classTime: formData.get("classTime") ?? "",
+  });
+  if (!parsed.success)
+    return { fieldErrors: fieldErrorsOf(parsed.error.issues) };
+
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("set_membership_class_time", {
+    p_membership: parsed.data.membershipId,
+    p_class_time: parsed.data.classTime,
+  });
+  if (error) return rpcFailure(error);
+
+  revalidatePath(`/members/${parsed.data.memberId}`);
+  return { success: me.memberships.classTimeSaved };
 }
 
 export type MembershipPreview = {

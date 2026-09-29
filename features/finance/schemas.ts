@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { classTimeValue } from "@/features/memberships/schemas";
 import { parseMoneyInput } from "@/lib/format";
 import { me } from "@/lib/i18n/me";
 
@@ -107,6 +108,12 @@ export const backdatedMembershipSchema = z.object({
   memberId: z.string().uuid({ message: me.finance.noMember }),
   planId: z.string().uuid({ message: me.errors.E_VALIDATION }),
   trainerId: optionalUuid,
+  // D-71: required by the database for Grupni and G+T, as on S-08.
+  classTime: z.preprocess(
+    (value) =>
+      typeof value === "string" && value.trim() === "" ? null : value,
+    classTimeValue.nullable(),
+  ),
   amount: z.preprocess(
     (value) =>
       typeof value === "string" && value.trim() === "" ? null : value,

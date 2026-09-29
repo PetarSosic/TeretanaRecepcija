@@ -6,6 +6,7 @@ import {
   type TrainerOption,
 } from "@/features/finance/components/backdated-screen";
 import type { PickableMember } from "@/features/finance/components/member-picker";
+import { loadClassTimes } from "@/features/memberships/catalog";
 import { requireStaff } from "@/lib/auth";
 import { gymToday } from "@/lib/gym-date";
 import { me } from "@/lib/i18n/me";
@@ -30,7 +31,7 @@ export default async function BackdatedPage() {
   const today = await gymToday(staff.gym_id);
 
   const supabase = await createClient();
-  const [members, plans, trainers, slots] = await Promise.all([
+  const [members, plans, trainers, slots, classTimes] = await Promise.all([
     supabase
       .from("members")
       .select("id, member_number, first_name, last_name, phone")
@@ -39,7 +40,7 @@ export default async function BackdatedPage() {
       .returns<PickableMember[]>(),
     supabase
       .from("plans")
-      .select("id, name, kind, requires_trainer, price::text")
+      .select("id, name, kind, requires_trainer, covers_group, price::text")
       .eq("is_active", true)
       .neq("kind", "day_pass")
       .order("sort_order")
@@ -58,6 +59,8 @@ export default async function BackdatedPage() {
       .order("weekday")
       .order("starts_at")
       .returns<SlotRow[]>(),
+    // D-71: a back-dated Grupni or G+T takes a fixed class time, as S-08 does.
+    loadClassTimes(),
   ]);
 
   const slotOptions: SlotOption[] = (slots.data ?? []).map((slot) => ({
@@ -72,6 +75,7 @@ export default async function BackdatedPage() {
       plans={plans.data ?? []}
       trainers={trainers.data ?? []}
       slots={slotOptions}
+      classTimes={classTimes}
       today={today}
     />
   );
