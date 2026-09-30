@@ -4094,14 +4094,14 @@ ništa od ovoga. Migracije 0041 i 0042 su primijenjene na bazu 30.09.2026.
 - [ ] Prije 23:00 ponovo pustiti recepcijske testove i FIN-05, desktop:
       `npx playwright test tests/e2e/reception.spec.ts tests/e2e/test-plan-high-a.spec.ts tests/e2e/test-plan-high-g.spec.ts tests/e2e/test-plan-medium-a.spec.ts tests/e2e/test-plan-rest.spec.ts --project=desktop`.
       Ako padnu i danju, to je pravi problem i treba ga istražiti.
-- [ ] Obrisati ručne testne podatke iz prave teretane (KP Fitness), ako to već nije urađeno.
-      Obim, koji je vlasnik potvrdio 30.09.2026: svi članovi, članarine, uplate, dolasci, smjene
-      (i njihovi PDF-ovi u Storage-u), troškovi (i „Suplementi“ 1.545 €), kretanja robe, kartice
-      i serije kartica, dnevnik izmjena, proizvod Monster, program Joga, nalozi Menadzer, Test
-      Recepcija i Ana (sa Auth korisnicima); brojač članova ide na 0. Ostaje seed (planovi,
-      treneri, programi Grupni/Personalni trening, raspored, kategorije, Voda, podešavanja),
-      vlasnik i Admin. Skripta `scripts/cleanup-test-data.local.mjs` postoji samo na računaru
-      na kojem je napisana i nije u repou.
+- [x] Obrisati ručne testne podatke iz prave teretane (KP Fitness) — **urađeno 30.09.2026.**
+      Obrisano: 6 članova sa članarinama, 7 uplata, 7 dolazaka, 7 smjena (i 7 PDF-ova u
+      Storage-u), 4 troška (i „Suplementi“ 1.545 €), 3 kretanja robe, 7 kartica u 2 serije,
+      89 stavki dnevnika izmjena, proizvod Monster, program Joga, nalozi Menadzer, Test
+      Recepcija i Ana (sa Auth korisnicima); brojač članova je na 0, pa sljedeći član dobija
+      broj 1. Ostali su seed (planovi, treneri, programi Grupni/Personalni trening, raspored,
+      kategorije, Voda, podešavanja), vlasnik i Admin. Rezervna kopija obrisanog je u
+      `kp-test-podaci-backup.json`, pored foldera projekta, samo na računaru na kojem je rađeno.
 - [ ] Ručno proći S-16 (bilans i novčani tok), S-20 i S-30 kao vlasnik, i S-16 kao menadžer.
 
 *Kraj plana. Novi rezultati upisani su uz slučajeve; neoznačeni kvadratići nisu automatski prolaz.*
