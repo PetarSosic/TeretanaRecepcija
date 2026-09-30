@@ -28,21 +28,29 @@ insert into products (id, gym_id, name, current_purchase_price, sale_price) valu
   ('99999999-1111-0000-0000-00000000e001', '99999999-1111-0000-0000-00000000b001', 'pgTAP Voda', 0.30, 1.50),
   ('99999999-1111-0000-0000-00000000e002', '99999999-1111-0000-0000-00000000b001', 'pgTAP Pločica', 1.00, 2.50);
 
--- Yesterday: a closed shift with a stock-in and a sale of Pločica.
+-- Yesterday: a closed shift with a stock-in and a sale of Pločica. The times are fixed
+-- hours of the gym's yesterday (BR-001), not offsets from now(), so a run late in the
+-- evening does not move them into today.
 insert into shifts (id, gym_id, staff_id, started_at, closed_at, close_type, closed_by)
 values ('99999999-1111-0000-0000-00000000d000', '99999999-1111-0000-0000-00000000b001',
-        '99999999-1111-0000-0000-00000000c001', now() - interval '1 day',
-        now() - interval '20 hours', 'manual', '99999999-1111-0000-0000-00000000c001');
+        '99999999-1111-0000-0000-00000000c001',
+        gym_day_start('99999999-1111-0000-0000-00000000b001',
+                      gym_today('99999999-1111-0000-0000-00000000b001') - 1) + interval '8 hours',
+        gym_day_start('99999999-1111-0000-0000-00000000b001',
+                      gym_today('99999999-1111-0000-0000-00000000b001') - 1) + interval '20 hours',
+        'manual', '99999999-1111-0000-0000-00000000c001');
 insert into stock_movements (id, gym_id, product_id, type, quantity, unit_cost, unit_price,
                              method, created_by, shift_id, created_at) values
   ('99999999-1111-0000-0000-000000040001', '99999999-1111-0000-0000-00000000b001',
    '99999999-1111-0000-0000-00000000e002', 'in', 10, 1.00, null, null,
    '99999999-1111-0000-0000-00000000c001', '99999999-1111-0000-0000-00000000d000',
-   now() - interval '23 hours'),
+   gym_day_start('99999999-1111-0000-0000-00000000b001',
+                 gym_today('99999999-1111-0000-0000-00000000b001') - 1) + interval '9 hours'),
   ('99999999-1111-0000-0000-000000040002', '99999999-1111-0000-0000-00000000b001',
    '99999999-1111-0000-0000-00000000e002', 'out', 2, 1.00, 2.50, 'cash',
    '99999999-1111-0000-0000-00000000c001', '99999999-1111-0000-0000-00000000d000',
-   now() - interval '22 hours');
+   gym_day_start('99999999-1111-0000-0000-00000000b001',
+                 gym_today('99999999-1111-0000-0000-00000000b001') - 1) + interval '10 hours');
 
 -- Helper: the detail an RPC raises, to read the stock level E17 names.
 create function pg_temp.error_detail(p_sql text) returns text language plpgsql as $$
