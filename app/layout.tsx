@@ -9,6 +9,8 @@ export const metadata: Metadata = {
   title: me.app.name,
   description: me.app.description,
   robots: { index: false, follow: false },
+  // D-91: the name under the icon when an iPhone adds the app to its home screen.
+  appleWebApp: { capable: true, title: me.app.name },
 };
 
 export default async function RootLayout({

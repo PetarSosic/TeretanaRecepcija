@@ -84,6 +84,8 @@ Resend: shift report emails · expiry reminders
 │   ├── backup.ts                  # CSV export + encrypted ZIP (BR-163)
 │   ├── pdf/{shift-report,card-sheet}.tsx
 │   └── email/{shift-report,expiry-reminder}.tsx
+├── app/manifest.ts, app/apple-icon.png   # installable app (D-91)
+├── public/icons/{icon-192,icon-512,maskable-512}.png   # D-91, from scripts/pwa-icons.mjs
 ├── public/sounds/{ok,warning,alarm}.mp3
 ├── supabase/
 │   ├── migrations/NNNN_description.sql
@@ -252,6 +254,8 @@ RPCs raise `P0001` with the message `E_<CODE>`. `lib/errors.ts` maps each code t
 - alarm ≈ 2 s.
 
 **Offline:** F-27 only. No caching of write operations.
+
+**Installable app (D-91):** a web app manifest lets Chrome and Edge (computer, Android) and Safari (iOS) install the app in its own window. There is no service worker and nothing is cached.
 
 **Security:**
 - RLS on every table.

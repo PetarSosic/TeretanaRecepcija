@@ -2946,6 +2946,25 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Gdje provjeriti:** Network tab
 - [x] Prošlo  [ ] Palo  Napomena: **30.09.2026 — PROŠLO.** `resource-use.spec.ts` na produkcijskom buildu (`E2E_PRODUCTION=1`): 0 RSC zahtjeva prije klika, klik ih ima i otvara `/members`. ESLint odbija `Link` bez `prefetch={false}`.
 
+### [UX-09] Aplikacija se instalira na računar i telefon (D-91)
+- **Prioritet:** Srednje
+- **Uloga / preduslovi:** produkcija (HTTPS); bilo koja uloga
+- **Koraci:**
+  1. Računar, Chrome: meni ⋮ → „Cast, save and share“ → „Install page as app…“ (Edge: ⋯ → „Apps“ →
+     „Install this site as an app“). Pokrenite aplikaciju sa radne površine ili iz Start menija.
+  2. Android, Chrome: meni ⋮ → „Add to home screen“ → „Install“. Otvorite je sa početnog ekrana.
+  3. iPhone, Safari: dugme za dijeljenje → „Add to Home Screen“. Otvorite je sa početnog ekrana.
+- **Test podaci:** —
+- **Očekivani rezultat:** ikona KP (bež pozadina, braon slova) i ime „KP Fitness“; aplikacija se
+  otvara u svom prozoru, bez adresne trake; prijava vodi na početni ekran uloge kao u browseru.
+  Bez interneta prozor pokazuje offline stranicu browsera; ništa se ne čuva u kešu.
+- **Gdje provjeriti:** UI; DevTools → Application → Manifest (bez grešaka)
+- [ ] Prošlo  [ ] Palo  Napomena: **30.09.2026 — automatski dio PROŠAO.** `pwa.spec.ts`:
+  `/manifest.webmanifest` i sve ikone stižu bez prijave (200, bez preusmjerenja na `/login`),
+  veličine PNG-ova odgovaraju manifestu, Chrome ne prijavljuje greške manifesta ni prepreke za
+  instalaciju (osim „in-incognito“, koju daje sam Playwright). Kad se ukloni izuzetak u proxy-ju,
+  manifest dobija 307 na `/login` i oba testa padaju. Ručna instalacija na uređajima nije izvršena.
+
 ---
 
 
@@ -4034,6 +4053,20 @@ transakciji): broj dolazaka za jedan mjesec 557 ms → 1,6 ms, isti rezultat.
 | E2E samo za izmijenjeno, desktop: `resource-use`, `auth`, `shifts`, `payments`, `finance`, `manager-finance`, `storage` | **31 prošlo**, 1 preskočen (D-86, samo na produkcijskom buildu) |
 | E2E D-86 na produkcijskom buildu | **1/1** |
 | Cijeli E2E paket | nije pušten (na zahtjev; prekinuti širi paket prošao je 37/37 prije prekida) |
+
+### 9.17 Dopuna — instalacija kao aplikacija (D-91), 30.09.2026
+
+**D-91** aplikacija se instalira kao PWA na računar (Chrome, Edge), Android i iPhone i otvara se
+u svom prozoru (UX-09). Nema service workera ni keša; baza se ne mijenja.
+
+| Provjera 30.09.2026 | Rezultat |
+|---|---|
+| `npm run lint`, `npm run typecheck` | PROŠLO |
+| `npm run test` | **214 PROŠLO** (1 preskočen) |
+| `next build` | PROŠLO; `/manifest.webmanifest` i `/apple-icon.png` su statični |
+| `npm run test:db` | nije pušten: nema izmjena u bazi |
+| E2E samo za izmijenjeno, oba projekta: `foundation`, `pwa` | `foundation` **6/6**; `pwa` **4/4** (prvi put 2 pala na „in-incognito“ iz Playwrighta, koji test sada preskače) |
+| Cijeli E2E paket | nije pušten (na zahtjev) |
 
 *Kraj plana. Novi rezultati upisani su uz slučajeve; neoznačeni kvadratići nisu automatski prolaz.*
 

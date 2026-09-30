@@ -163,8 +163,10 @@ export const config = {
   // Every matched request with a session costs a database call (session_context, D-89),
   // so only real navigations and route handlers are matched. Framework assets
   // and static files are served by a document that already carries the CSP, and the
-  // headers in next.config.ts still apply to them.
+  // headers in next.config.ts still apply to them. D-91: browsers fetch the manifest
+  // without cookies, so a match would redirect it to /login and the app could not be
+  // installed.
   matcher: [
-    "/((?!_next/|favicon.ico|.*\\.(?:png|jpe?g|svg|ico|webp|avif|mp3|css|js|woff2?)$).*)",
+    "/((?!_next/|favicon.ico|.*\\.(?:png|jpe?g|svg|ico|webp|avif|mp3|css|js|woff2?|webmanifest)$).*)",
   ],
 };
