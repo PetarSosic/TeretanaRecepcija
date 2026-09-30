@@ -217,6 +217,7 @@ RPCs raise `P0001` with the message `E_<CODE>`. `lib/errors.ts` maps each code t
 
 - **Automatic check-out (BR-082a, D-74)** needs no handler. A second pg_cron job, `kp-fitness-auto-checkout`, runs `job_auto_checkout()` in the database **every 5 minutes** for every gym (D-84). It needs no application URL, secret or gym clock, since it compares instants, and it is idempotent by nature.
 - **Run log cleanup (D-88).** pg_cron records every run in `cron.job_run_details` and never deletes one. A third job, `kp-fitness-cron-log-cleanup`, runs `purge_cron_log()` daily at 03:17 UTC and keeps the last 7 days.
+- **Fixed expenses (BR-136, D-93)** need no handler either. A fourth job, `kp-fitness-recurring-expenses`, runs `job_recurring_expenses()` at 22:05 and 23:05 UTC, which is 00:05 in Podgorica in summer and in winter; the other run finds the month already posted. It posts, for every gym, this month's fixed expenses on the 1st, at most once a month (a unique index on `expenses (recurring_expense_id, spent_on)`), so a run that is missed or repeated changes nothing.
 
 ## 9. Non-functional requirements
 **Performance:**

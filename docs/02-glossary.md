@@ -71,9 +71,16 @@ Use these terms **exactly** in the documents, code and UI.
 | Expense | `expense` | Trošak | Money spent. |
 | Expense category | `expense_category` | Kategorija troška | Owner-managed list. |
 | Salary category | `is_salary = true` | — | Category "Plate". Only the owner can use it. |
-| System category | `is_system = true` | — | Category "Roba za prodaju". Used automatically by stock-in; cannot be deactivated. |
+| System category | `is_system = true` | — | Category "Roba za prodaju". Used automatically by stock-in; cannot be deactivated or chosen for a hand-entered expense (D-92). |
 | Paid from till | `paid_from_till` | Plaćeno iz kase | An expense paid with cash from the desk. It reduces expected cash. |
-| Profit | computed | Profit | Income minus expenses. Owner only. |
+| Fixed expense | `recurring_expenses` | Fiksni trošak | A monthly cost the owner describes once; it is posted as an expense on the 1st of every month and marked `Fiksni` on S-17 (BR-136, D-93). Owner only. |
+| Goods bought | expense with `stock_movement_id` | Nabavka robe / Plaćena nova roba | A stock-in's automatic expense: money paid and stock gained, never a cost in the profit (BR-151, D-92). |
+| Operating expense | expense without `stock_movement_id` | Operativni troškovi | Every expense that is not goods bought, salaries and payouts included (BR-151). |
+| Cost of goods sold | computed | Trošak prodate robe | Σ sold quantity × the purchase price at the sale (BR-153). Owner only. |
+| Gross profit | computed | Bruto dobit | Income minus cost of goods sold. Owner only. |
+| Profit | computed | Profit | Income minus cost of goods sold minus operating expenses (BR-152, D-92). Owner only. |
+| Income statement | `fin_statement` | Bilans uspjeha | S-16's income, cost of goods sold, gross profit, operating expenses and profit. Owner only. |
+| Cash flow | `fin_statement` | Novčani tok | Primljeno, Plaćena nova roba, Ostala plaćanja and Neto promjena novca (BR-158). Owner only. |
 | Trainer share | computed | Za trenera | The part of a trainer-linked payment that belongs to the trainer. |
 | Gym share | computed | Za teretanu | Payment amount minus trainer share. |
 | Trainer fee | `personal_gym_fee` | Naknada teretani | Amount per personal client that goes to the gym (e.g. €80). |
@@ -103,8 +110,9 @@ Use these terms **exactly** in the documents, code and UI.
 | Purchase price | `unit_cost` / `current_purchase_price` | Nabavna cijena | Per-unit cost as written on the supplier's invoice. |
 | Sale price | `sale_price` / `unit_price` | Prodajna cijena | Per-unit price charged. Set by the owner only. |
 | Stock level | computed | Stanje | Total stock-in minus total sales (non-voided). |
-| Stock value | computed | Vrijednost zalihe | Stock level × current purchase price. Owner only. |
-| Bar profit | computed | Zarada na magacinu | Σ sales × (sale price − purchase price). Owner only. |
+| Stock value | computed | Vrijednost zalihe | Stock level × purchase price, at the end of a day (BR-159): today at the current purchase price. Owner only. |
+| Bar profit | computed | Zarada na magacinu (S-16); Bruto zarada (per product, S-20) | Σ sales × (sale price − purchase price). Owner only. |
+| Margin | computed | Marža | Bruto zarada as a percentage of the sales income (S-20). Owner only. |
 
 ## Other
 | Term | Code | UI label | Definition |

@@ -24,17 +24,33 @@ import { cn } from "@/lib/utils";
 import { voidSale } from "@/features/storage/actions";
 import { RankedBars } from "./ranked-bars";
 
-export type StorageProductRow = {
-  product_id: string;
-  name: string;
-  stock: number;
-  /** Decimal text, as numeric(10,2) arrives (BR-003). */
-  stock_value: string;
+/** D-92: what came in, what was sold and what it cost, and the stock at the end. */
+type StorageFigures = {
+  in_quantity: number;
+  /** Decimal text, as numeric arrives (BR-003). */
+  in_amount: string;
   sold_quantity: number;
   revenue: string;
   cost: string;
   profit: string;
+  /** Gross profit over revenue, one decimal; null when nothing was sold. */
+  margin_pct: string | null;
+  stock: number;
+  stock_value: string;
 };
+
+export type StorageProductRow = StorageFigures & {
+  product_id: string;
+  name: string;
+  purchase_price: string;
+  sale_price: string;
+};
+
+export type StorageTotals = StorageFigures;
+
+function margin(value: string | null): string {
+  return value === null ? "—" : `${value.replace(".", ",")} %`;
+}
 
 export type DailyRow = {
   day: string;
@@ -56,13 +72,22 @@ export type StockInRow = {
   void_reason: string | null;
 };
 
-/** S-20 (F-15 for the owner): stock value, what the bar earned, and the stock-ins. */
+/**
+ * S-20 (F-15 for the owner): per product what came in, what was sold, what the sold
+ * goods cost and earned (BR-153), and the stock and its value at the end of the period
+ * (BR-159), with a totals row; then the daily sales and the stock-ins.
+ */
 export function StorageReport({
   products,
+  totals,
+  stockDate,
   daily,
   stockIns,
 }: {
   products: StorageProductRow[];
+  totals: StorageTotals | null;
+  /** yyyy-mm-dd: the day the stock and its value are given for. */
+  stockDate: string | null;
   daily: DailyRow[];
   stockIns: StockInRow[];
 }) {
@@ -71,50 +96,59 @@ export function StorageReport({
   return (
     <div className="grid grid-cols-1 gap-8">
       <RankedBars
-        title={`${me.finance.profit} — ${me.finance.product}`}
+        title={`${me.finance.grossMargin} — ${me.finance.product}`}
         rows={products.map((row) => ({ label: row.name, value: row.profit }))}
       />
 
       <section>
-        <h2 className="mb-3 text-lg font-semibold">
+        <h2 className="mb-1 text-lg font-semibold">
           {me.finance.storageTitle}
         </h2>
+        {stockDate ? (
+          <p className="mb-3 text-sm text-muted-foreground">
+            {me.finance.stockOn.replace("{date}", formatDate(stockDate))}
+          </p>
+        ) : null}
         <TableWrapper>
           <Table>
             <thead>
               <tr>
                 <Th>{me.finance.product}</Th>
-                <Th className="text-right">{me.finance.stock}</Th>
-                <Th className="text-right">{me.finance.stockValue}</Th>
+                <Th className="text-right">{me.finance.purchasePrice}</Th>
+                <Th className="text-right">{me.finance.salePrice}</Th>
+                <Th className="text-right">{me.finance.inQuantity}</Th>
+                <Th className="text-right">{me.finance.inAmount}</Th>
                 <Th className="text-right">{me.finance.soldQuantity}</Th>
                 <Th className="text-right">{me.finance.revenue}</Th>
                 <Th className="text-right">{me.finance.soldCost}</Th>
-                <Th className="text-right">{me.finance.profit}</Th>
+                <Th className="text-right">{me.finance.grossMargin}</Th>
+                <Th className="text-right">{me.finance.marginPct}</Th>
+                <Th className="text-right">{me.finance.stock}</Th>
+                <Th className="text-right">{me.finance.stockValue}</Th>
               </tr>
             </thead>
             <tbody>
               {products.map((row) => (
                 <tr key={row.product_id}>
                   <Td>{row.name}</Td>
-                  <Td className="text-right tabular-nums">{row.stock}</Td>
                   <Td className="text-right tabular-nums">
-                    {formatMoney(row.stock_value)}
-                  </Td>
-                  <Td className="text-right tabular-nums">
-                    {row.sold_quantity}
+                    {formatMoney(row.purchase_price)}
                   </Td>
                   <Td className="text-right tabular-nums">
-                    {formatMoney(row.revenue)}
+                    {formatMoney(row.sale_price)}
                   </Td>
-                  <Td className="text-right tabular-nums">
-                    {formatMoney(row.cost)}
-                  </Td>
-                  <Td className="text-right font-medium tabular-nums">
-                    {formatMoney(row.profit)}
-                  </Td>
+                  <Figures row={row} />
                 </tr>
               ))}
             </tbody>
+            {totals ? (
+              <tfoot>
+                <tr className="font-semibold">
+                  <Td colSpan={3}>{me.finance.total}</Td>
+                  <Figures row={totals} />
+                </tr>
+              </tfoot>
+            ) : null}
           </Table>
         </TableWrapper>
       </section>
@@ -230,6 +264,27 @@ export function StorageReport({
         <VoidStockIn movement={voiding} onDone={() => setVoiding(null)} />
       ) : null}
     </div>
+  );
+}
+
+/** The S-20 columns a product row and the totals row share. */
+function Figures({ row }: { row: StorageFigures }) {
+  return (
+    <>
+      <Td className="text-right tabular-nums">{row.in_quantity}</Td>
+      <Td className="text-right tabular-nums">{formatMoney(row.in_amount)}</Td>
+      <Td className="text-right tabular-nums">{row.sold_quantity}</Td>
+      <Td className="text-right tabular-nums">{formatMoney(row.revenue)}</Td>
+      <Td className="text-right tabular-nums">{formatMoney(row.cost)}</Td>
+      <Td className="text-right font-medium tabular-nums">
+        {formatMoney(row.profit)}
+      </Td>
+      <Td className="text-right tabular-nums">{margin(row.margin_pct)}</Td>
+      <Td className="text-right tabular-nums">{row.stock}</Td>
+      <Td className="text-right tabular-nums">
+        {formatMoney(row.stock_value)}
+      </Td>
+    </>
   );
 }
 

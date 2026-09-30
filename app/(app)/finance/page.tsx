@@ -16,6 +16,10 @@ import {
   type Summary,
 } from "@/features/finance/components/stat-cards";
 import {
+  StatementSection,
+  type Statement,
+} from "@/features/finance/components/statement";
+import {
   chartFromParams,
   periodFromParams,
   presetsFor,
@@ -66,6 +70,7 @@ const METHODS: Record<string, string> = {
  * S-16 (F-17). The layout above has already refused the receptionist. D-80: a manager
  * sees only the Prihod and Troškovi cards and the three breakdowns, for Danas, Ova
  * sedmica or Ovaj mjesec; `fin_summary` sends them nothing else, and salaries not at all.
+ * D-92: the owner also gets the income statement and the cash flow (`fin_statement`).
  */
 export default async function FinancePage({
   searchParams,
@@ -98,25 +103,28 @@ export default async function FinancePage({
       <div className="grid grid-cols-1 gap-8">
         <PeriodPicker period={period} presets={presets} />
         {totals ? <StatCards summary={totals} /> : null}
-        <Breakdowns split={breakdown.data as Breakdown | null} />
+        <Breakdowns split={breakdown.data as Breakdown | null} withCategories />
       </div>
     );
   }
 
   // D-68: the chart has its own year and month, and opens on the whole current year.
   const range = chartFromParams(params, today);
-  const [summary, breakdown, chart, expiring, unpaid] = await Promise.all([
-    supabase.rpc("fin_summary", { p_from: period.from, p_to: period.to }),
-    supabase.rpc("fin_income_breakdown", {
-      p_from: period.from,
-      p_to: period.to,
-    }),
-    supabase.rpc("fin_chart", { p_year: range.year, p_month: range.month }),
-    supabase.rpc("fin_expiring", { p_days: 7 }),
-    supabase.rpc("fin_unpaid_members"),
-  ]);
+  const [summary, statement, breakdown, chart, expiring, unpaid] =
+    await Promise.all([
+      supabase.rpc("fin_summary", { p_from: period.from, p_to: period.to }),
+      supabase.rpc("fin_statement", { p_from: period.from, p_to: period.to }),
+      supabase.rpc("fin_income_breakdown", {
+        p_from: period.from,
+        p_to: period.to,
+      }),
+      supabase.rpc("fin_chart", { p_year: range.year, p_month: range.month }),
+      supabase.rpc("fin_expiring", { p_days: 7 }),
+      supabase.rpc("fin_unpaid_members"),
+    ]);
 
   const totals = summary.data as Summary | null;
+  const statementData = statement.data as Statement | null;
   // SUSPECT-01: a rejected call answers with null data; say so instead of an empty chart.
   const chartFailure = chart.error ? getErrorMessage(rpcCode(chart.error)) : null;
   const chartData = chartFailure ? null : (chart.data as Chart | null);
@@ -128,6 +136,8 @@ export default async function FinancePage({
       <PeriodPicker period={period} />
 
       {totals ? <StatCards summary={totals} /> : null}
+
+      {statementData ? <StatementSection statement={statementData} /> : null}
 
       {/* N-24: minmax(0, 1fr), so the chart scrolls inside its frame at 375 px. */}
       <section className="grid grid-cols-1 gap-4">
@@ -234,9 +244,29 @@ export default async function FinancePage({
   );
 }
 
-/** S-16: income by plan and by method, and expenses by category (US-17.1 AC2). */
-function Breakdowns({ split }: { split: Breakdown | null }) {
+/**
+ * S-16: income by plan and by method, and expenses by category (US-17.1 AC2). D-92: the
+ * owner reads expenses by category in the statement's operating expenses, so the
+ * category table, which counts stock-ins as paid, is the manager's only (D-80).
+ */
+function Breakdowns({
+  split,
+  withCategories = false,
+}: {
+  split: Breakdown | null;
+  withCategories?: boolean;
+}) {
   const rows = split ?? { by_plan: [], by_method: [], by_category: [] };
+  const byMethod = (
+    <BreakdownTable
+      title={me.finance.byMethod}
+      rows={rows.by_method.map((row) => ({
+        ...row,
+        name: METHODS[row.name] ?? row.name,
+      }))}
+      countLabel={me.finance.count}
+    />
+  );
   return (
     <>
       <div className="grid gap-8 lg:grid-cols-2">
@@ -245,21 +275,18 @@ function Breakdowns({ split }: { split: Breakdown | null }) {
           rows={rows.by_plan}
           countLabel={me.finance.count}
         />
-        <BreakdownTable
-          title={me.finance.byCategory}
-          rows={rows.by_category}
-          countLabel={me.finance.count}
-        />
+        {withCategories ? (
+          <BreakdownTable
+            title={me.finance.byCategory}
+            rows={rows.by_category}
+            countLabel={me.finance.count}
+          />
+        ) : (
+          byMethod
+        )}
       </div>
 
-      <BreakdownTable
-        title={me.finance.byMethod}
-        rows={rows.by_method.map((row) => ({
-          ...row,
-          name: METHODS[row.name] ?? row.name,
-        }))}
-        countLabel={me.finance.count}
-      />
+      {withCategories ? byMethod : null}
     </>
   );
 }

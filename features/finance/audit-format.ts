@@ -53,6 +53,7 @@ const HIDDEN = new Set([
   "shift_id",
   "membership_id",
   "stock_movement_id",
+  "recurring_expense_id",
 ]);
 
 /** Money columns, so a change reads "79,00 €" rather than "79.00". */
@@ -198,6 +199,7 @@ export function auditSubject(
         return joined(me.audit.values.cardReplacement, member());
       return joined(ref("plan_id"), member());
     case "expenses":
+    case "recurring_expenses":
       return `${ref("category_id")}: ${text("description")}`;
     case "stock_movements":
       return `${auditValue(row.table_name, "type", data.type, lookups)}: ${ref("product_id")} × ${text("quantity")}`;

@@ -77,6 +77,33 @@ export const expenseSchema = z
     path: ["method"],
   });
 
+/**
+ * BR-136 (D-93): a fixed expense. The first month arrives from `<input type="month">`
+ * as yyyy-mm and becomes the 1st of that month; the action checks it is not in the past,
+ * since only the database knows the gym's today (BR-001).
+ */
+export const recurringExpenseSchema = z.object({
+  id: optionalUuid,
+  categoryId: z.string().uuid({ message: me.errors.E_VALIDATION }),
+  description: z
+    .string()
+    .trim()
+    .min(2, me.finance.descriptionInvalid)
+    .max(200, me.finance.descriptionInvalid),
+  amount: expenseAmount,
+  method: z.enum(["cash", "card", "none"], {
+    message: me.errors.E_VALIDATION,
+  }),
+  startsOn: z
+    .string()
+    .trim()
+    .refine((value) => /^\d{4}-(0[1-9]|1[0-2])$/.test(value), {
+      message: me.finance.recurringStartInvalid,
+    })
+    .transform((value) => `${value}-01`),
+  isActive: checkbox,
+});
+
 /** BR-135: a void always carries a reason. */
 export const voidExpenseSchema = z.object({
   expenseId: z.string().uuid(),

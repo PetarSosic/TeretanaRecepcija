@@ -223,11 +223,13 @@ select is(
 select is(
   (fin_summary((select first from fin_month),
                (select first from fin_month) + 27) ->> 'expenses')::numeric,
-  150.00::numeric, 'BR-151: the electricity bill and the payout');
+  153.00::numeric,
+  'BR-151 and BR-153 (D-92): the electricity bill, the payout and the €3.00 the sold water cost');
 select is(
   (fin_summary((select first from fin_month),
                (select first from fin_month) + 27) ->> 'profit')::numeric,
-  253.00::numeric, 'BR-152: profit is income minus expenses');
+  250.00::numeric,
+  'BR-152 (D-92): profit is income minus the cost of goods sold minus operating expenses');
 select is(
   (fin_summary((select first from fin_month),
                (select first from fin_month) + 27) ->> 'bar_profit')::numeric,
@@ -264,7 +266,7 @@ select is(
   (select value ->> 'expenses'
    from json_array_elements(fin_chart((select year from fin_chart_month)) -> 'points')
    where value ->> 'date' = to_char((select first from fin_month), 'YYYY-MM-DD')),
-  '150.00', 'D-68: and the BR-151 expenses');
+  '153.00', 'D-68: and the BR-151 expenses with the BR-153 cost of goods sold (D-92)');
 select is(
   (fin_chart((select year from fin_chart_month)) ->> 'first_year')::int,
   (select year from fin_chart_month),
@@ -297,7 +299,7 @@ select is(
 select is(
   (fin_chart((select year from fin_chart_month),
              (select month from fin_chart_month)) ->> 'profit')::numeric,
-  253.00::numeric, 'D-68: and its profit is income minus expenses (BR-152)');
+  250.00::numeric, 'D-68: and its profit is BR-152 (D-92), as on the card');
 select throws_ok(
   format('select fin_chart(%s)',
          extract(year from gym_today('cccccccc-0000-0000-0000-00000000b001'))::int + 1),

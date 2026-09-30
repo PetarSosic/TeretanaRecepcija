@@ -284,6 +284,8 @@ test("AUTH-02: a username login opens the receptionist's shift and desk menu", a
 const FINANCE = [
   "/finance",
   "/finance/expenses",
+  // D-93: S-30 Fiksni troškovi.
+  "/finance/recurring",
   "/finance/trainers",
   "/finance/shifts",
   "/finance/storage",
@@ -343,6 +345,8 @@ test("PERM-01/02/03: the route matrix, member profile and shift screens included
         "/finance/shifts",
       ],
       [
+        // D-93: fixed expenses hold salaries.
+        "/finance/recurring",
         "/finance/trainers",
         "/finance/storage",
         "/finance/audit",

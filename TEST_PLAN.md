@@ -4068,6 +4068,42 @@ u svom prozoru (UX-09). Nema service workera ni keša; baza se ne mijenja.
 | E2E samo za izmijenjeno, oba projekta: `foundation`, `pwa` | `foundation` **6/6**; `pwa` **4/4** (prvi put 2 pala na „in-incognito“ iz Playwrighta, koji test sada preskače) |
 | Cijeli E2E paket | nije pušten (na zahtjev) |
 
+### 9.18 Dopuna — trošak prodate robe, bilans uspjeha, novčani tok, fiksni troškovi (D-92, D-93), 30.09.2026
+
+**D-92** nabavka robe više nije trošak mjeseca: u profit ulazi samo nabavna cijena prodate robe
+(zadnja nabavna, AS-6). S-16 za vlasnika ima **Bilans uspjeha** i **Novčani tok** sa vrijednošću
+zalihe na kraju perioda (`fin_statement`, migracija 0041); S-20 ima nabavnu i prodajnu cijenu,
+ulaz, trošak prodate robe, bruto zaradu, maržu i red Ukupno. „Roba za prodaju“ se ne unosi ručno.
+**D-93** fiksni troškovi i plate (S-30 `/finance/recurring`) knjiže se sami 1. u mjesecu u 00:05
+(`kp-fitness-recurring-expenses`, migracija 0042), sa oznakom „Fiksni“ na S-17. Menadžer ne vidi
+ništa od ovoga. Migracije 0041 i 0042 su primijenjene na bazu 30.09.2026.
+
+| Provjera 30.09.2026 | Rezultat |
+|---|---|
+| `npm run lint`, `npm run typecheck`, `next build` | PROŠLO |
+| `npm run test` | **214 PROŠLO** (1 preskočen) |
+| `npm run test:db` (novo: 0024 E23–E25, 49 provjera; 0025 fiksni troškovi, 39 provjera) | **26/26 fajlova** |
+| Cijeli E2E paket (pušten 23:20–23:40) | **316 prošlo, 8 palo**, 162 preskočeno, 14 nije pokrenuto (serijski nakon pada) |
+| — `finance` Flow 10 (desktop i mobile) | palo: čišćenje test teretane nije znalo za `recurring_expenses`; popravljeno u `fixtures.ts`, `finance.spec` ponovo **6/6** |
+| — FIN-05 (`test-plan-rest`) | palo po D-92 (kartica Troškovi sad uključuje 0,60 € troška prodate robe); očekivanje ispravljeno na 504,60 €, **nije ponovo pušteno** |
+| — UX-04 | poznato: dev server (dugme Next.js dev alata), prolazi na produkcijskom buildu |
+| — REC-17, REC-21, Flow 3 i E3, E2E-04 | recepcija i smjene; vjerovatno noćni posao u 23:00 (automatsko zatvaranje smjene i odjava) usred testa — **nije potvrđeno** |
+
+**OTVORENO — nastaviti sljedeći put (bilo koji računar):**
+
+- [ ] Prije 23:00 ponovo pustiti recepcijske testove i FIN-05, desktop:
+      `npx playwright test tests/e2e/reception.spec.ts tests/e2e/test-plan-high-a.spec.ts tests/e2e/test-plan-high-g.spec.ts tests/e2e/test-plan-medium-a.spec.ts tests/e2e/test-plan-rest.spec.ts --project=desktop`.
+      Ako padnu i danju, to je pravi problem i treba ga istražiti.
+- [ ] Obrisati ručne testne podatke iz prave teretane (KP Fitness), ako to već nije urađeno.
+      Obim, koji je vlasnik potvrdio 30.09.2026: svi članovi, članarine, uplate, dolasci, smjene
+      (i njihovi PDF-ovi u Storage-u), troškovi (i „Suplementi“ 1.545 €), kretanja robe, kartice
+      i serije kartica, dnevnik izmjena, proizvod Monster, program Joga, nalozi Menadzer, Test
+      Recepcija i Ana (sa Auth korisnicima); brojač članova ide na 0. Ostaje seed (planovi,
+      treneri, programi Grupni/Personalni trening, raspored, kategorije, Voda, podešavanja),
+      vlasnik i Admin. Skripta `scripts/cleanup-test-data.local.mjs` postoji samo na računaru
+      na kojem je napisana i nije u repou.
+- [ ] Ručno proći S-16 (bilans i novčani tok), S-20 i S-30 kao vlasnik, i S-16 kao menadžer.
+
 *Kraj plana. Novi rezultati upisani su uz slučajeve; neoznačeni kvadratići nisu automatski prolaz.*
 
 

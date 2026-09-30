@@ -16,6 +16,7 @@ import {
   backdatedVisitSchema,
   closeAnyShiftSchema,
   expenseSchema,
+  recurringExpenseSchema,
   resendShiftSchema,
   voidExpenseSchema,
 } from "./schemas";
@@ -47,6 +48,7 @@ async function futureDate(
 function revalidateFinance() {
   revalidatePath("/finance");
   revalidatePath("/finance/expenses");
+  revalidatePath("/finance/recurring");
   revalidatePath("/finance/trainers");
   revalidatePath("/finance/shifts");
   revalidatePath("/finance/storage");
@@ -95,6 +97,49 @@ export async function saveExpense(
 
   revalidateFinance();
   return { success: me.finance.expenseSaved };
+}
+
+/**
+ * S-30 [Dodaj fiksni trošak] and [Uredi] (BR-136, D-93). A new fixed expense starts this
+ * month or later; the RPC checks that again, and keeps a started one's first month.
+ */
+export async function saveRecurringExpense(
+  _state: ActionState,
+  formData: FormData,
+): Promise<ActionState> {
+  const staff = await requireOwner();
+  const parsed = recurringExpenseSchema.safeParse({
+    id: formData.get("id") ?? "",
+    categoryId: formData.get("categoryId") ?? "",
+    description: formData.get("description") ?? "",
+    amount: formData.get("amount") ?? "",
+    method: formData.get("method") ?? "",
+    startsOn: formData.get("startsOn") ?? "",
+    isActive: formData.get("isActive"),
+  });
+  if (!parsed.success)
+    return { fieldErrors: fieldErrorsOf(parsed.error.issues) };
+
+  // BR-001: this month is the gym's, and a new fixed expense is never for the past.
+  const thisMonth = `${(await gymToday(staff.gym_id)).slice(0, 7)}-01`;
+  if (!parsed.data.id && parsed.data.startsOn < thisMonth)
+    return { fieldErrors: { startsOn: me.finance.recurringStartInvalid } };
+
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("upsert_recurring_expense", {
+    p_id: parsed.data.id,
+    p_category: parsed.data.categoryId,
+    p_description: parsed.data.description,
+    p_amount: parsed.data.amount,
+    // AS-17: "Van kase" is stored as no method at all.
+    p_method: parsed.data.method === "none" ? null : parsed.data.method,
+    p_starts_on: parsed.data.startsOn,
+    p_is_active: parsed.data.isActive,
+  });
+  if (error) return rpcFailure(error);
+
+  revalidateFinance();
+  return { success: me.finance.recurringSaved };
 }
 
 /** S-17 (BR-135): the owner may void any expense, with a reason. */
@@ -304,7 +349,9 @@ export async function resendShiftReport(
   // SUSPECT-10: a hand-rolled shape let through text that is not a UUID at all, and the
   // query then failed with 22P02 whose error nobody read, so a malformed identifier
   // answered "Nemate dozvolu" instead of saying the input was wrong.
-  const parsed = resendShiftSchema.safeParse({ shiftId: formData.get("shiftId") });
+  const parsed = resendShiftSchema.safeParse({
+    shiftId: formData.get("shiftId"),
+  });
   if (!parsed.success) return { error: me.errors.E_VALIDATION };
 
   // The report pipeline runs with the service role, so the shift is checked against the

@@ -223,6 +223,10 @@ test("D-80: the manager's Pregled has income and expenses, no profit and no sala
     "Aktivni članovi",
     "Prihod i troškovi po mjesecima (€)",
     "Ističe u narednih 7 dana",
+    // D-92: nor the owner's statement and cash flow.
+    "Bilans uspjeha",
+    "Novčani tok",
+    "Trošak prodate robe",
   ])
     await expect(main.getByText(hidden, { exact: true })).toHaveCount(0);
   await expect(main).not.toContainText("E2E Plate");
@@ -286,6 +290,8 @@ test("D-80, D-81: the owner's pages stay closed to the manager", async ({
 }) => {
   await signIn(page, manager);
   for (const path of [
+    // D-93: fixed expenses hold salaries.
+    "/finance/recurring",
     "/finance/trainers",
     "/finance/storage",
     "/finance/audit",

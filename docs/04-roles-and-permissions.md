@@ -45,15 +45,16 @@
 | P-41 | Stock-in (enter the invoice purchase price); sale | ✓ | ✓ | ✓ | BR-141, BR-142 |
 | P-42 | Add or edit products, change the sale price (on S-13 Magacin) | ✓ | ✓ (D-76) | ✗ | BR-140, D-76 |
 | P-43 | Void a stock-in | ✓ | ✗ | ✗ | BR-095 |
-| P-44 | Stock value, bar profit, sales history beyond today | ✓ | ✗ | ✗ | BR-144 |
+| P-44 | Stock value, cost of goods sold, bar profit, sales history beyond today | ✓ | ✗ | ✗ | BR-144, BR-153, BR-159 |
 | **Statistics and finance** | | | | | |
 | P-50 | Visit statistics page (S-15) | ✓ | ✓ | ✗ | D-40 |
-| P-51 | Finance dashboard, income, expenses, profit (S-16…S-21) | ✓ | Pregled, Troškovi and Smjene only: Prihod and Troškovi without salaries, for Danas, Ova sedmica or Ovaj mjesec; never profit (D-80) | ✗ | BR-157, D-80 |
+| P-51 | Finance dashboard, income, expenses, profit, income statement and cash flow (S-16…S-21) | ✓ | Pregled, Troškovi and Smjene only: Prihod and Troškovi without salaries, for Danas, Ova sedmica or Ovaj mjesec; never profit, the statement or the cash flow (D-80, D-92) | ✗ | BR-157, BR-158, D-80, D-92 |
 | P-52 | Trainer statistics, shares, payouts | ✓ | ✗ | ✗ | BR-156 |
 | P-53 | Owner expense form (any category, incl. Plate and payouts) | ✓ | ✗ | ✗ | BR-133 |
 | P-54 | Manage expense categories | ✓ | ✗ | ✗ | BR-131 |
 | P-55 | Back-dated entries | ✓ | ✗ | ✗ | BR-120 |
 | P-56 | Audit log | ✓ | ✗ | ✗ | BR-096 |
+| P-57 | Fixed expenses and salaries (S-30): view, add, change, deactivate | ✓ | ✗ | ✗ | BR-136, D-93 |
 | **Settings** | | | | | |
 | P-60 | Trainers (name, active), programs, assignments, class slots | ✓ | ✓ | ✗ | BR-026 |
 | P-61 | Trainer fees, plan prices, share %, gym fixed amounts | ✓ | ✗ | ✗ | BR-026 |
@@ -75,7 +76,7 @@
    - `plan_finance`, `membership_finance` and `trainer_finance` hold them.
    - Owner reports are `security definer` functions that start with an owner check.
    - Managers and receptionists can never receive these values, even through the API directly.
-   - The one exception is D-80: `fin_summary`, `fin_income_breakdown`, `fin_expenses` and `fin_shifts` start with `assert_finance_period`, which also admits a manager for today, this week or this month, and then return income, non-salary expenses and shift totals only. Profit, bar profit, salaries, trainer shares and shift reports never reach a manager.
+   - The one exception is D-80: `fin_summary`, `fin_income_breakdown`, `fin_expenses` and `fin_shifts` start with `assert_finance_period`, which also admits a manager for today, this week or this month, and then return income, non-salary expenses and shift totals only. Profit, bar profit, the cost of goods sold, the income statement and cash flow (`fin_statement`, D-92), stock value, salaries, trainer shares and shift reports never reach a manager.
 3. **UI.**
    - Navigation and buttons are shown only when the role may use them.
    - Server components also check the role and return 404 for pages the role may not open.

@@ -51,6 +51,7 @@ const SCREENS = [
   { path: "/settings/cards", name: "S-28 Kartice", role: "owner" },
   { path: "/finance", name: "S-16 Finansije", role: "owner" },
   { path: "/finance/expenses", name: "S-17 Troškovi", role: "owner" },
+  { path: "/finance/recurring", name: "S-30 Fiksni troškovi", role: "owner" },
   { path: "/finance/trainers", name: "S-18 Treneri", role: "owner" },
   { path: "/finance/shifts", name: "S-19 Smjene", role: "owner" },
   { path: "/finance/storage", name: "S-20 Magacin", role: "owner" },

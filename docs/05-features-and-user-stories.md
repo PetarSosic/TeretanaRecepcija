@@ -157,6 +157,7 @@ Covered by US-04.4, BR-078 and BR-079.
 
 **US-15.2** As the owner, I manage products and see stock value and bar profit (S-20).
 - AC1 (D-76): The owner, the admin and the manager add products with [Dodaj proizvod] and edit them with [Uredi] on S-13 Magacin, and bring back deactivated ones under [Prikaži neaktivne]. A receptionist sees neither. There is no separate products screen.
+- AC2 (D-92): For a chosen period S-20 shows per product the purchase and sale price, what came in (pieces and €), what was sold, its income, its cost of goods sold, Bruto zarada and Marža, and the stock and its value at the end of the period (BR-159), with a totals row (E23, E24).
 
 ## F-16 Shift close and report
 **US-16.1** As a receptionist, I close my shift (BR-114) on S-14.
@@ -168,12 +169,13 @@ Covered by US-04.4, BR-078 and BR-079.
 ## F-17 Owner finance dashboard
 **US-17.1** As the owner, I see income, expenses and profit for a chosen period (S-16).
 - AC1: The period presets are Danas, Ova sedmica (Monday–Sunday), Ovaj mjesec, Prošli mjesec, Ova godina, plus a custom range. The default is Ovaj mjesec.
-- AC2: The numbers follow BR-150–153 and have breakdowns by plan, method and category.
+- AC2: The numbers follow BR-150–153 and have breakdowns by plan and method; expenses by category are the statement's operating expenses (AC4). The Troškovi card is the cost of goods sold plus the operating expenses, so a stock-in is not a cost of its month (D-92).
 - AC3: The page also shows:
   - a bar chart of income vs expenses for one calendar year, month by month, opening on the current year; its own filter picks an earlier year or narrows the chart to one month, day by day, with that year's or month's totals under it (D-68);
   - active members (count of members with at least one Aktivna membership today);
   - memberships expiring in the next 7 days (list);
   - members with unlinked unpaid visits (list).
+- AC4 (D-92): Under the cards, `Bilans uspjeha` shows income by group (Članarine, Treninzi, Prodaja iz magacina, Ostalo), `Trošak prodate robe`, `Bruto dobit`, operating expenses by category and `Profit`. `Novčani tok` shows Primljeno, Plaćena nova roba, Ostala plaćanja and Neto promjena novca (BR-158), and under it the stock value at the end of the period (BR-159). Profit is the same on the card, in the statement and under the chart (E25).
 
 **US-17.2** As a manager, I see the gym's income and expenses for today, this week or this month, without profit or salaries (D-80).
 - AC1: Finansije shows me only Pregled, Troškovi and Smjene. The period offers only Danas, Ova sedmica and Ovaj mjesec (default Ovaj mjesec); every other period is refused by the database.
@@ -186,6 +188,13 @@ Covered by US-04.4, BR-078 and BR-079.
 - AC1 (D-63): the screen shows `Ukupno: <iznos>` for the listed expenses, voided ones excluded, and the total follows every change of period or filter.
 
 **US-18.2** As the owner, I manage categories (BR-131) with [Kategorije troškova].
+
+**US-18.3** As the owner, I describe the costs that repeat every month — rent, internet, salaries — once, and they are posted as expenses on the 1st of every month (BR-136, S-30, D-93).
+- AC1: S-30 lists the active fixed expenses with Naziv, Kategorija, Iznos, Način, Od mjeseca and Zadnje knjiženje, and above them `Mjesečno ukupno` with Plate and the other fixed expenses apart. Inactive ones are under [Prikaži neaktivne (N)].
+- AC2: [Dodaj fiksni trošak] and [Uredi] open the BR-136 form. `Od mjeseca` offers this month or later, and is locked once something was posted.
+- AC3: A fixed expense added for this month is posted at once, dated the 1st; every later month is posted by the 00:05 job on the 1st. A month is posted once, even if its expense is voided.
+- AC4: A posted expense appears on S-17 with the badge `Fiksni` and counts like any other expense on S-16. A change applies from the next month; posted expenses keep their amount.
+- AC5: A manager and a receptionist get 404 on S-30 and `E_FORBIDDEN` from its RPCs.
 
 ## F-19 Trainer statistics and payouts
 **US-19.1** As the owner, I see BR-156 metrics per trainer for a chosen month (S-18).

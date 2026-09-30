@@ -165,7 +165,7 @@ An `admin` sees everything an owner sees (D-58).
 - **Buttons:** [Naplati] and [Otkaži].
 
 ## S-11 Desk expense dialog
-- **Fields:** `Kategorija` (active, non-salary), `Opis`, `Iznos (€)`, and the fixed note `Plaćeno iz kase · danas`.
+- **Fields:** `Kategorija` (active, non-salary, not "Roba za prodaju", D-92), `Opis`, `Iznos (€)`, and the fixed note `Plaćeno iz kase · danas`.
 - **Buttons:** [Sačuvaj] and [Otkaži].
 
 ## S-12 Today's payments — `/payments/today`
@@ -210,23 +210,26 @@ An `admin` sees everything an owner sees (D-58).
 
 ## S-16 Finance dashboard — `/finance` (owner)
 - **Content:** as in US-17.1.
-- **Cards:** Prihod, Troškovi, Profit, Zarada na magacinu.
+- **Cards:** Prihod, Troškovi, Profit, Zarada na magacinu. For the owner, Troškovi is the cost of goods sold plus the operating expenses (BR-151 to BR-153, D-92).
+- **Statement and cash flow (D-92, owner only):** under the cards, two blocks side by side (stacked on a phone):
+  - `Bilans uspjeha`: `Prihodi` with Članarine, Treninzi (grupni i personalni), Prodaja iz magacina, Ostalo, then `Ukupni prihodi`, `Trošak prodate robe`, `Bruto dobit`, `Operativni troškovi` one line per category (`Nema operativnih troškova.` when none) with `Ukupno operativni troškovi`, and `Profit`, signed and coloured;
+  - `Novčani tok`: Primljeno, Plaćena nova roba, Ostala plaćanja, `Neto promjena novca` (signed), and below it `Vrijednost zalihe na dan <dd.mm.yyyy>` with the BR-159 amount.
 - **Chart (D-68):** `Prihod i troškovi po mjesecima (€)`, January to December of the chosen year. Its own controls, independent of the period: **Godina** (default: the current year; back to the first year with any money) and **Mjesec** (`Cijela godina`, or one month up to the current one). A chosen month shows `Prihod i troškovi po danima (€)`. Months and days after today stay empty. Under the chart: `Ukupno za <godina | mjesec godina>: Prihod … · Troškovi … · Profit …`.
 - **Tables:**
   - income by plan and by method;
-  - expenses by category;
+  - expenses by category (manager only since D-92; the owner reads them in `Operativni troškovi`);
   - Ističe u narednih 7 dana (members with a membership expiring in the next 7 days);
   - Članovi sa neplaćenim dolascima (members with unpaid visits).
-- **Sub-navigation:** Pregled · Troškovi · Treneri · Smjene · Magacin · Naknadni unos · Dnevnik izmjena.
+- **Sub-navigation:** Pregled · Troškovi · Fiksni troškovi (D-93) · Treneri · Smjene · Magacin · Naknadni unos · Dnevnik izmjena.
 - **Manager (D-80):**
   - the sub-navigation is only Pregled · Troškovi · Smjene; the other tabs answer 404;
   - the period offers only `Danas`, `Ova sedmica` and `Ovaj mjesec`; any other period in the URL falls back to `Ovaj mjesec`;
   - Pregled shows only the Prihod and Troškovi cards and the three tables by plan, by method and by category. Troškovi leave out salary categories. There is no chart and no Ističe or Neplaćeni list.
 
 ## S-17 Expenses — `/finance/expenses` (owner)
-- **Controls:** filters and [Novi trošak] (the BR-133 form).
+- **Controls:** filters and [Novi trošak] (the BR-133 form, which does not offer "Roba za prodaju", D-92; the category filter still does).
 - **Total (D-63):** `Ukupno: <iznos>` above the table, for the listed expenses without the voided ones; when voided rows are listed, the note `Poništeni troškovi nisu uračunati.`
-- **Table:** Datum, Kategorija, Opis, Dobavljač, Račun, Način, Iz kase, Iznos, Unio/la, and actions.
+- **Table:** Datum, Kategorija, Opis, Dobavljač, Račun, Način, Iz kase, Iznos, Unio/la, and actions. A row posted from a fixed expense carries the badge `Fiksni` beside its Opis (BR-136, D-93).
 - **Button:** [Kategorije troškova] opens a dialog listing categories with inline rename, active toggle and [Dodaj].
 - **Manager (D-80):** read-only, with the D-80 periods. Salary-category expenses are not listed and not offered in the category filter. There is no [Novi trošak], [Kategorije troškova] or [Poništi].
 
@@ -241,7 +244,7 @@ An `admin` sees everything an owner sees (D-58).
 - **Manager (D-80):** the D-80 periods; no Email status column, no [PDF], no [Pošalji ponovo], and the open shift without [Zaključi smjenu] (P-12).
 
 ## S-20 Storage report — `/finance/storage` (owner)
-- **Per product:** stanje, vrijednost zalihe, and for the period: prodato kom, prihod, nabavna vrijednost prodatog, zarada.
+- **Per product (D-92):** Proizvod, Nabavna cijena, Prodajna cijena, and for the period Ulaz (kom), Nabavka, Prodato kom, Prihod, Trošak prodate robe, Bruto zarada, Marža; then Stanje and Vrijednost zalihe at the end of the period (BR-159), named above the table as `Stanje i vrijednost zalihe na dan <dd.mm.yyyy>.` A totals row `Ukupno` closes the table.
 - **Other content:**
   - daily sales per product (table);
   - a list of stock-ins with [Poništi].
@@ -314,3 +317,12 @@ The screen `/settings/products` and its Podešavanja item are gone. It showed th
 - **Today:** for a class time held today the header adds `Došlo danas: <n> / <m>`, and `Danas` shows each member's check-in time (`HH:mm`) or `—`. Under the members, the line `Prijavljeni na čas, a nisu na spisku:` lists the others who checked in to it, each as `#<broj> <ime i prezime> (HH:mm)`, adding `neplaćen dolazak` for an unpaid visit. For a class time not held today, `Danas` stays empty.
 - **Owner and admin:** the trainer's table ends with the row `UKUPNO – <trener>` and the sum of `Cijena po članu (€)`.
 - **Empty list:** `Nema grupnih termina ni članova sa grupnom članarinom.`
+
+## S-30 Fixed expenses — `/finance/recurring` (owner; D-93)
+- **Title:** `Fiksni troškovi`, with [Dodaj fiksni trošak] beside it and the line `Trošak se knjiži automatski 1. u mjesecu. Izmjena važi od sljedećeg knjiženja.`
+- **Totals:** `Mjesečno ukupno: <iznos>` for the active fixed expenses, and under it `Plate: <iznos> · Ostali fiksni troškovi: <iznos>`.
+- **Table (active ones):** Naziv, Kategorija, Iznos, Način, Od mjeseca (`oktobar 2026`), Zadnje knjiženje (the date of the last posted and not voided month, or `—`), [Uredi].
+- **Inactive:** [Prikaži neaktivne (N)] shows them in the same table, greyed; the button then reads [Sakrij neaktivne (N)].
+- **Dialog** (`Dodaj fiksni trošak` / `Uredi fiksni trošak`): Naziv, Kategorija (active, not "Roba za prodaju"), Iznos (€), Način (Van kase, Platna kartica, Gotovina; Van kase first), Od mjeseca (a month picker, from this month; a new one opens on next month), Aktivan. Once something was posted, Od mjeseca is locked with `Mjesec početka se ne mijenja nakon prvog knjiženja.` A past month shows `Izaberite tekući ili neki kasniji mjesec.` Success: `Fiksni trošak je sačuvan.`
+- **Empty text:** `Nema fiksnih troškova. Dodajte kiriju, plate i ostale troškove koji se ponavljaju svakog mjeseca.`
+- **Manager and receptionist:** 404; the tab is not shown (P-57).

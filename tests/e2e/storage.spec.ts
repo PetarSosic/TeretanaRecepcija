@@ -9,13 +9,15 @@ import {
 } from "./fixtures";
 
 // M-09 (doc 09): S-13 Magacin through the screens. D-55 in the form, E18 and E17, and a
-// bar sale corrected and voided on S-12 (its quantity returns to stock).
+// bar sale corrected and voided on S-12 (its quantity returns to stock). D-92: E23 from
+// the desk to the owner's statement, cash flow and S-20.
 test.describe.configure({ mode: "serial" });
 
 const PASSWORD = "magacinlozinka1";
 
 let gymId: string;
 let receptionist: TestStaff;
+let owner: TestStaff;
 let productId: string;
 
 test.beforeAll(async ({}, workerInfo) => {
@@ -23,6 +25,11 @@ test.beforeAll(async ({}, workerInfo) => {
   receptionist = await createTestStaff(gymId, {
     role: "receptionist",
     fullName: "E2E Šank",
+    password: PASSWORD,
+  });
+  owner = await createTestStaff(gymId, {
+    role: "owner",
+    fullName: "E2E Vlasnik Magacina",
     password: PASSWORD,
   });
   const admin = adminClient();
@@ -171,4 +178,90 @@ test("BR-094 and BR-095: the sale is corrected and voided on S-12", async ({
       () => document.documentElement.scrollWidth <= window.innerWidth,
     ),
   ).toBe(true);
+});
+
+test("E23 and D-92: a sale costs its purchase price; the goods bought are a payment", async ({
+  page,
+  browser,
+}) => {
+  const whey = await adminClient().from("products").insert({
+    gym_id: gymId,
+    name: "E2E Whey",
+    current_purchase_price: 28,
+    sale_price: 41,
+  });
+  if (whey.error) throw new Error(whey.error.message);
+
+  // The desk receives ten outside the till and sells one (BR-141, BR-142).
+  await openStorage(page);
+  await page.getByRole("button", { name: "Nova roba E2E Whey" }).click();
+  const goods = page.getByRole("dialog");
+  await goods.getByLabel("Količina").fill("10");
+  await expect(
+    goods.getByLabel("Nabavna cijena po komadu (sa fakture)"),
+  ).toHaveValue("28,00");
+  await goods.getByText("Van kase", { exact: true }).click();
+  await goods.getByRole("button", { name: "Sačuvaj" }).click();
+  await expect(page.getByText("Roba je evidentirana.")).toBeVisible();
+  await page.getByRole("button", { name: "Prodaja E2E Whey" }).click();
+  const sale = page.getByRole("dialog");
+  await sale.getByLabel("Količina").fill("1");
+  await sale.getByText("Gotovina", { exact: true }).click();
+  await sale.getByRole("button", { name: "Naplati" }).click();
+  await expect(page.getByText("Prodaja je sačuvana.")).toBeVisible();
+  await expect(page.getByTestId("stock-E2E Whey")).toHaveText("9");
+
+  const ownerPage = await (await browser.newContext()).newPage();
+  await ownerPage.goto("/login");
+  await ownerPage.getByLabel("Korisničko ime ili email").fill(owner.identifier);
+  await ownerPage.getByLabel("Lozinka", { exact: true }).fill(PASSWORD);
+  await ownerPage.getByRole("button", { name: "Prijavi se" }).click();
+  await ownerPage.waitForURL((url) => !url.pathname.startsWith("/login"));
+
+  // S-16: today the Whey cost €28 (the Voda sale above was voided), while €280 of Whey
+  // and the €8.40 of Voda from the first test were paid for (BR-153, BR-158). What is
+  // left is 9 × €28 of Whey and 24 × €0.35 of Voda (BR-159).
+  await ownerPage.goto("/finance?period=today");
+  const statement = ownerPage.locator("section", {
+    has: ownerPage.getByRole("heading", { name: "Bilans uspjeha" }),
+  });
+  await expect(
+    statement.getByRole("row", { name: /^Trošak prodate robe/ }),
+  ).toContainText("28,00 €");
+  await expect(
+    statement.getByRole("row", { name: /^Bruto dobit/ }),
+  ).toContainText("13,00 €");
+  await expect(statement.getByRole("row", { name: /^Profit/ })).toContainText(
+    "+13,00 €",
+  );
+  const cash = ownerPage.locator("section", {
+    has: ownerPage.getByRole("heading", { name: "Novčani tok" }),
+  });
+  await expect(
+    cash.getByRole("row", { name: /^Plaćena nova roba/ }),
+  ).toContainText("288,40 €");
+  await expect(cash).toContainText("260,40 €");
+
+  // S-20: E23 per product, and the stock at the end of the period.
+  await ownerPage.goto("/finance/storage?period=today");
+  const row = ownerPage
+    .locator("section", {
+      has: ownerPage.getByRole("heading", { name: "Magacin", exact: true }),
+    })
+    .getByRole("row", { name: /^E2E Whey/ });
+  await expect(row.getByRole("cell")).toHaveText([
+    "E2E Whey",
+    "28,00 €",
+    "41,00 €",
+    "10",
+    "280,00 €",
+    "1",
+    "41,00 €",
+    "28,00 €",
+    "13,00 €",
+    "31,7 %",
+    "9",
+    "252,00 €",
+  ]);
+  await ownerPage.context().close();
 });

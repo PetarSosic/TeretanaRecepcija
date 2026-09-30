@@ -427,16 +427,20 @@ test("FIN-01 and FIN-03: periods in the address, tiles and breakdowns that add u
   await page.goto("/finance?period=today");
   const byPlan = await section(page, "Prihod po vrsti članarine").innerText();
   const byMethod = await section(page, "Prihod po načinu plaćanja").innerText();
-  const byCategory = await section(page, "Troškovi po kategoriji").innerText();
+  // D-92: the owner reads expenses by category in the statement's operating expenses.
+  const statement = await section(page, "Bilans uspjeha").innerText();
   console.log(
-    `[note] FIN-03 by plan: ${byPlan.replace(/\s+/g, " ")} | by method: ${byMethod.replace(/\s+/g, " ")} | by category: ${byCategory.replace(/\s+/g, " ")}`,
+    `[note] FIN-03 by plan: ${byPlan.replace(/\s+/g, " ")} | by method: ${byMethod.replace(/\s+/g, " ")} | statement: ${statement.replace(/\s+/g, " ")}`,
   );
+  await expect(
+    page.getByRole("heading", { name: "Troškovi po kategoriji" }),
+  ).toHaveCount(0);
   for (const amount of ["79,00 €", "69,00 €", "99,00 €", "100,00 €"])
     expect(byPlan).toContain(amount);
   expect(byPlan).not.toContain("Dnevna karta");
   expect(byMethod).toContain("179,00 €");
   expect(byMethod).toContain("168,00 €");
-  expect(byCategory).toContain("Nema podataka za izabrani period.");
+  expect(statement).toContain("Nema operativnih troškova.");
   const expiring = section(page, "Ističe u narednih 7 dana");
   await expect(expiring).toContainText("E2E Ističe Finansije");
   await expect(expiring).toContainText(gymDate(3).display);

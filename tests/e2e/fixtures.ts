@@ -153,6 +153,9 @@ export async function deleteTestGym(gymId: string): Promise<void> {
     ["expiry_notifications", "gym_id"],
     // M-08 and M-09: expenses point at stock movements, and both at shifts and staff.
     ["expenses", "gym_id"],
+    // D-93: fixed expenses, after the expenses posted from them and before the
+    // categories and staff they point at.
+    ["recurring_expenses", "gym_id"],
     ["stock_movements", "gym_id"],
     // M-06: visits and payments reference memberships, which reference shifts and plans.
     ["visits", "gym_id"],

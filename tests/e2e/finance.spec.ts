@@ -290,7 +290,8 @@ test("Flow 9: S-16 shows the period totals and the twelve-month chart", async ({
   // BR-150: €69 + €99 + €120 + €100.
   await expect(page.getByText("Prihod", { exact: true }).first()).toBeVisible();
   await expect(page.getByText("388,00 €").first()).toBeVisible();
-  await expect(page.getByText("Profit", { exact: true })).toBeVisible();
+  // D-92: Profit is both a card and the statement's last line.
+  await expect(page.getByText("Profit", { exact: true }).first()).toBeVisible();
 
   // US-17.1 AC3: the chart is a real figure with both series named.
   const figure = page.getByRole("img", {
@@ -411,6 +412,49 @@ test("US-18.1 and BR-133: the owner records an expense on a past day", async ({
   await expect(page.getByRole("cell", { name: "123,45 €" })).toBeVisible();
 });
 
+test("D-93 and BR-136: a fixed expense is posted on the 1st and marked on S-17", async ({
+  page,
+}) => {
+  const admin = adminClient();
+  const category = await admin
+    .from("expense_categories")
+    .insert({ gym_id: gymId, name: "E2E Kirija" });
+  if (category.error) throw new Error(category.error.message);
+  const { data: today } = await admin.rpc("gym_today", { p_gym: gymId });
+  const [year, month] = (today as string).split("-");
+
+  await signIn(page, owner);
+  await page.goto("/finance/recurring");
+  await expect(
+    page.getByRole("heading", { name: "Fiksni troškovi", level: 2 }),
+  ).toBeVisible();
+  await expect(page.getByText(/^Nema fiksnih troškova\./)).toBeVisible();
+
+  await page.getByRole("button", { name: "Dodaj fiksni trošak" }).click();
+  const dialog = page.getByRole("dialog");
+  await dialog.getByLabel("Naziv").fill("E2E Kirija lokala");
+  await dialog
+    .getByLabel("Kategorija", { exact: true })
+    .selectOption({ label: "E2E Kirija" });
+  await dialog.getByLabel("Iznos (€)").fill("500");
+  // This month, so it is posted at once, on the 1st (BR-136).
+  await dialog.getByLabel("Od mjeseca").fill(`${year}-${month}`);
+  await dialog.getByRole("button", { name: "Sačuvaj" }).click();
+  await expect(page.getByText("Fiksni trošak je sačuvan.")).toBeVisible();
+
+  const row = page.getByRole("row", { name: /E2E Kirija lokala/ });
+  await expect(row).toContainText("500,00 €");
+  await expect(row).toContainText("Van kase");
+  await expect(row).toContainText(`01.${month}.${year}`);
+  await expect(page.getByText("Mjesečno ukupno: 500,00 €")).toBeVisible();
+
+  await page.goto("/finance/expenses?period=month");
+  const posted = page.getByRole("row", { name: /E2E Kirija lokala/ });
+  await expect(posted).toContainText("Fiksni");
+  await expect(posted).toContainText(`01.${month}.${year}`);
+  await expect(posted).toContainText("500,00 €");
+});
+
 test("Flow 10: a receptionist opens no finance page, a manager only three (D-80)", async ({
   page,
 }) => {
@@ -421,6 +465,7 @@ test("Flow 10: a receptionist opens no finance page, a manager only three (D-80)
     for (const path of [
       "/finance",
       "/finance/expenses",
+      "/finance/recurring",
       "/finance/trainers",
       "/finance/shifts",
       "/finance/storage",

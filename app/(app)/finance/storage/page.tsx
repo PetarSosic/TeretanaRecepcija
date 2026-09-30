@@ -6,6 +6,7 @@ import {
   type DailyRow,
   type StockInRow,
   type StorageProductRow,
+  type StorageTotals,
 } from "@/features/finance/components/storage-report";
 import { periodFromParams } from "@/features/finance/period";
 import { requireStaff } from "@/lib/auth";
@@ -18,7 +19,10 @@ export const metadata: Metadata = {
 };
 
 type Report = {
+  /** D-92 (BR-159): the day the stock and its value are given for. */
+  stock_date: string | null;
   products: StorageProductRow[];
+  totals: StorageTotals | null;
   daily: DailyRow[];
   stock_ins: StockInRow[];
 };
@@ -45,7 +49,9 @@ export default async function StorageReportPage({
     p_to: period.to,
   });
   const data = (report.data as Report | null) ?? {
+    stock_date: null,
     products: [],
+    totals: null,
     daily: [],
     stock_ins: [],
   };
@@ -55,6 +61,8 @@ export default async function StorageReportPage({
       <PeriodPicker period={period} />
       <StorageReport
         products={data.products}
+        totals={data.totals}
+        stockDate={data.stock_date}
         daily={data.daily}
         stockIns={data.stock_ins}
       />

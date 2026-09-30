@@ -6,8 +6,9 @@ import { me } from "@/lib/i18n/me";
 import { cn } from "@/lib/utils";
 
 /**
- * S-16 sub-navigation: Pregled · Troškovi · Treneri · Smjene · Magacin · Naknadni unos ·
- * Dnevnik izmjena. D-80: a manager has only the tabs not marked `ownerOnly`.
+ * S-16 sub-navigation: Pregled · Troškovi · Fiksni troškovi · Treneri · Smjene · Magacin ·
+ * Naknadni unos · Dnevnik izmjena. D-80: a manager has only the tabs not marked
+ * `ownerOnly`; D-93: Fiksni troškovi holds salaries, so it is the owner's.
  */
 const TABS = [
   { href: "/finance", label: me.finance.overview, ownerOnly: false },
@@ -15,6 +16,11 @@ const TABS = [
     href: "/finance/expenses",
     label: me.finance.expensesTab,
     ownerOnly: false,
+  },
+  {
+    href: "/finance/recurring",
+    label: me.finance.recurringTab,
+    ownerOnly: true,
   },
   { href: "/finance/trainers", label: me.finance.trainersTab, ownerOnly: true },
   { href: "/finance/shifts", label: me.finance.shiftsTab, ownerOnly: false },

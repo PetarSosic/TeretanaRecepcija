@@ -133,7 +133,8 @@ an account only the owner has.
    block (D-01, doc 08 §4).
 7. Confirm that the extensions `pg_cron` and `pg_net` are enabled (migration `0019` does
    this) and that `cron.job` holds `kp-fitness-jobs` and `kp-fitness-auto-checkout`, both
-   on `*/5 * * * *`.
+   on `*/5 * * * *`, `kp-fitness-cron-log-cleanup` on `17 3 * * *` (D-88), and
+   `kp-fitness-recurring-expenses` on `5 22,23 * * *` (D-93).
 
 ### 2. Resend
 

@@ -26,12 +26,14 @@ export default async function ReceptionPage() {
       .order("sort_order")
       .limit(1)
       .maybeSingle<{ price: string }>(),
-    // S-11 and BR-132: active categories that are not salary categories (D-37).
+    // S-11 and BR-132: active categories that are not salary categories (D-37), nor
+    // Roba za prodaju, which only Nova roba writes (D-92).
     supabase
       .from("expense_categories")
       .select("id, name")
       .eq("is_active", true)
       .eq("is_salary", false)
+      .eq("is_system", false)
       .order("name")
       .returns<{ id: string; name: string }[]>(),
   ]);

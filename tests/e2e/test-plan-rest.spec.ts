@@ -772,8 +772,9 @@ test("FIN-05: the owner's full expense form lands in the list and the period tot
   // D-63 and S-16: the period totals include it (plus the desk's 4 € from CLOSE-01).
   await expect(page.getByText("Ukupno: 504,00 €")).toBeVisible();
   await page.goto("/finance?period=month");
-  // S-16 streams in after its skeleton; the Troškovi tile then shows the same total.
+  // S-16 streams in after its skeleton. D-92: the owner's Troškovi tile is the operating
+  // expenses plus the cost of the goods sold — the 2 Voda of CLOSE-01 at €0.30 each.
   const tile = page.locator("p", { hasText: /^Troškovi$/ }).locator("xpath=..");
-  await expect(tile).toContainText("504,00 €", { timeout: 30_000 });
+  await expect(tile).toContainText("504,60 €", { timeout: 30_000 });
   console.log(`[note] all: ${notes.join(" | ")}`);
 });

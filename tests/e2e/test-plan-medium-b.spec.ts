@@ -524,14 +524,20 @@ test("E2E-08: a new price, a new product — old sales keep 79 €, the new one 
   const izotonik = owner
     .locator("section", { has: owner.getByRole("heading", { name: "Magacin", exact: true }) })
     .getByRole("row", { name: /^E2E Izotonik/ });
+  // D-92: prices, what came in, what was sold and its cost, margin, then the stock.
   await expect(izotonik.getByRole("cell")).toHaveText([
     "E2E Izotonik",
-    "11",
-    "6,60 €",
+    "0,60 €",
+    "2,00 €",
+    "12",
+    "7,20 €",
     "1",
     "2,00 €",
     "0,60 €",
     "1,40 €",
+    "70,0 %",
+    "11",
+    "6,60 €",
   ]);
   note(`E2E-08 /finance/storage Izotonik: ${(await izotonik.innerText()).replace(/\s+/g, " ")}`);
   await owner.context().close();
@@ -544,7 +550,7 @@ test("FIN-13: S-20 for the owner, and the profit it shows is the overview's", as
   await page.goto("/finance/storage?period=month");
   for (const heading of ["Magacin", "Dnevna prodaja", "Ulazi robe"])
     await expect(page.getByRole("heading", { name: heading })).toBeVisible();
-  for (const column of ["Vrijednost zalihe", "Prodato kom", "Nabavna vrijednost prodatog"])
+  for (const column of ["Vrijednost zalihe", "Prodato kom", "Trošak prodate robe", "Bruto zarada"])
     await expect(page.getByRole("columnheader", { name: column }).first()).toBeVisible();
   const daily = page.locator("section", { has: page.getByRole("heading", { name: "Dnevna prodaja" }) });
   await expect(daily.locator("tbody tr")).toHaveCount(1);
@@ -553,7 +559,8 @@ test("FIN-13: S-20 for the owner, and the profit it shows is the overview's", as
   await expect(ins.locator("tbody tr", { hasText: "E2E Izotonik" })).toContainText(/12\s*0,60 €\s*7,20 €\s*Ne/);
   const profits = await page
     .locator("section", { has: page.getByRole("heading", { name: "Magacin", exact: true }) })
-    .locator("tbody tr td:last-child")
+    // D-92: Bruto zarada is the ninth column of a product row.
+    .locator("tbody tr td:nth-child(9)")
     .allInnerTexts();
   const total = profits.reduce((sum, text) => sum + cents(text), 0);
 

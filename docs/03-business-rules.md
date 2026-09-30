@@ -408,7 +408,7 @@ Every rule has an ID. Code comments and tests must reference these IDs, e.g. `//
   - `is_system` categories cannot be deactivated;
   - deactivated categories are hidden from new expenses but stay on old ones.
 - **BR-132 (desk expense, any role):**
-  - category: active and not a salary category;
+  - category: active, not a salary category, and not "Roba za prodaju" (goods come in only through Nova roba, BR-141; D-92);
   - description: 2–200 characters;
   - amount: 0.01–10,000.00;
   - date: gym today;
@@ -419,7 +419,7 @@ Every rule has an ID. Code comments and tests must reference these IDs, e.g. `//
 | Field | Rule |
 |---|---|
 | Date | ≤ gym today |
-| Category | Any active category |
+| Category | Any active category except "Roba za prodaju" (D-92) |
 | Description | 2–200 characters |
 | Amount | 0.01–100,000.00 |
 | Method | Cash / Platna kartica / Van kase |
@@ -431,6 +431,26 @@ Every rule has an ID. Code comments and tests must reference these IDs, e.g. `//
 
 - **BR-134:** Managers and receptionists see only the expenses **they** created **today**. The owner sees all. D-80 adds one view for a manager: S-17 lists every expense of today, this week or this month **except salary categories**, read-only.
 - **BR-135:** An expense void requires a reason. The owner can void any expense; others only their own records of the open shift (AS-14).
+- **BR-136 (fixed expenses, owner only, D-93):** the owner describes a cost that repeats every month — rent, internet, a staff salary — once, on S-30, and it is posted as an expense on the 1st of every month.
+  - **Fields:**
+    - `Naziv` (the expense's description), 2–200 characters;
+    - `Kategorija`: active, and not "Roba za prodaju" (goods come in through Nova roba, D-92); a salary category is allowed;
+    - `Iznos`: 0.01–100,000.00;
+    - `Način`: Gotovina, Platna kartica or Van kase (`null`, AS-17); never from the till;
+    - `Od mjeseca`: this month or a later one;
+    - `Aktivan`.
+  - **Posting:** for every active fixed expense whose first month has begun, one expense for the gym's month (BR-001):
+    - `spent_on` = the 1st of the month;
+    - description, category, amount and method from the fixed expense;
+    - `paid_from_till = false`, no shift;
+    - `created_by` = the owner who added the fixed expense.
+
+    It is posted by the daily job at 00:05 on the 1st (BR-162), or at once when a fixed expense is added or reactivated during a month that has begun.
+  - **At most once a month:** a posted month is never posted again, not even after the owner voided it. A month the owner does not want, or wants at another amount, is voided on S-17 and, if needed, entered by hand.
+  - **Changes** (name, category, amount, method, active) apply from the next posting; posted expenses keep their values (as BR-004). `Od mjeseca` can change only while nothing has been posted, and never to a past month, so nothing is ever posted for the past.
+  - **Nothing is deleted:** deactivating stops the posting; posted expenses stay.
+  - A fixed salary is not linked to a trainer. Trainer payouts stay on S-18 (BR-156).
+  - Posted expenses are ordinary expenses: operating expenses in the statement and Ostala plaćanja in the cash flow (BR-151, BR-158), listed on S-17 with the badge `Fiksni`, and hidden from a manager when their category is a salary category (D-80).
 
 ## 13. Magacin (bar storage)
 - **BR-140 (products):**
@@ -471,10 +491,18 @@ Every rule has an ID. Code comments and tests must reference these IDs, e.g. `//
 - **BR-144:** Managers and receptionists see product, stock level, purchase price and sale price. They never see stock value, profit, or totals over more than today.
 
 ## 14. Finance calculations (owner only, except D-80)
-- **BR-150:** Income for a period = non-voided payments by `paid_on` + non-voided sales by local date.
-- **BR-151:** Expenses for a period = non-voided expenses by `spent_on`. This includes automatic stock-in expenses and trainer payouts.
-- **BR-152:** Profit = income − expenses. Bar purchase costs are counted **once**, through the stock-in expenses.
-- **BR-153:** Bar profit (informational, shown separately) = Σ sales quantity × (unit price − unit cost).
+Buying goods and the cost of the goods sold are two different things (D-92). A stock-in moves money and stock; only a sale turns the purchase price of what was sold into a cost.
+
+- **BR-150:** Income for a period = non-voided payments by `paid_on` + non-voided sales by local date. The owner's statement groups it (D-92):
+  - **Članarine:** payments of gym plans (`kind = 'gym'`) and day passes;
+  - **Treninzi (grupni i personalni):** payments of group, G+T and personal plans;
+  - **Prodaja iz magacina:** the sales;
+  - **Ostalo:** card replacements.
+- **BR-151:** Expenses for a period, non-voided, by `spent_on`, are of two kinds (D-92):
+  - **Nabavka robe (goods bought):** the automatic stock-in expenses (`stock_movement_id` set). They are money paid (BR-158) and stock (BR-159), never a cost in the profit.
+  - **Operativni troškovi (operating expenses):** every other expense, trainer payouts and salaries included.
+- **BR-152:** Profit = income − cost of goods sold (BR-153) − operating expenses (BR-151). Bruto dobit (gross profit) = income − cost of goods sold.
+- **BR-153:** Cost of goods sold (`Trošak prodate robe`) = Σ over non-voided sales of quantity × unit cost, by the sale's local date. The unit cost is the purchase price at the moment of the sale (BR-142, AS-6). Bar profit (`Zarada na magacinu`, shown separately) = Σ sales quantity × (unit price − unit cost).
 - **BR-154 (trainer revenue):** a membership payment belongs to the **membership's** trainer and to the month of `paid_on`. A group visit with another trainer changes only that other trainer's session count.
 - **BR-155 (shares per membership payment):**
   - **Grupni and G+T:** trainer share = max(amount − gym fixed amount, 0) × share % / 100, where the share % is the one stored on the membership at sale (BR-050, D-62) — never the plan's current value.
@@ -499,7 +527,13 @@ Every rule has an ID. Code comments and tests must reference these IDs, e.g. `//
 | Isplaćeno | Sum of non-voided salary-category expenses with this trainer in that month |
 | Razlika | Za isplatu − Isplaćeno |
 
-- **BR-157:** No value from §14 is ever returned to managers or receptionists, with one exception (D-80): a manager receives BR-150 income and BR-151 expenses **without salary categories**, for today, this week or this month only. BR-152 profit, BR-153 bar profit and BR-154 to BR-156 never reach a manager.
+- **BR-157:** No value from §14 is ever returned to managers or receptionists, with one exception (D-80): a manager receives BR-150 income and BR-151 expenses **without salary categories**, for today, this week or this month only. A manager's expenses are what was paid, stock-ins included, exactly as S-17 lists them. BR-152 profit, BR-153 cost of goods sold and bar profit, BR-154 to BR-156, BR-158 and BR-159 never reach a manager.
+- **BR-158 (cash flow, D-92):** for a period:
+  - **Primljeno** = income (BR-150), cash and card;
+  - **Plaćena nova roba** = the non-voided stock-in expenses by `spent_on`, sold or not;
+  - **Ostala plaćanja** = all other non-voided expenses by `spent_on`;
+  - **Neto promjena novca** = Primljeno − Plaćena nova roba − Ostala plaćanja.
+- **BR-159 (stock value at a date, D-92):** Σ over products of the stock level at the end of the day × the purchase price in effect then. For a period that reaches today, that is today's stock at the current purchase price (as on S-13). For an earlier end, the price is the unit cost of the last non-voided stock-in before the end of that day, or the current purchase price if there was none. Because the cost of a sale is the purchase price of the moment (AS-6), stock value equals "goods bought − cost of goods sold" only while the purchase price stays the same.
 
 ## 15. Notifications and jobs
 - **BR-160 (expiry reminder email):**
@@ -524,6 +558,7 @@ Every rule has an ID. Code comments and tests must reference these IDs, e.g. `//
 | Retry | Every 15 minutes | BR-118 failed shift emails |
 | Weekly backup | Every Sunday at 03:00 | BR-163 |
 | Cron log cleanup | Daily at 03:17 UTC | Delete pg_cron run records older than 7 days (D-88) |
+| Fixed expenses | Daily at 00:05 (22:05 and 23:05 UTC, so it is 00:05 in summer and in winter) | Post the month's fixed expenses (BR-136, D-93) |
 
   Every job is idempotent: running it twice on the same day changes nothing.
 
@@ -568,3 +603,6 @@ Every rule has an ID. Code comments and tests must reference these IDs, e.g. `//
 | E20 | Nightly job with 2 open visits and 1 open shift | Visits auto-checked-out at 23:00; shift closed as auto; job run again changes nothing |
 | E21 | Checked in at 17:10, never scanned out | Auto check-out recorded at 18:40; gone from "U teretani"; excluded from the average duration (BR-082a) |
 | E22 | Checked in at 17:10, auto check-out 18:40, card scanned at 19:05 | `Odjavljen/a: … – 1h 55min`; the visit ends at 19:05 as a real check-out; no new visit (BR-072a). A scan after 19:40 instead would be a new check-in. |
+| E23 | Whey, purchase €28, sale €41; one sold | Income +€41; cost of goods sold €28; bar profit €13; stock −1 (BR-142, BR-153) |
+| E24 | 100 × €10 bought in a month; 40 sold | Cost of goods sold €400; Plaćena nova roba €1,000; stock value €600 (BR-151, BR-158, BR-159) |
+| E25 | A month with Članarine €8,500, Treninzi €2,000, sales €2,000 whose goods cost €1,100; operating expenses €7,400 (Plate 4,000, Zakup 2,000, Struja 500, Marketing 300, Ostalo 600); €2,500 of goods bought in the month; €3,200 of goods left | Income €12,500; gross profit €11,400; profit €4,000; cash flow: received €12,500, goods €2,500, other €7,400, net +€2,600; stock value €3,200 (D-92) |

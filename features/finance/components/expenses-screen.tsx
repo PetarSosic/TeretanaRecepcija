@@ -45,6 +45,8 @@ export type ExpenseRow = {
   trainer_name: string | null;
   created_by_name: string;
   stock_movement_id: string | null;
+  /** D-93: the fixed expense this row was posted from (BR-136). */
+  recurring_expense_id: string | null;
   created_at: string;
   voided_at: string | null;
   void_reason: string | null;
@@ -102,8 +104,9 @@ export function ExpensesScreen({
   const [creating, setCreating] = useState(Boolean(prefill));
   const [managing, setManaging] = useState(false);
   const [voiding, setVoiding] = useState<ExpenseRow | null>(null);
-  // D-63: what the period and filters list, without voided rows (BR-095), which is how
-  // S-16 counts its Troškovi card.
+  // D-63: what the period and filters list, without voided rows (BR-095). This is what was
+  // paid, stock-ins included; the owner's S-16 Troškovi card counts the cost of the goods
+  // sold in their place (D-92), the manager's counts the same as this list (D-80).
   const total = sumMoney(
     rows.filter((row) => !row.voided_at).map((row) => row.amount),
   );
@@ -190,6 +193,11 @@ export function ExpensesScreen({
                   </Td>
                   <Td>
                     {row.description}
+                    {row.recurring_expense_id ? (
+                      <span className="ml-2 rounded bg-muted px-2 py-0.5 text-xs text-muted-foreground">
+                        {me.finance.recurringBadge}
+                      </span>
+                    ) : null}
                     {/* An inline-block is not struck by the row's line-through. */}
                     {row.voided_at ? (
                       <span className="inline-block w-full text-xs text-danger">
@@ -396,7 +404,10 @@ function ExpenseForm({
   const [categoryId, setCategoryId] = useState(prefill?.categoryId ?? "");
   const [fromTill, setFromTill] = useState(false);
 
-  const active = categories.filter((category) => category.is_active);
+  // BR-133 (D-92): Roba za prodaju is written only by Nova roba, never by hand.
+  const active = categories.filter(
+    (category) => category.is_active && !category.is_system,
+  );
   const salary = active.some(
     (category) => category.id === categoryId && category.is_salary,
   );
