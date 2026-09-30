@@ -58,6 +58,7 @@ export function AppHeader({
       <div className="flex items-center gap-4 px-4 py-3 sm:px-6">
         <Link
           href="/"
+          prefetch={false}
           className="flex shrink-0 items-center gap-2 font-semibold whitespace-nowrap"
         >
           <BrandMark className="h-7" />
@@ -81,6 +82,7 @@ export function AppHeader({
                   <li key={item.href}>
                     <Link
                       href={item.href}
+                      prefetch={false}
                       aria-current={isCurrent(item.href) ? "page" : undefined}
                       className={cn(
                         "rounded-lg px-2.5 py-2 text-sm whitespace-nowrap hover:bg-muted",
@@ -130,6 +132,7 @@ export function AppHeader({
                 <DropdownMenu.Item asChild>
                   <Link
                     href="/change-password"
+                    prefetch={false}
                     className="block rounded-md px-3 py-2 text-sm outline-hidden hover:bg-muted focus:bg-muted"
                   >
                     {me.account.changePassword}
@@ -239,6 +242,7 @@ function MobileNav({
               <DropdownMenu.Item key={item.href} asChild>
                 <Link
                   href={item.href}
+                  prefetch={false}
                   aria-current={isCurrent(item.href) ? "page" : undefined}
                   className="block rounded-md px-3 py-2 text-sm outline-hidden hover:bg-muted focus:bg-muted"
                 >
@@ -285,6 +289,7 @@ function SubMenu({
             <DropdownMenu.Item key={child.href} asChild>
               <Link
                 href={child.href}
+                prefetch={false}
                 aria-current={isCurrent(child.href) ? "page" : undefined}
                 className="block rounded-md px-3 py-2 text-sm outline-hidden hover:bg-muted focus:bg-muted"
               >

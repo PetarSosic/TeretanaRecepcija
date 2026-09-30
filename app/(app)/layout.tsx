@@ -2,10 +2,9 @@ import { redirect } from "next/navigation";
 import { AppHeader } from "@/components/common/app-header";
 import { AppStateProvider } from "@/components/common/app-state";
 import { signOutAction } from "@/features/auth/actions";
-import { getStaff } from "@/lib/auth";
+import { getSessionContext } from "@/lib/auth";
 import { me } from "@/lib/i18n/me";
 import { navigationFor } from "@/lib/nav";
-import { getOpenShift } from "@/lib/shift";
 import { createClient } from "@/lib/supabase/server";
 
 // Doc 04 §2 point 3: the session and role are checked on the server, not only in the
@@ -13,27 +12,19 @@ import { createClient } from "@/lib/supabase/server";
 export default async function AppLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  const staff = await getStaff();
-  if (!staff) redirect("/login");
+  // D-89: the staff row, the gym's name and its open shift (BR-110) in one call, which
+  // the page of this render shares.
+  const session = await getSessionContext();
+  if (!session) redirect("/login");
+  const { staff, open_shift: shift } = session;
   if (staff.must_change_password) redirect("/change-password");
-
-  const supabase = await createClient();
-  const [gym, shift] = await Promise.all([
-    supabase
-      .from("gyms")
-      .select("name")
-      .eq("id", staff.gym_id)
-      .maybeSingle<{ name: string }>(),
-    // BR-110: at most one open shift per gym, named through open_shift_info because
-    // doc 07 §6 hides another receptionist's staff row.
-    getOpenShift(),
-  ]);
 
   // BR-116 and BR-119: the nightly job closes the shift while the receptionist is still
   // signed in, and an owner may close it from S-19. Their next request ends the session
   // and lands on S-01 with the notice. A receptionist who reaches the S-02 gate always
   // has an open shift to take over, so the gate is not caught by this.
   if (staff.role === "receptionist" && !shift) {
+    const supabase = await createClient();
     await supabase.auth.signOut();
     redirect("/login?auto=1");
   }
@@ -46,7 +37,7 @@ export default async function AppLayout({
     <AppStateProvider hasOpenShift={openShift !== null}>
       <div className="flex min-h-svh flex-col">
         <AppHeader
-          gymName={gym.data?.name ?? me.app.name}
+          gymName={session.gym_name ?? me.app.name}
           fullName={staff.full_name}
           roleLabel={me.roles[staff.role]}
           navigation={navigationFor(staff.role)}

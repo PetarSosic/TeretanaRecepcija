@@ -84,6 +84,7 @@ An `admin` sees everything an owner sees (D-58).
 - rows showing name, #number, type badge, check-in time, and live duration;
 - an [Odjavi] button per row;
 - a member leaves the list 1 h 30 min after checking in, at the latest (BR-082a);
+- the durations tick every minute in the browser; the list itself is reloaded from the server every 5 minutes while the screen is visible, at once when it becomes visible again, and after every check-in, check-out or registration at this desk (D-85);
 - empty text: `Trenutno nema nikoga u teretani.`
 
 **Check-in dialogs:**

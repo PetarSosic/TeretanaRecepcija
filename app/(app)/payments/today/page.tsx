@@ -8,6 +8,7 @@ import {
 import type { ShiftTotalsOnly } from "@/features/shifts/types";
 import { formatDate } from "@/lib/format";
 import { requireStaff } from "@/lib/auth";
+import { gymToday } from "@/lib/gym-date";
 import { me } from "@/lib/i18n/me";
 import { getOpenShift } from "@/lib/shift";
 import { createClient } from "@/lib/supabase/server";
@@ -44,10 +45,9 @@ export default async function PaymentsTodayPage() {
   const staff = await requireStaff();
   const isOwner = staff.role === "owner" || staff.role === "admin";
   const supabase = await createClient();
-  const [{ data: today }, shift] = await Promise.all([
-    supabase.rpc("gym_today", { p_gym: staff.gym_id }),
-    getOpenShift(),
-  ]);
+  // D-89: both come with the session, so they cost no call of their own.
+  const today = await gymToday(staff.gym_id);
+  const shift = await getOpenShift();
 
   const [payments, expenses, sales] = await Promise.all([
     supabase
@@ -55,7 +55,7 @@ export default async function PaymentsTodayPage() {
       .select(
         "id, created_at, kind, quantity, amount::text, method, note, shift_id, voided_at, void_reason, created_by, plans(name), members(member_number, first_name, last_name)",
       )
-      .eq("paid_on", today as string)
+      .eq("paid_on", today)
       .eq("is_backdated", false)
       .order("created_at", { ascending: false })
       .returns<
@@ -70,7 +70,7 @@ export default async function PaymentsTodayPage() {
       .select(
         "id, created_at, description, amount::text, method, shift_id, created_by, voided_at, void_reason, stock_movement_id, expense_categories(name)",
       )
-      .eq("spent_on", today as string)
+      .eq("spent_on", today)
       .order("created_at", { ascending: false })
       .returns<
         (Omit<TodayExpense, "category" | "entered_by"> & {
@@ -85,7 +85,7 @@ export default async function PaymentsTodayPage() {
         "id, created_at, quantity, unit_price::text, method, shift_id, created_by, voided_at, void_reason, products(name)",
       )
       .eq("type", "out")
-      .gte("created_at", dayBefore(today as string))
+      .gte("created_at", dayBefore(today))
       .order("created_at", { ascending: false })
       .returns<
         {
@@ -141,9 +141,7 @@ export default async function PaymentsTodayPage() {
         entered_by: names.get(row.created_by) ?? "—",
       }))}
       sales={(sales.data ?? [])
-        .filter(
-          (row) => formatDate(row.created_at) === formatDate(today as string),
-        )
+        .filter((row) => formatDate(row.created_at) === formatDate(today))
         .map(({ products, unit_price, created_by, ...row }): TodaySale => ({
           ...row,
           product: products?.name ?? "—",

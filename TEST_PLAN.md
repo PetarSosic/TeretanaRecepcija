@@ -562,6 +562,15 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   svojim okom prelazi iz `password` u `text` i nazad, vrijednost ostaje ista, a klik ne mijenja
   adresu (forma se ne šalje). Svi postojeći testovi prijave, promjene lozinke i S-23 prolaze.
 
+### [AUTH-28] Jedan poziv baze za sesiju (D-89)
+- **Prioritet:** Visoko
+- **Uloga / preduslovi:** sve uloge; deaktiviran nalog; nalog sa privremenom lozinkom; recepcioner čiju smjenu drži drugi
+- **Koraci:** prijavite se svakom ulogom i otvorite po nekoliko ekrana; deaktivirajte prijavljenog korisnika i kliknite u meniju; prijavite se privremenom lozinkom; kao drugi recepcioner otvorite `/reception`.
+- **Test podaci:** —
+- **Očekivani rezultat:** kao ranije: ime teretane i oznaka smjene u zaglavlju, deaktiviran korisnik je odjavljen sljedećim klikom, privremena lozinka vodi na S-01b, drugi recepcioner vidi samo S-02. Proxy i layout sada to saznaju jednim pozivom `session_context()`.
+- **Gdje provjeriti:** UI; DB `0022_session_context`
+- [x] Prošlo  [ ] Palo  Napomena: **30.09.2026 — PROŠLO.** DB `0022_session_context` (14 tvrdnji: red zaposlenog, ime teretane, `gym_today()`, otvorena smjena kao `open_shift_info()`, `is_mine`, null za deaktiviran nalog, nalog bez zaposlenog i poziv bez korisnika). E2E `auth.spec.ts` i `shifts.spec.ts` (desktop) prolaze bez izmjene.
+
 ---
 
 ### 3.2 PERM — dozvole i pristup rutama
@@ -1108,6 +1117,15 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   daje „Odjavljen/a: E2E Auto Odjava – 1h 40min“, bez novog dolaska. DB `0016_auto_checkout`
   (26 tvrdnji: tačno vrijeme odjave, granica od 1 h 30 min, ponovljeni posao, prava, skeniranje do
   i poslije 60 min, poslije noćne odjave, [Odjavi] na već zatvorenom redu).
+
+### [REC-23] Lista „U teretani“ se osvježava rjeđe i ne dok je ekran sakriven (D-85)
+- **Prioritet:** Srednje
+- **Uloga / preduslovi:** Recepcioner na `/reception`; drugi pult (ili vlasnik) može prijaviti dolazak
+- **Koraci:** 1) Prijavite dolazak na drugom pultu. 2) Sačekajte do 5 minuta. 3) Prebacite se na drugi tab 10 minuta, pa se vratite. 4) Prijavite dolazak na svom pultu.
+- **Test podaci:** —
+- **Očekivani rezultat:** 1–2) dolazak sa drugog pulta pojavi se najkasnije za 5 minuta; 3) dok je tab sakriven nema poziva serveru, a pri povratku lista se odmah osvježi; 4) vlastita prijava se vidi odmah. Trajanje boravka se i dalje mijenja svake minute.
+- **Gdje provjeriti:** UI, Network tab (POST server akcije)
+- [x] Prošlo  [ ] Palo  Napomena: **30.09.2026 — PROŠLO.** `resource-use.spec.ts` sa lažnim satom: 4 min 50 s nijedan poziv, 5 min tačno jedan; 30 min sakriveno nijedan; povratak odmah jedan, pa opet svakih 5 min. Unit `visible-interval.test.ts` (4 testa).
 
 ---
 
@@ -2616,6 +2634,15 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Gdje provjeriti:** UI
 - [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-high-g.spec.ts`: član sa 6 dolazaka anonimiziran kroz UI („Član je anonimiziran.“); `/stats/visits` za posljednjih 10 dana pokazuje „Ukupno dolazaka“ 10 — tačno koliko teretana ima dolazaka, uključujući njegovih 6 — a „Najčešći članovi“ su samo #6 (2), #4 (1) i #7 (1), bez njega iako ima najviše dolazaka. Raniji dokaz (22.09.): DB 0013: automatski odjavljeni dolazak ne ulazi u prosjek, anonimizovan član ne ulazi u top listu. Nije ponovljeno kroz UI sa tim podacima.
 
+### [STAT-06] Dolazak oko ponoći se broji na svoj lokalni dan (D-90)
+- **Prioritet:** Visoko
+- **Uloga / preduslovi:** Vlasnik; dolasci u 23:30 i u 00:10 po crnogorskom vremenu
+- **Koraci:** otvorite `/stats/visits` za prvi dan, pa za drugi, pa za oba.
+- **Test podaci:** dolazak u 23:30 i dolazak u 00:10 sljedećeg dana
+- **Očekivani rezultat:** svaki dan pokazuje po jedan dolazak (00:10 je po UTC-u još prethodni dan, ali se broji na lokalni); zbir za oba dana je 2.
+- **Gdje provjeriti:** UI; DB `0023_query_ranges`
+- [x] Prošlo  [ ] Palo  Napomena: **30.09.2026 — PROŠLO.** DB `0023_query_ranges` (13 tvrdnji: granice dana, dan promjene sata od 23 i od 25 sati, isti broj kao `gym_local_date()`, nijedna polisa ne pita za korisnika po redu, tri nova indeksa). Postojeći DB testovi 0009, 0012, 0013 i 0019 prolaze bez izmjene.
+
 ---
 
 
@@ -2713,6 +2740,15 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   Posao ne pokušava više od pet puta po smjeni.
 - **Gdje provjeriti:** izlaz komande; UI
 - [x] Prošlo  [ ] Palo  Napomena: **24.09.2026 — PROŠLO.** `test-plan-medium-jobs.spec.ts`: smjena zaključena na S-14 sa odbijenim ključem → `failed`, 1 pokušaj. Ponovno slanje odmah poslije zaključenja ne dira smjenu (nije prošlo 15 minuta). Sa pomjerenim vremenom posljednjeg pokušaja i i dalje odbijenim ključem, pokušaji 2–5 daju `failed`, a šesti poziv je više ne bira (ostaje 5). Druga smjena sa neuspjelim izvještajem, pa ispravan ključ: poslata je samo ona (`sent`, 2 pokušaja), Resend `delivered` na `delivered@resend.dev`, sa PDF prilogom. Na `/finance/shifts` jedna smjena ima „poslato“, druga „neuspješno“. Red za ponovno slanje ograničen je na testnu teretanu. Raniji dokaz (22.09.): Na testnoj smjeni prvo izazvan failed nevažećim ključem, zatim stvarni runEmailRetry sa izborom samo te smjene: sent, Resend delivered. Interval i limit pet pokušaja pokriva DB 0011; globalni red drugih teretana nije obrađivan.
+
+### [JOB-08] Dnevnik pg_cron-a čuva 7 dana (D-88)
+- **Prioritet:** Nisko
+- **Uloga / preduslovi:** pristup bazi
+- **Koraci:** u `cron.job` provjerite posao `kp-fitness-cron-log-cleanup`; poslije 03:17 UTC provjerite `cron.job_run_details`.
+- **Test podaci:** —
+- **Očekivani rezultat:** posao se izvršava dnevno u 03:17 UTC; zapisi stariji od 7 dana su obrisani, noviji ostaju.
+- **Gdje provjeriti:** DB
+- [x] Prošlo  [ ] Palo  Napomena: **30.09.2026 — PROŠLO.** DB `0021_cron_log_cleanup` (6 tvrdnji: raspored, komanda, brisanje starijih od 7 dana i zapisa koji nikad nije završio, čuvanje novijih, nijedna uloga aplikacije ne smije da je pozove).
 
 ---
 
@@ -2900,6 +2936,15 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   dugmetom „Otvori meni“.
 - **Gdje provjeriti:** UI (zaglavlje)
 - [x] Prošlo  [ ] Palo  Napomena: **30.09.2026 — PROŠLO.** `shifts.spec.ts` (vlasnik uz smjenu recepcionera, 1366 px): 8 stavki u jednom redu, nijedna viša od 40 px, oznaka smjene cijela; na 1100 px meni skriven, „Otvori meni“ vidljiv. Mjerenje sa vlasnikom „Matija Vojinović“ i adminom: vidi 9.14.
+
+### [UX-08] Linkovi ne učitavaju stranice unaprijed (D-86)
+- **Prioritet:** Srednje
+- **Uloga / preduslovi:** produkcijski build (`npm run build`, `npm run start`); bilo koja uloga
+- **Koraci:** otvorite `/finance` ili listu članova, sačekajte, pređite mišem preko stavke menija, pa kliknite.
+- **Test podaci:** —
+- **Očekivani rezultat:** prije klika nema nijednog zahtjeva za stranicom (RSC); klik otvara stranicu kao ranije.
+- **Gdje provjeriti:** Network tab
+- [x] Prošlo  [ ] Palo  Napomena: **30.09.2026 — PROŠLO.** `resource-use.spec.ts` na produkcijskom buildu (`E2E_PRODUCTION=1`): 0 RSC zahtjeva prije klika, klik ih ima i otvara `/members`. ESLint odbija `Link` bez `prefetch={false}`.
 
 ---
 
@@ -3969,6 +4014,26 @@ su u D-80–D-82. Komentari u već primijenjenoj migraciji 0035 i dalje kažu D-
 | E2E samo za izmijenjeno, oba projekta: `manager-finance`, `finance`, `cards`, `auth` | **35 prošlo**, 7 preskočeno (mobilne varijante) |
 | E2E samo za izmijenjeno: PERM-01/02/03, PERM-04, PERM-10, PERM-13, CARD-02/03, SET-01, SET-05/06, ekrani S-16–S-23 i S-28 | **25 prošlo**, 7 preskočeno (mobilne varijante) |
 | Cijeli E2E paket | nije pušten ovaj put (prekinut na zahtjev; pokrivena samo izmijenjena mjesta) |
+
+### 9.16 Dopuna — manja potrošnja Vercela i Supabase-a (D-85–D-90), 30.09.2026
+
+**D-85** recepcija se osvježava svakih 5 min i samo dok je vidljiva (REC-23). **D-86** nijedan link
+ne učitava stranicu unaprijed (UX-08). **D-87** Vercel ne pravi build za commit koji mijenja samo
+dokumentaciju, testove, migracije, skripte ili podešavanja alata (unit `ignore-build.test.ts`;
+od 54 commita prije ove odluke 13 bi bilo preskočeno). **D-88** dnevnik pg_cron-a čuva 7 dana
+(JOB-08). **D-89** sesija jednim pozivom baze (AUTH-28). **D-90** polise pitaju za korisnika jednom
+po upitu, izvještaji čitaju period kao opseg vremena, tri nova indeksa, `fin_shifts` računa zbir
+smjene jednom (STAT-06). Mjereno na godini od 50.000 dolazaka (sintetički, u poništenoj
+transakciji): broj dolazaka za jedan mjesec 557 ms → 1,6 ms, isti rezultat.
+
+| Provjera 30.09.2026 | Rezultat |
+|---|---|
+| `npm run lint`, `npm run typecheck` | PROŠLO |
+| `npm run test` | **214 PROŠLO** (1 preskočen) |
+| `npm run test:db` (migracije 0036–0040 primijenjene) | **24/24 fajlova** |
+| E2E samo za izmijenjeno, desktop: `resource-use`, `auth`, `shifts`, `payments`, `finance`, `manager-finance`, `storage` | **31 prošlo**, 1 preskočen (D-86, samo na produkcijskom buildu) |
+| E2E D-86 na produkcijskom buildu | **1/1** |
+| Cijeli E2E paket | nije pušten (na zahtjev; prekinuti širi paket prošao je 37/37 prije prekida) |
 
 *Kraj plana. Novi rezultati upisani su uz slučajeve; neoznačeni kvadratići nisu automatski prolaz.*
 

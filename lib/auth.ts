@@ -17,34 +17,50 @@ export type Staff = {
   is_active: boolean;
 };
 
-const COLUMNS =
-  "id, gym_id, user_id, role, full_name, username, email, must_change_password, is_active";
+/** The gym's open shift as the header badge and S-02 need it (BR-110). */
+export type OpenShift = {
+  id: string;
+  staff_id: string;
+  staff_name: string;
+  started_at: string;
+  is_mine: boolean;
+};
+
+/** D-89: what `session_context()` answers for a signed-in, active staff member. */
+export type SessionContext = {
+  staff: Staff;
+  gym_name: string | null;
+  /** BR-001: `gym_today(gym_id)`, Europe/Podgorica. */
+  today: string;
+  open_shift: OpenShift | null;
+};
 
 /**
- * The signed-in staff row, or null when there is no session or no active staff row.
+ * D-89: the signed-in session in one database call — the staff row, the gym's name,
+ * the gym's today and its open shift — or null when there is no session or no active
+ * staff row, and the caller signs the user out (doc 04 §2 point 5). An error counts as
+ * null too.
  *
- * A deactivated account makes the doc 07 §6 policies raise E_NOT_STAFF rather than
- * return an empty result, so an error is treated the same as "not staff" here and the
- * caller signs the user out (doc 04 §2 point 5).
- *
- * getClaims checks the token's signature locally instead of asking Auth, and `cache`
- * lets the layout and the page of one render share a single lookup. Outside a render
- * (server actions, route handlers) `cache` does not memoise, so an action always reads
- * the row as it is now.
+ * getClaims checks the token's signature locally instead of asking Auth, so a request
+ * without a session costs no database call. `cache` lets the layout and the page of one
+ * render share a single call. Outside a render (server actions, route handlers) `cache`
+ * does not memoise, so an action always reads the session as it is now.
  */
-export const getStaff = cache(async (): Promise<Staff | null> => {
-  const supabase = await createClient();
-  const { data: auth } = await supabase.auth.getClaims();
-  const userId = auth?.claims.sub;
-  if (!userId) return null;
-  const { data, error } = await supabase
-    .from("staff")
-    .select(COLUMNS)
-    .eq("user_id", userId)
-    .maybeSingle<Staff>();
-  if (error || !data || !data.is_active) return null;
-  return data;
-});
+export const getSessionContext = cache(
+  async (): Promise<SessionContext | null> => {
+    const supabase = await createClient();
+    const { data: auth } = await supabase.auth.getClaims();
+    if (!auth?.claims.sub) return null;
+    const { data, error } = await supabase.rpc("session_context");
+    if (error || !data) return null;
+    return data as SessionContext;
+  },
+);
+
+/** The signed-in staff row, or null when there is no session or no active staff row. */
+export async function getStaff(): Promise<Staff | null> {
+  return (await getSessionContext())?.staff ?? null;
+}
 
 /** The staff row, or an E_NOT_STAFF throw for routes that require a signed-in user. */
 export async function requireStaff(): Promise<Staff> {

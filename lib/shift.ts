@@ -1,27 +1,14 @@
 import "server-only";
-import { cache } from "react";
-import { createClient } from "@/lib/supabase/server";
+import { getSessionContext, type OpenShift } from "@/lib/auth";
 
-/** The gym's open shift as the header badge and S-02 need it (BR-110). */
-export type OpenShift = {
-  id: string;
-  staff_id: string;
-  staff_name: string;
-  started_at: string;
-  is_mine: boolean;
-};
+export type { OpenShift };
 
 /**
- * Doc 07 §6 hides another receptionist's staff row, so the holder's name comes from
- * the open_shift_info function rather than from a join (see migration 0011). The layout
- * and some pages both ask during one render, and `cache` lets them share the answer.
+ * The gym's open shift (BR-110), or null. Doc 07 §6 hides another receptionist's staff
+ * row, so the holder's name comes from the database function (migration 0011); since
+ * D-89 it arrives with the rest of the session, so the layout and the page of one render
+ * share it with no call of their own.
  */
-export const getOpenShift = cache(async (): Promise<OpenShift | null> => {
-  const supabase = await createClient();
-  const { data, error } = await supabase.rpc("open_shift_info");
-  if (error) {
-    console.error(`open_shift_info: ${error.message}`);
-    return null;
-  }
-  return (data as OpenShift | null) ?? null;
-});
+export async function getOpenShift(): Promise<OpenShift | null> {
+  return (await getSessionContext())?.open_shift ?? null;
+}

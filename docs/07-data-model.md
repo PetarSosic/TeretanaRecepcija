@@ -464,6 +464,7 @@ All are `stable`, with `set search_path = public`.
 | `my_gym()` | `uuid` | `current_staff().gym_id` |
 | `gym_today(p_gym uuid)` | `date` | `(now() at time zone gyms.timezone)::date` |
 | `gym_local_date(p_gym uuid, p_ts timestamptz)` | `date` | Local date of a timestamp |
+| `gym_day_start(p_gym uuid, p_date date)` | `timestamptz` | First instant of a local day. A period filter is `ts >= gym_day_start(g, from) and ts < gym_day_start(g, to + 1)`, which lets an index serve it and calls nothing per row (D-90) |
 | `open_shift(p_gym uuid)` | `shifts` row or null | The gym's open shift |
 | `membership_end_date(p_start date, p_value int, p_unit duration_unit)` | `date` | BR-051 |
 | `membership_used(p_membership uuid, p_type visit_type)` | `int` | Count of visits linked with that type |
@@ -515,6 +516,8 @@ All RPCs are `security definer`. Each one:
 | `upsert_product` | owner, manager (D-76) | BR-140, P-42 |
 | `job_nightly(p_gym)` → shift ids to report | service role only | BR-082, BR-116 |
 | `job_auto_checkout()` → number of visits closed, for every gym | pg_cron and service role only | BR-082a (D-74) |
+| `purge_cron_log(p_keep interval default '7 days')` → records deleted | pg_cron only | D-88 |
+| `session_context()` → json `{staff, gym_name, today, open_shift}`, or null for anyone who is not active staff (read-only) | any signed-in user | D-89 |
 | `job_expiring_memberships(p_gym)` → rows | service role only | BR-160 |
 | `job_backup_tables()` → table names in export order | service role only | BR-163 |
 
@@ -543,6 +546,8 @@ The four functions marked D-80 start with `assert_finance_period(p_from, p_to)` 
 
 ## 6. RLS — SELECT policies
 Writes: **none** for `authenticated`; everything goes through RPCs.
+
+Every helper that names the caller or the day (`my_gym()`, `my_role()`, `current_staff()`, `gym_today()`, `auth.uid()`) appears in a policy inside a sub-select, e.g. `gym_id = (select my_gym())`, so Postgres evaluates it once per statement instead of once per row. A "today only" rule on a timestamp is a range from `gym_day_start()` (D-90, migration 0039).
 
 | Table | Owner | Manager | Receptionist |
 |---|---|---|---|

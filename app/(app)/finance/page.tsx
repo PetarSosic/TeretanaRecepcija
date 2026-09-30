@@ -172,6 +172,7 @@ export default async function FinancePage({
                     <Td>
                       <Link
                         href={`/members/${row.member_id}`}
+                        prefetch={false}
                         className="underline underline-offset-4"
                       >
                         #{row.member_number} {row.member_name}
@@ -211,6 +212,7 @@ export default async function FinancePage({
                     <Td>
                       <Link
                         href={`/members/${row.member_id}`}
+                        prefetch={false}
                         className="underline underline-offset-4"
                       >
                         #{row.member_number} {row.member_name}

@@ -118,6 +118,7 @@ export default async function TrainersPage({
                 <Td>
                   <Link
                     href={`/finance/trainers?month=${month.slice(0, 7)}&trainer=${row.trainer_id}`}
+                    prefetch={false}
                     className="underline underline-offset-4"
                   >
                     {row.trainer_name}
@@ -156,6 +157,7 @@ export default async function TrainersPage({
                   <Button asChild variant="outline" size="sm">
                     <Link
                       href={`/finance/expenses?payoutTrainer=${row.trainer_id}&payoutAmount=${row.difference}`}
+                      prefetch={false}
                     >
                       {me.finance.recordPayout}
                     </Link>

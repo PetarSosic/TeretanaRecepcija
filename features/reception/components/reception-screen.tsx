@@ -29,6 +29,7 @@ import { formatDuration, formatTime } from "@/lib/format";
 import { getErrorMessage } from "@/lib/errors";
 import { me } from "@/lib/i18n/me";
 import { isAudioUnlocked, unlockAudio } from "@/lib/sounds";
+import { useVisibleInterval } from "@/lib/visible-interval";
 import {
   beginCheckIn,
   checkOut,
@@ -42,6 +43,9 @@ import { useCheckInFlow } from "./check-in-flow";
 /** BR-070: the card answers S-03 shows in its status area (red, 5 s, no dialog). */
 /** SUSPECT-09: how long a half-typed scan waits before it is forgotten. */
 const SCAN_IDLE_MS = 1000;
+
+/** D-85: how often the "U teretani" panel is reloaded while the screen is visible. */
+const PANEL_REFRESH_MS = 5 * 60_000;
 
 const CARD_MESSAGES: Record<string, string> = {
   invalid: getErrorMessage("E_CARD_INVALID"),
@@ -87,11 +91,11 @@ export function ReceptionScreen({
     setAudioReady(isAudioUnlocked());
   }, []);
 
-  // US-05.2 AC1: durations tick every minute; other desks' changes arrive too.
-  useEffect(() => {
-    const timer = setInterval(refreshPanel, 60_000);
-    return () => clearInterval(timer);
-  }, [refreshPanel]);
+  // D-85: other desks' changes and BR-082a's automatic check-outs (every 5 minutes,
+  // D-84) arrive every 5 minutes while the screen is visible, and at once when it comes
+  // back. This desk's own actions reload the panel themselves; the durations tick every
+  // minute in the browser (US-05.2 AC1, InGymPanel).
+  useVisibleInterval(refreshPanel, PANEL_REFRESH_MS);
 
   // BR-070 messages stay for five seconds.
   useEffect(() => {
@@ -414,6 +418,7 @@ function MemberSearch({ onPick }: { onPick: (memberId: string) => void }) {
                 </button>
                 <Link
                   href={`/members/${member.id}`}
+                  prefetch={false}
                   className="shrink-0 rounded-md px-3 py-2 text-sm underline-offset-2 hover:underline"
                 >
                   {me.reception.openProfile}

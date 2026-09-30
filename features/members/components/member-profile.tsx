@@ -357,6 +357,7 @@ export function MemberProfile({
                 ? `/members/${member.id}`
                 : `/members/${member.id}?tab=${item.id}`
             }
+            prefetch={false}
             scroll={false}
             aria-current={tab === item.id ? "page" : undefined}
             className={cn(
@@ -580,6 +581,7 @@ export function MemberProfile({
                 {visitPage > 1 ? (
                   <Link
                     href={`/members/${member.id}?tab=dolasci&strana=${visitPage - 1}`}
+                    prefetch={false}
                     scroll={false}
                   >
                     {me.members.previous}
@@ -602,6 +604,7 @@ export function MemberProfile({
                 {visitPage < visitPages ? (
                   <Link
                     href={`/members/${member.id}?tab=dolasci&strana=${visitPage + 1}`}
+                    prefetch={false}
                     scroll={false}
                   >
                     {me.members.next}

@@ -107,6 +107,7 @@ Resend: shift report emails · expiry reminders
 - **Sessions:**
   - Supabase cookie sessions via `@supabase/ssr`.
   - Middleware refreshes sessions and, for inactive staff or a closed-shift receptionist, signs out and redirects to `/login`.
+  - The middleware and the app layout each learn the session with one call, `session_context()`: the staff row, the gym's name, `gym_today()` and the open shift (D-89). The layout and the page of one render share that answer.
   - `must_change_password = true` redirects every route to S-01b.
 
 > ASSUMPTION (AS-18): Accounts created with a temporary password must change it at first login.
@@ -213,6 +214,7 @@ RPCs raise `P0001` with the message `E_<CODE>`. `lib/errors.ts` maps each code t
 | email-retry | Every run | Shifts with `email_status = 'failed'` and `email_attempts < 5`, last attempt ≥ 15 min ago |
 
 - **Automatic check-out (BR-082a, D-74)** needs no handler. A second pg_cron job, `kp-fitness-auto-checkout`, runs `job_auto_checkout()` in the database **every 5 minutes** for every gym (D-84). It needs no application URL, secret or gym clock, since it compares instants, and it is idempotent by nature.
+- **Run log cleanup (D-88).** pg_cron records every run in `cron.job_run_details` and never deletes one. A third job, `kp-fitness-cron-log-cleanup`, runs `purge_cron_log()` daily at 03:17 UTC and keeps the last 7 days.
 
 ## 9. Non-functional requirements
 **Performance:**
@@ -221,6 +223,12 @@ RPCs raise `P0001` with the message `E_<CODE>`. `lib/errors.ts` maps each code t
 - Any page is interactive ≤ 3 s on the reception PC.
 - Finance pages for a 12-month range load in ≤ 3 s.
 - Sizing assumption: 3,000 members, 150,000 visits per year, 20,000 payments per year.
+
+**Resource use (Vercel Hobby and the Supabase free plan):**
+- No request is made for nothing: links do not prefetch (D-86), the reception panel reloads every 5 minutes and only while visible (D-85), and pg_cron calls a job handler only when its job has work (D-83).
+- A request reads its session with one database call (D-89).
+- Policies evaluate the caller once per statement, and period filters are ranges of instants that indexes serve (D-90).
+- Vercel builds only commits that change the app (D-87).
 
 **Browsers and devices:**
 - Reception: current Chrome (last 2 versions) on desktop, 1366×768 and larger, with no horizontal scrolling on S-03, S-12, S-13 and S-14.
@@ -281,7 +289,7 @@ RPCs raise `P0001` with the message `E_<CODE>`. `lib/errors.ts` maps each code t
 
 ## 11. Environments and configuration
 - **Development (D-56):** `npm run dev` serves the app locally and connects directly to hosted Supabase project `paakuxiufzmdobpooqdi`. No Docker or local Supabase stack. Initialize the CLI metadata with `supabase init`, link the hosted project, inspect existing data, and apply only new numbered migrations with `supabase db push --linked`. No remote resets. Database tests use `scripts/test-db.mjs` with pgTAP over a TLS Postgres connection, isolated in transactions and rolled back. Synthetic E2E fixtures must avoid modifying existing gym data. Owner seeding arrives in M-01.
-- **Production:** one Supabase free project and one Vercel project (Hobby for now, OQ-5). Vercel Functions run in `fra1` (Frankfurt), set in `vercel.json`, because the Supabase project is in `eu-central-1`; in Vercel's default `iad1` every database call crossed the Atlantic and a screen took about three times as long. Migrations are applied with `supabase db push`. The pg_cron schedules are created by a migration that reads `APP_URL` and `CRON_SECRET` from Supabase Vault.
+- **Production:** one Supabase free project and one Vercel project (Hobby for now, OQ-5). Vercel Functions run in `fra1` (Frankfurt), set in `vercel.json`, because the Supabase project is in `eu-central-1`; in Vercel's default `iad1` every database call crossed the Atlantic and a screen took about three times as long. Migrations are applied with `supabase db push`. The pg_cron schedules are created by a migration that reads `APP_URL` and `CRON_SECRET` from Supabase Vault. `vercel.json` sets `ignoreCommand` to `node scripts/ignore-build.mjs`, so a push that changes only documentation, tests, migrations, developer scripts or tool settings since the last deployment is not built (D-87).
 - **Environment variables:**
 
 | Variable | Used by |

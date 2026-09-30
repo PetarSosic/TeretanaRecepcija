@@ -43,6 +43,7 @@ export function FinanceNav({ ownerTabs }: { ownerTabs: boolean }) {
             <li key={tab.href}>
               <Link
                 href={tab.href}
+                prefetch={false}
                 aria-current={active ? "page" : undefined}
                 className={cn(
                   "-mb-px inline-block border-b-2 px-3 py-2 text-sm whitespace-nowrap",

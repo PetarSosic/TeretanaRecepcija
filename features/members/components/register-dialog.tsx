@@ -171,7 +171,7 @@ function RegisterForm({
                     #{duplicate.member_number} {duplicate.first_name}{" "}
                     {duplicate.last_name}
                     <Button asChild variant="outline" size="sm">
-                      <Link href={`/members/${duplicate.id}`}>
+                      <Link href={`/members/${duplicate.id}`} prefetch={false}>
                         {me.members.openExisting}
                       </Link>
                     </Button>

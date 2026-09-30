@@ -8,6 +8,12 @@ const PUBLIC_ROUTES = ["/login", "/auth/callback", "/api/jobs"];
 const PASSWORD_ROUTE = "/change-password";
 const GATE_ROUTE = "/shift/gate";
 
+/** D-89: the part of `session_context()` the proxy reads. */
+type ProxySession = {
+  staff: { role: string; is_active: boolean; must_change_password: boolean };
+  open_shift: { is_mine: boolean } | null;
+};
+
 function securityHeaders(request: NextRequest) {
   // Doc 08 §9: per-request nonce.
   const nonce = Buffer.from(crypto.randomUUID()).toString("base64");
@@ -82,15 +88,11 @@ export async function proxy(request: NextRequest) {
     if (!user) {
       if (!isPublic) return redirect(request, "/login", policy);
     } else {
-      const { data: staff, error } = await supabase
-        .from("staff")
-        .select("role, is_active, must_change_password")
-        .eq("user_id", user.id)
-        .maybeSingle<{
-          role: string;
-          is_active: boolean;
-          must_change_password: boolean;
-        }>();
+      // D-89: one call answers for the staff row and the gym's open shift. It is null
+      // for a user with no staff row or a deactivated one.
+      const { data: session, error } = await supabase.rpc("session_context");
+      const staff = (session as ProxySession | null)?.staff;
+      const shift = (session as ProxySession | null)?.open_shift ?? null;
 
       // A banned or deactivated account loses its session on the next request.
       if (error || !staff || !staff.is_active) {
@@ -113,9 +115,7 @@ export async function proxy(request: NextRequest) {
         // the shared layout and never re-runs it; this proxy sees every navigation.
         // Server actions (POST) are left alone: the RPC answers them with BR-092's
         // message instead of a redirect the action cannot follow.
-        const { data: shift, error: shiftError } =
-          await supabase.rpc("open_shift_info");
-        if (!shiftError && !shift) {
+        if (!shift) {
           await supabase.auth.signOut();
           return redirect(request, "/login", policy, response, "auto=1");
         }
@@ -123,12 +123,7 @@ export async function proxy(request: NextRequest) {
         // over, S-02 is the only screen; a typed desk URL or a menu click would
         // otherwise record this receptionist's money in the other one's shift. Route
         // handlers (/api) are not screens and keep their own answers (PERM-10).
-        if (
-          !shiftError &&
-          !(shift as { is_mine: boolean }).is_mine &&
-          path !== GATE_ROUTE &&
-          !path.startsWith("/api/")
-        )
+        if (!shift.is_mine && path !== GATE_ROUTE && !path.startsWith("/api/"))
           return redirect(request, GATE_ROUTE, policy, response);
       } else if (path === "/login") {
         const home = staff.must_change_password
@@ -165,8 +160,8 @@ function redirect(
 }
 
 export const config = {
-  // Every matched request costs two Supabase round trips (token check plus the staff
-  // row), so only real navigations and route handlers are matched. Framework assets
+  // Every matched request with a session costs a database call (session_context, D-89),
+  // so only real navigations and route handlers are matched. Framework assets
   // and static files are served by a document that already carries the CSP, and the
   // headers in next.config.ts still apply to them.
   matcher: [

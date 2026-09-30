@@ -86,7 +86,7 @@ All features are **MVP**. Acceptance criteria (AC) are written so each one can b
 - AC1: The search is on S-03 and follows BR-044. Choosing a result starts the same flow as a scan, with `is_manual = true`.
 
 **US-05.2** As a receptionist, I see everyone currently in the gym and can check anyone out.
-- AC1: The "U teretani" list shows name, member number, visit type, check-in time and live duration (updated every minute), sorted by check-in time.
+- AC1: The "U teretani" list shows name, member number, visit type, check-in time and live duration (updated every minute; the list itself is reloaded every 5 minutes while visible, D-85), sorted by check-in time.
 - AC2: [Odjavi] checks that member out and the row disappears.
 - AC3: The header of the list shows the count and today's total visits.
 

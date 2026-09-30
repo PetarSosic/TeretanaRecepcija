@@ -523,6 +523,7 @@ Every rule has an ID. Code comments and tests must reference these IDs, e.g. `//
 | Morning | Daily at 09:00 | BR-160 reminders |
 | Retry | Every 15 minutes | BR-118 failed shift emails |
 | Weekly backup | Every Sunday at 03:00 | BR-163 |
+| Cron log cleanup | Daily at 03:17 UTC | Delete pg_cron run records older than 7 days (D-88) |
 
   Every job is idempotent: running it twice on the same day changes nothing.
 

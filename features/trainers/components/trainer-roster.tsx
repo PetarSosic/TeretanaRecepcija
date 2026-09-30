@@ -109,6 +109,7 @@ export function TrainerRoster({
                           <Td>
                             <Link
                               href={`/members/${row.member_id}`}
+                              prefetch={false}
                               className="underline underline-offset-4"
                             >
                               #{row.member_number} {row.first_name}{" "}
@@ -150,6 +151,7 @@ export function TrainerRoster({
                               {index ? ", " : null}
                               <Link
                                 href={`/members/${extra.member_id}`}
+                                prefetch={false}
                                 className="underline underline-offset-4"
                               >
                                 #{extra.member_number} {extra.first_name}{" "}

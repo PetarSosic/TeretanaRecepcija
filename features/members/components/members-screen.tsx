@@ -183,6 +183,7 @@ export function MembersScreen({
                     {/* The link keeps the row reachable by keyboard (D-47). */}
                     <Link
                       href={`/members/${row.id}`}
+                      prefetch={false}
                       className="font-medium hover:underline"
                       onClick={(event) => event.stopPropagation()}
                     >
