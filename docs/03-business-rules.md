@@ -284,7 +284,7 @@ Every rule has an ID. Code comments and tests must reference these IDs, e.g. `//
   - Automatic check-outs are excluded from visit-duration statistics.
 - **BR-082a (automatic check-out after 1 h 30 min, D-74):**
   - Every open visit that began 1 h 30 min ago or earlier gets `checked_out_at` = check-in + 1 h 30 min and `auto_checkout = true`, and leaves "U teretani". The time is exact, whenever the job notices it.
-  - A database job does this every minute (BR-162). The 1 h 30 min is fixed, for every visit type.
+  - A database job does this every 5 minutes (BR-162, D-84), so a member can still be listed in "U teretani" for up to 5 minutes after the 1 h 30 min. The 1 h 30 min is fixed, for every visit type.
   - As with BR-082, these check-outs are excluded from visit-duration statistics, unless BR-072a turns one into a real check-out.
 - **BR-083 (back-dated visit, owner only):**
   - The owner enters member, date, check-in time, check-out time (> check-in), visit type, and trainer/slot when needed.
@@ -519,7 +519,7 @@ Every rule has an ID. Code comments and tests must reference these IDs, e.g. `//
 | Job | Schedule (gym time) | Steps |
 |---|---|---|
 | Nightly | Daily at the automatic close time (default 23:00) | 1. BR-082 automatic check-out. 2. BR-116 automatic shift close. 3. Report and email (BR-117). |
-| Auto check-out | Every minute | BR-082a (D-74) |
+| Auto check-out | Every 5 minutes | BR-082a (D-74, D-84) |
 | Morning | Daily at 09:00 | BR-160 reminders |
 | Retry | Every 15 minutes | BR-118 failed shift emails |
 | Weekly backup | Every Sunday at 03:00 | BR-163 |

@@ -159,7 +159,7 @@ Poništene stavke ostaju u Dnevniku izmjena — tako i treba (BR-095).
   Postgres funkcijama (RPC); browser nikada ne piše direktno u tabele.
 - **Validacija:** Zod u server akcijama + `check` ograničenja i provjere u RPC-ovima (dvostruko).
 - **Email:** Resend (`lib/email/send.ts`). **PDF:** react-pdf (izvještaj smjene, list kartica).
-- **Zakazani poslovi:** `pg_cron` poziva `POST /api/jobs/<ime>` svakih 5 minuta sa `x-cron-secret`.
+- **Zakazani poslovi:** `pg_cron` svakih 5 minuta u bazi provjeri koji posao ima posla i samo njega poziva na `POST /api/jobs/<ime>` sa `x-cron-secret` (D-83).
 - **Sigurnosna zaglavlja:** CSP sa nonce-om, `frame-ancestors 'none'`, `Cache-Control: private, no-store`.
 
 ### 2.2 Rute
@@ -1092,13 +1092,13 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 ### [REC-22] Automatska odjava nakon 1 h 30 min i skeniranje poslije nje (D-74, BR-082a, BR-072a)
 - **Prioritet:** Visoko
 - **Uloga / preduslovi:** Recepcioner, otvorena smjena; član bez članarine (ili sa Mjesečnom).
-- **Koraci:** 1) Prijavite člana skeniranjem i ne odjavljujte ga. 2) Sačekajte 1 h 31 min
-  (ili u bazi pomjerite `checked_in_at` otvorenog dolaska 1 h 40 min unazad i sačekajte minut).
+- **Koraci:** 1) Prijavite člana skeniranjem i ne odjavljujte ga. 2) Sačekajte 1 h 35 min
+  (ili u bazi pomjerite `checked_in_at` otvorenog dolaska 1 h 40 min unazad i sačekajte 5 minuta).
   3) Pogledajte listu „U teretani“ i profil člana → „Dolasci“. 4) Do 60 min poslije automatske
   odjave ponovo skenirajte karticu. 5) Za drugog člana ponovite 1–2, pa skenirajte karticu više
   od 60 min poslije automatske odjave.
 - **Test podaci:** —
-- **Očekivani rezultat:** 2–3) Član nestaje sa liste najkasnije minut kasnije; na profilu je
+- **Očekivani rezultat:** 2–3) Član nestaje sa liste najkasnije 5 minuta kasnije (D-84); na profilu je
   izlaz tačno 1 h 30 min poslije ulaza. 4) „Odjavljen/a: <ime> – Xh Ymin“ sa trajanjem od
   ulaza do skeniranja, bez dijaloga prijave; na profilu je i dalje jedan dolazak, a izlaz je
   vrijeme skeniranja. 5) Obična nova prijava (drugi dolazak, za člana bez članarine žuto upozorenje).

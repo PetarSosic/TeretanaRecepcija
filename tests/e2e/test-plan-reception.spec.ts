@@ -528,7 +528,7 @@ test("REC-22: out after 1 h 30 min by itself, and a scan soon after is the leavi
     "Visit of 1 h 40 min",
   );
 
-  // BR-082a: pg_cron runs the job every minute; running it here as well changes nothing
+  // BR-082a: pg_cron runs the job every five minutes (D-84); running it here as well changes nothing
   // it has already done.
   const job = await admin.rpc("job_auto_checkout");
   expect(job.error).toBeNull();

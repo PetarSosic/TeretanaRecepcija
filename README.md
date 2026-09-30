@@ -82,7 +82,8 @@ Technical references: [Next.js CSP](https://nextjs.org/docs/app/guides/content-s
 ## Jobs and backups (M-11)
 
 The four scheduled jobs of doc 08 §8 run behind `POST /api/jobs/<name>` with the header
-`x-cron-secret`, and `pg_cron` posts to them every five minutes. The schedule is created
+`x-cron-secret`. Every five minutes `pg_cron` checks in the database which jobs have work
+and posts only to those (D-83). The schedule is created
 by migration `0019` and reads `APP_URL` and `CRON_SECRET` from Supabase Vault at each run,
 so neither value is ever committed. Until both secrets exist the schedule does nothing,
 which is what makes it harmless in development.
@@ -131,7 +132,8 @@ an account only the owner has.
    Accounts are created only on S-23 through the admin API, which this setting does not
    block (D-01, doc 08 §4).
 7. Confirm that the extensions `pg_cron` and `pg_net` are enabled (migration `0019` does
-   this) and that `cron.job` holds one row named `kp-fitness-jobs` on `*/5 * * * *`.
+   this) and that `cron.job` holds `kp-fitness-jobs` and `kp-fitness-auto-checkout`, both
+   on `*/5 * * * *`.
 
 ### 2. Resend
 

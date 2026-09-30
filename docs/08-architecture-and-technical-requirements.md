@@ -199,10 +199,10 @@ RPCs raise `P0001` with the message `E_<CODE>`. `lib/errors.ts` maps each code t
 **QR:** `qrcode.toString(code, { type: 'svg', errorCorrectionLevel: 'M', margin: 2 })`.
 
 ## 8. Scheduled jobs
-- **pg_cron** runs `every 5 minutes` and calls `net.http_post` to `APP_URL/api/jobs/<name>` with the header `x-cron-secret: CRON_SECRET`.
+- **pg_cron** runs `every 5 minutes`. In the database it checks which jobs have work, with the same read-only functions the handlers use (`jobs_due`, `shifts_pending_email`), and calls `net.http_post` to `APP_URL/api/jobs/<name>` with the header `x-cron-secret: CRON_SECRET` only for those (D-83). If a check fails, it calls the handler anyway, so the handler reports the problem.
 - **Each handler:**
   1. verifies the secret (otherwise 401);
-  2. for each gym, checks the gym's local time against the schedule;
+  2. for each gym, checks the gym's local time against the schedule again (a manual call gets the same answer as pg_cron's);
   3. runs if due and not yet run today (the `job_runs` table, doc 07, guarantees idempotency).
 
 | Job | Due when | Handler steps |
@@ -212,7 +212,7 @@ RPCs raise `P0001` with the message `E_<CODE>`. `lib/errors.ts` maps each code t
 | weekly-backup | Sunday, local time ≥ 03:00 | Export tables (service role) → CSVs + `manifest.json` → encrypted ZIP → upload to `backups` → delete all but the newest 8 → email → record in `backup_runs`. On failure, retry on later runs, up to 3 attempts that day. |
 | email-retry | Every run | Shifts with `email_status = 'failed'` and `email_attempts < 5`, last attempt ≥ 15 min ago |
 
-- **Automatic check-out (BR-082a, D-74)** needs no handler. A second pg_cron job, `kp-fitness-auto-checkout`, runs `job_auto_checkout()` in the database **every minute** for every gym. It needs no application URL, secret or gym clock, since it compares instants, and it is idempotent by nature.
+- **Automatic check-out (BR-082a, D-74)** needs no handler. A second pg_cron job, `kp-fitness-auto-checkout`, runs `job_auto_checkout()` in the database **every 5 minutes** for every gym (D-84). It needs no application URL, secret or gym clock, since it compares instants, and it is idempotent by nature.
 
 ## 9. Non-functional requirements
 **Performance:**

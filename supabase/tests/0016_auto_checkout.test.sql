@@ -75,7 +75,7 @@ from (values
 
 -- BR-082a: the job --------------------------------------------------------------------
 select is((select schedule from cron.job where jobname = 'kp-fitness-auto-checkout'),
-  '* * * * *', 'BR-082a: pg_cron runs the automatic check-out every minute');
+  '*/5 * * * *', 'BR-082a (D-84): pg_cron runs the automatic check-out every five minutes');
 
 select cmp_ok(job_auto_checkout(), '>=', 4,
   'BR-082a: the job closes every visit open for 1 h 30 min or more');
