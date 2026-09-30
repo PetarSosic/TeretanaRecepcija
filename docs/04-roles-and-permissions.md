@@ -22,7 +22,7 @@
 | P-10 | Have a shift (auto-open on login, resume, take over) | ✗ | ✗ | ✓ | BR-110–113 |
 | P-11 | Close own shift | — | — | ✓ | BR-114 |
 | P-12 | Close any open shift | ✓ | ✗ | ✗ | BR-114 |
-| P-13 | Shift archive, report PDFs, resend email | ✓ | ✗ | ✗ | BR-118 |
+| P-13 | Shift archive, report PDFs, resend email | ✓ | archive only: no PDF, no email status (D-80) | ✗ | BR-118, D-80 |
 | P-14 | Current open shift totals: cash income, card income, till expenses, expected cash | ✓ | ✓ | own shift | BR-115, D-54 |
 | **Desk** | | | | | |
 | P-20 | Scan, check in, check out (incl. manual), see "U teretani" | ✓ | ✓ | ✓ | BR-070–081 |
@@ -38,7 +38,7 @@
 | P-30 | Correct method or note; void with reason | ✓ (any record) | open shift | open shift | BR-094, BR-095 |
 | P-31 | Correct an amount | ✓ | ✗ | ✗ | BR-094 |
 | P-32 | Enter a desk expense (non-salary category, from till) | ✓ | ✓ | ✓ | BR-132 |
-| P-33 | View expenses | all | own, today | own, today | BR-134 |
+| P-33 | View expenses | all | own, today; on S-17 every non-salary expense of Danas, Ova sedmica or Ovaj mjesec, read-only (D-80) | own, today | BR-134, D-80 |
 | P-34 | Void an expense | ✓ (any) | own, open shift | own, open shift | BR-135 |
 | **Magacin** | | | | | |
 | P-40 | View products, stock level, purchase and sale price | ✓ | ✓ | ✓ | BR-144 |
@@ -48,7 +48,7 @@
 | P-44 | Stock value, bar profit, sales history beyond today | ✓ | ✗ | ✗ | BR-144 |
 | **Statistics and finance** | | | | | |
 | P-50 | Visit statistics page (S-15) | ✓ | ✓ | ✗ | D-40 |
-| P-51 | Finance dashboard, income, expenses, profit (S-16…S-21) | ✓ | ✗ | ✗ | BR-157 |
+| P-51 | Finance dashboard, income, expenses, profit (S-16…S-21) | ✓ | Pregled, Troškovi and Smjene only: Prihod and Troškovi without salaries, for Danas, Ova sedmica or Ovaj mjesec; never profit (D-80) | ✗ | BR-157, D-80 |
 | P-52 | Trainer statistics, shares, payouts | ✓ | ✗ | ✗ | BR-156 |
 | P-53 | Owner expense form (any category, incl. Plate and payouts) | ✓ | ✗ | ✗ | BR-133 |
 | P-54 | Manage expense categories | ✓ | ✗ | ✗ | BR-131 |
@@ -59,7 +59,7 @@
 | P-61 | Trainer fees, plan prices, share %, gym fixed amounts | ✓ | ✗ | ✗ | BR-026 |
 | P-62 | Plans (add, edit, deactivate) | ✓ | ✗ | ✗ | BR-004 |
 | P-63 | Gym settings: fees, minimum, reminder days, close time, double-scan seconds, report recipients, logo | ✓ | ✗ | ✗ | BR-012 |
-| P-64 | Generate and print card batches | ✓ | ✓ | ✗ | BR-036 |
+| P-64 | Generate and print card batches | ✓ | ✗ (D-81) | ✗ | BR-036, D-81 |
 | P-65 | Trainer roster (S-29): members per trainer and fixed class time, today's check-ins | ✓ | ✓ | ✓ | BR-027, D-72 |
 | P-66 | Membership amounts and the revenue total on S-29 | ✓ | ✗ | ✗ | BR-027, BR-157 |
 
@@ -75,6 +75,7 @@
    - `plan_finance`, `membership_finance` and `trainer_finance` hold them.
    - Owner reports are `security definer` functions that start with an owner check.
    - Managers and receptionists can never receive these values, even through the API directly.
+   - The one exception is D-80: `fin_summary`, `fin_income_breakdown`, `fin_expenses` and `fin_shifts` start with `assert_finance_period`, which also admits a manager for today, this week or this month, and then return income, non-salary expenses and shift totals only. Profit, bar profit, salaries, trainer shares and shift reports never reach a manager.
 3. **UI.**
    - Navigation and buttons are shown only when the role may use them.
    - Server components also check the role and return 404 for pages the role may not open.

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { notFound } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Table, TableWrapper, Td, Th } from "@/components/ui/table";
 import { MonthPicker } from "@/features/finance/components/month-picker";
@@ -53,13 +54,17 @@ function share(value: string | null, defined: boolean): string {
     : me.finance.undefinedShare;
 }
 
-/** S-18 (F-19). The finance layout has already refused every role but owner and admin. */
+/**
+ * S-18 (F-19). The finance layout has already refused the receptionist; trainer shares and
+ * payouts stay the owner's and the admin's (BR-156, D-80), so a manager gets 404 here.
+ */
 export default async function TrainersPage({
   searchParams,
 }: {
   searchParams: Promise<{ month?: string; trainer?: string }>;
 }) {
   const staff = await requireStaff();
+  if (staff.role !== "owner" && staff.role !== "admin") notFound();
   const params = await searchParams;
   const today = await gymToday(staff.gym_id);
   const month = monthFromParam(params.month, today);

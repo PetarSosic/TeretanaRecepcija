@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
@@ -42,7 +43,10 @@ type Person = { id: string; full_name: string };
 /** Doc 08 §9: one screenful of history at a time; the filters narrow it further. */
 const LIMIT = 200;
 
-/** S-21 (F-24). The layout has already refused every role but owner and admin. */
+/**
+ * S-21 (F-24). The layout has already refused the receptionist; the audit log stays the
+ * owner's and the admin's (P-56, D-80), so a manager gets 404 here.
+ */
 export default async function AuditPage({
   searchParams,
 }: {
@@ -55,6 +59,7 @@ export default async function AuditPage({
   }>;
 }) {
   const staff = await requireStaff();
+  if (staff.role !== "owner" && staff.role !== "admin") notFound();
   const params = await searchParams;
   const period = periodFromParams(params, await gymToday(staff.gym_id));
 

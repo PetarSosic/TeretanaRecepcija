@@ -337,10 +337,18 @@ test("PERM-01/02/03: the route matrix, member profile and shift screens included
         "/stats/visits",
         "/settings/users",
         "/settings/trainers",
-        "/settings/cards",
+        // D-80: Pregled, Troškovi and Smjene.
+        "/finance",
+        "/finance/expenses",
+        "/finance/shifts",
       ],
       [
-        ...FINANCE,
+        "/finance/trainers",
+        "/finance/storage",
+        "/finance/audit",
+        "/finance/backdated",
+        // D-81: no card printing.
+        "/settings/cards",
         "/settings/plans",
         "/settings/gym",
         "/shift/close",

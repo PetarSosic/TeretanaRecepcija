@@ -509,7 +509,7 @@ All RPCs are `security definer`. Each one:
 | `stock_sale(p_product, p_qty, p_method)` | all | BR-142 |
 | `correct_sale(p_movement, p_method)`, `void_stock_movement(p_movement, p_reason)` | per BR-094 and BR-095 | |
 | `backdated_visit(…)`, `backdated_membership(…, p_class_time time default null)`, `backdated_day_passes(…)`, `backdated_card_fee(…)` | owner | BR-120, BR-058a |
-| `generate_card_batch(p_qty)` → batch | owner, manager | BR-030, BR-036 |
+| `generate_card_batch(p_qty)` → batch | owner (D-81) | BR-030, BR-036 |
 | `upsert_trainer`, `upsert_program`, `set_trainer_program`, `upsert_class_slot` | owner, manager | BR-023–026 |
 | `set_trainer_fee(p_trainer, p_fee, p_group_share_pct)`, `upsert_plan` (incl. finance), `upsert_expense_category`, `update_gym_settings` | owner | BR-004, BR-131, BR-140, D-62 |
 | `upsert_product` | owner, manager (D-76) | BR-140, P-42 |
@@ -523,17 +523,19 @@ For managers, `shift_summary` must verify that the requested shift is the curren
 `stock_in` rejects a purchase price below €0.01 with `E_STOCK_COST_INVALID` before creating either the movement or its expense (BR-141, D-55).
 
 **Owner-only report functions** (`security definer`; each starts with `if my_role() <> 'owner' then raise`):
-- `fin_summary(p_from, p_to)`;
-- `fin_income_breakdown(p_from, p_to)`;
+- `fin_summary(p_from, p_to)` — also a manager (D-80), who gets only `income` and `expenses`, salary categories left out;
+- `fin_income_breakdown(p_from, p_to)` — also a manager (D-80), whose `by_category` leaves out salary categories;
 - `fin_chart(p_year, p_month default null)` — the S-16 chart (D-68): the year's twelve months, or the month's days, each with income and expenses, `null` after today; plus the totals and the first year that holds any money;
-- `fin_expenses(p_from, p_to, filters)`;
+- `fin_expenses(p_from, p_to, filters)` — also a manager (D-80), without salary-category rows;
 - `fin_trainer_stats(p_month date)`;
 - `fin_trainer_payments(p_trainer, p_month)`;
 - `fin_storage(p_from, p_to)`;
-- `fin_shifts(p_from, p_to)`;
+- `fin_shifts(p_from, p_to)` — also a manager (D-80), without `report_path`, `email_status`, `email_attempts` and `emailed_at`;
 - `fin_expiring(p_days)`;
 - `fin_unpaid_members()`;
 - `fin_roster_prices(p_memberships uuid[])` — the payment amount of each listed membership, for S-29's owner columns (BR-027, D-72).
+
+The four functions marked D-80 start with `assert_finance_period(p_from, p_to)` instead of the owner check. It admits the owner and the admin for any range, and a manager only for exactly today, this week (Monday to Sunday) or this month by `gym_today()`; anything else raises `E_FORBIDDEN`.
 
 **Statistics** (owner, manager): `visit_stats(p_from, p_to)`.
 
@@ -553,7 +555,7 @@ An `admin` reads every table in the list below on the same terms as an owner, an
 | trainers, programs, trainer_programs, class_slots, plans | own gym | own gym | own gym |
 | trainer_finance, plan_finance, membership_finance | ✓ | ✗ | ✗ |
 | staff_credentials | ✗ (admin only, D-59) | ✗ | ✗ |
-| members, cards, card_batches, memberships, visits | own gym | own gym | own gym (card_batches: ✗) |
+| members, cards, card_batches, memberships, visits | own gym | own gym (card_batches: ✗, D-81) | own gym (card_batches: ✗) |
 | payments | all | `paid_on = gym_today()` and not back-dated | same as manager |
 | stock_movements | all | local date = today | same as manager |
 | products | own gym | own gym | own gym |

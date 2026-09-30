@@ -14,6 +14,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { Label } from "@/components/ui/label";
 import { idleState } from "@/lib/action-state";
 import { me } from "@/lib/i18n/me";
@@ -42,10 +43,9 @@ export function LoginForm({ notice }: { notice?: string }) {
         </div>
         <div className="grid gap-1.5">
           <Label htmlFor="password">{me.login.password}</Label>
-          <Input
+          <PasswordInput
             id="password"
             name="password"
-            type="password"
             autoComplete="current-password"
             required
           />

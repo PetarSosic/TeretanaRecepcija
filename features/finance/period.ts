@@ -5,6 +5,7 @@
  * browser's or the server's own date. All arithmetic runs on the `yyyy-mm-dd` text at
  * UTC noon, so a daylight-saving change can never move a boundary by a day.
  */
+import type { AppRole } from "@/lib/auth";
 import { GYM_TIME_ZONE } from "@/lib/format";
 
 export const PERIOD_PRESETS = [
@@ -20,6 +21,21 @@ export type PeriodPreset = (typeof PERIOD_PRESETS)[number];
 export type Period = { preset: PeriodPreset; from: string; to: string };
 
 export const DEFAULT_PRESET: PeriodPreset = "month";
+
+/**
+ * D-80: the only periods a manager may ask the finance reports for. The database refuses
+ * a manager any other range (`assert_finance_period`), so the picker offers no other.
+ */
+export const MANAGER_PRESETS: readonly PeriodPreset[] = [
+  "today",
+  "week",
+  "month",
+];
+
+/** The presets a role's period picker offers on the finance screens. */
+export function presetsFor(role: AppRole): readonly PeriodPreset[] {
+  return role === "manager" ? MANAGER_PRESETS : PERIOD_PRESETS;
+}
 
 function utc(date: string): Date {
   return new Date(`${date}T12:00:00Z`);
@@ -120,13 +136,19 @@ export function periodInstants(
   };
 }
 
-/** The period a screen's search parameters ask for, falling back to Ovaj mjesec. */
+/**
+ * The period a screen's search parameters ask for, falling back to Ovaj mjesec — also
+ * when the preset is one the caller may not use (D-80).
+ */
 export function periodFromParams(
   params: { period?: string; from?: string; to?: string },
   today: string,
+  allowed: readonly PeriodPreset[] = PERIOD_PRESETS,
 ): Period {
   const preset =
-    params.period && isPreset(params.period) ? params.period : DEFAULT_PRESET;
+    params.period && isPreset(params.period) && allowed.includes(params.period)
+      ? params.period
+      : DEFAULT_PRESET;
   return resolvePeriod(preset, today, params.from, params.to);
 }
 

@@ -149,8 +149,8 @@ test("AS-5 and P-03: a manager cannot create an owner", async ({ page }) => {
   const ownerRow = page.getByRole("row", { name: owner.fullName });
   await expect(ownerRow.getByRole("button", { name: "Uredi" })).toHaveCount(0);
 
-  // P-51: finance stays owner-only.
-  await page.goto("/finance");
+  // P-51 (D-80): the manager reads Pregled, Troškovi and Smjene; the rest stays owner-only.
+  await page.goto("/finance/trainers");
   await expect(page.getByText("404")).toBeVisible();
 });
 

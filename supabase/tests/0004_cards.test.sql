@@ -87,9 +87,11 @@ select throws_ok(
 reset role;
 set local request.jwt.claims = '{"sub": "44444444-0000-0000-0000-00000000a002"}';
 set local role authenticated;
-select lives_ok(
+select throws_ok(
   $$select generate_card_batch(1)$$,
-  'P-64: a manager may generate a batch'
+  'P0001',
+  'E_FORBIDDEN',
+  'P-64 (D-81): a manager may not generate a batch'
 );
 
 reset role;

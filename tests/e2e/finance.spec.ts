@@ -9,7 +9,7 @@ import {
 } from "./fixtures";
 
 // M-12, doc 08 §10 flows 9 and 10: the owner's finance pages show the E9–E12 figures,
-// and a manager cannot reach any of them.
+// and a manager reaches only Pregled, Troškovi and Smjene (D-80).
 test.describe.configure({ mode: "serial" });
 
 const PASSWORD = "finansije12345";
@@ -411,9 +411,11 @@ test("US-18.1 and BR-133: the owner records an expense on a past day", async ({
   await expect(page.getByRole("cell", { name: "123,45 €" })).toBeVisible();
 });
 
-test("Flow 10: a manager and a receptionist cannot open any finance page", async ({
+test("Flow 10: a receptionist opens no finance page, a manager only three (D-80)", async ({
   page,
 }) => {
+  // D-80: the manager's Pregled, Troškovi and Smjene; everything else stays the owner's.
+  const managerPages = ["/finance", "/finance/expenses", "/finance/shifts"];
   for (const staff of [manager, receptionist]) {
     await signIn(page, staff);
     for (const path of [
@@ -426,6 +428,13 @@ test("Flow 10: a manager and a receptionist cannot open any finance page", async
       "/finance/backdated",
     ]) {
       await page.goto(path);
+      if (staff === manager && managerPages.includes(path)) {
+        await expect(
+          page.getByRole("heading", { name: "Finansije" }),
+          `${staff.identifier} on ${path}`,
+        ).toBeVisible();
+        continue;
+      }
       await expect(
         page.getByText("404", { exact: false }).first(),
         `${staff.identifier} on ${path}`,

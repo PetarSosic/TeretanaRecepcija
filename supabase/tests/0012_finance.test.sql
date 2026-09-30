@@ -408,12 +408,14 @@ select is(
   423.00::numeric, 'BR-120: but finance counts the €20.00 of back-dated day passes');
 
 -- BR-157: none of this is a manager's or a receptionist's ------------------------------
+-- D-80 lets a manager read today, this week and this month (0019_manager_finance); the
+-- fixture month is last month, which stays out of their reach.
 reset role;
 set local request.jwt.claims = '{"sub": "cccccccc-0000-0000-0000-00000000a002"}';
 set local role authenticated;
 select throws_ok(
-  $$select fin_summary(current_date, current_date)$$,
-  'E_FORBIDDEN', 'BR-157: a manager gets nothing from fin_summary');
+  $$select fin_summary((select first from fin_month), (select last from fin_chart_month))$$,
+  'E_FORBIDDEN', 'BR-157 (D-80): a manager gets nothing of last month from fin_summary');
 select throws_ok(
   $$select fin_trainer_stats(current_date)$$,
   'E_FORBIDDEN', 'BR-157: nor from fin_trainer_stats');
@@ -421,8 +423,8 @@ select throws_ok(
   $$select fin_chart(2026)$$,
   'E_FORBIDDEN', 'BR-157: nor from fin_chart (D-68)');
 select throws_ok(
-  $$select fin_expenses(current_date, current_date)$$,
-  'E_FORBIDDEN', 'BR-157: nor from fin_expenses');
+  $$select fin_expenses((select first from fin_month), (select last from fin_chart_month))$$,
+  'E_FORBIDDEN', 'BR-157 (D-80): nor from fin_expenses');
 select throws_ok(
   $$select record_expense('cccccccc-0000-0000-0000-000000060001', 'pgTAP', 10,
                           current_date, 'cash', false, null, null, null, null)$$,

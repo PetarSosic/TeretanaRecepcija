@@ -6,7 +6,7 @@ import {
   type StaffOption,
   type Trainer,
 } from "@/features/finance/components/expenses-screen";
-import { periodFromParams } from "@/features/finance/period";
+import { periodFromParams, presetsFor } from "@/features/finance/period";
 import type { Category } from "@/features/settings/components/categories-section";
 import { requireStaff } from "@/lib/auth";
 import { gymToday } from "@/lib/gym-date";
@@ -17,7 +17,10 @@ export const metadata: Metadata = {
   title: `${me.finance.expensesTitle} — ${me.app.name}`,
 };
 
-/** S-17 (F-18). The finance layout has already refused every role but owner and admin. */
+/**
+ * S-17 (F-18). The finance layout has already refused the receptionist. D-80: a manager
+ * reads the non-salary expenses of Danas, Ova sedmica or Ovaj mjesec, and changes nothing.
+ */
 export default async function ExpensesPage({
   searchParams,
 }: {
@@ -35,7 +38,9 @@ export default async function ExpensesPage({
   const staff = await requireStaff();
   const params = await searchParams;
   const today = await gymToday(staff.gym_id);
-  const period = periodFromParams(params, today);
+  const presets = presetsFor(staff.role);
+  const period = periodFromParams(params, today, presets);
+  const readOnly = staff.role === "manager";
 
   const filters = {
     categoryId: params.categoryId ?? "",
@@ -70,11 +75,14 @@ export default async function ExpensesPage({
       .returns<StaffOption[]>(),
   ]);
 
-  const categoryList = categories.data ?? [];
+  // D-80: a manager is never offered a salary category (RLS already hides them).
+  const categoryList = (categories.data ?? []).filter(
+    (category) => !readOnly || !category.is_salary,
+  );
   // US-19.1 AC2: S-18 sends the payout here with the salary category already chosen.
   const salary = categoryList.find((category) => category.is_salary);
   const prefill =
-    params.payoutTrainer && params.payoutAmount && salary
+    !readOnly && params.payoutTrainer && params.payoutAmount && salary
       ? {
           categoryId: salary.id,
           trainerId: params.payoutTrainer,
@@ -86,7 +94,7 @@ export default async function ExpensesPage({
 
   return (
     <div className="grid grid-cols-1 gap-6">
-      <PeriodPicker period={period} />
+      <PeriodPicker period={period} presets={presets} />
       <ExpensesScreen
         rows={(expenses.data as ExpenseRow[] | null) ?? []}
         categories={categoryList}
@@ -96,6 +104,7 @@ export default async function ExpensesPage({
         period={period}
         today={today}
         prefill={prefill}
+        readOnly={readOnly}
       />
     </div>
   );

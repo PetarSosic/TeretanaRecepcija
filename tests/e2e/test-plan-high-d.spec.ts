@@ -375,7 +375,8 @@ test("STO-09 (E18): a stock-in that was sold cannot be voided; one that can take
 test("CARD-02 and CARD-03: batch size bounds; the sheet PDF and its codes", async ({
   page,
 }) => {
-  await signIn(page, staff.manager);
+  // D-81: card printing is the owner's.
+  await signIn(page, staff.owner);
   await page.goto("/settings/cards");
   const quantity = page.getByLabel("Broj kartica (1–100)");
   const generate = page.getByRole("button", { name: "Generiši" });

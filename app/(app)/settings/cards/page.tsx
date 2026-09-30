@@ -12,10 +12,10 @@ export const metadata: Metadata = {
   title: `${me.cards.title} — ${me.app.name}`,
 };
 
-// S-28. P-64: owners, managers and admins; RLS hides batches from receptionists too.
+// S-28. P-64 (D-81): owners and admins only; RLS hides the batches from everyone else too.
 export default async function CardsPage() {
   const staff = await requireStaff();
-  if (staff.role === "receptionist") notFound();
+  if (staff.role !== "owner" && staff.role !== "admin") notFound();
 
   const supabase = await createClient();
   const [batches, cards] = await Promise.all([

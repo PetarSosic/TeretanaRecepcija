@@ -108,7 +108,7 @@ Every rule has an ID. Code comments and tests must reference these IDs, e.g. `//
 
   It requires an open shift (BR-092). Voiding the fee payment later does not reactivate the old card.
 - **BR-035:** A returning former member keeps their member number and active card. If they no longer have the card, BR-034 applies.
-- **BR-036 (printing):** owners and managers generate batches of 1–100 unassigned cards and download a print PDF. The layout is in doc 06 (S-28).
+- **BR-036 (printing):** owners and admins generate batches of 1–100 unassigned cards and download a print PDF. The layout is in doc 06 (S-28). A manager does not (D-81).
 
 ## 5. Members
 - **BR-040 (required fields):**
@@ -355,7 +355,7 @@ Every rule has an ID. Code comments and tests must reference these IDs, e.g. `//
   - `till_expenses` = expenses with `paid_from_till = true`;
   - `expected_cash` = `cash_income − till_expenses`;
   - `difference` = `counted_cash − expected_cash`. Negative is shown as "Manjak", positive as "Višak". Not shown when the cash was not counted.
-  - Managers may read the currently open shift's `cash_income`, `card_income`, `till_expenses` and `expected_cash` (D-54). This grants aggregate totals only; expense details still follow BR-134, and closed-shift reports remain owner-only.
+  - Managers may read the currently open shift's `cash_income`, `card_income`, `till_expenses` and `expected_cash` (D-54). This grants aggregate totals only; expense details still follow BR-134, and closed-shift reports remain owner-only. D-80 lets a manager list the shifts of today, this week or this month on S-19, with their totals but without the report PDF or its email status.
 - **BR-116 (automatic close):**
   - At the automatic close time (default 23:00), after BR-082, the open shift is closed with `close_type = 'auto'` and no counted cash.
   - The report states: `Automatski zaključeno u 23:00 – gotovina nije prebrojana.`
@@ -383,7 +383,7 @@ Every rule has an ID. Code comments and tests must reference these IDs, e.g. `//
 - **BR-118 (email failure):**
   - The shift stays closed and `email_status = 'failed'`.
   - The system retries every 15 minutes, up to 5 attempts in total.
-  - The owner sees the status on S-19 and can press [Pošalji ponovo].
+  - The owner sees the status on S-19 and can press [Pošalji ponovo]. A manager sees neither (D-80).
 - **BR-119:** No idle timeout. Sessions end only on logout, shift close, or an automatic close (receptionists).
 
 ## 11. Back-dated entries
@@ -429,7 +429,7 @@ Every rule has an ID. Code comments and tests must reference these IDs, e.g. `//
 | VAT included | Optional: Da / Ne / not set |
 | Trainer | Only for a salary category, optional. Marks the expense as a payout to that trainer. |
 
-- **BR-134:** Managers and receptionists see only the expenses **they** created **today**. The owner sees all.
+- **BR-134:** Managers and receptionists see only the expenses **they** created **today**. The owner sees all. D-80 adds one view for a manager: S-17 lists every expense of today, this week or this month **except salary categories**, read-only.
 - **BR-135:** An expense void requires a reason. The owner can void any expense; others only their own records of the open shift (AS-14).
 
 ## 13. Magacin (bar storage)
@@ -470,7 +470,7 @@ Every rule has an ID. Code comments and tests must reference these IDs, e.g. `//
 - **BR-143:** Stock level = Σ stock-in − Σ sales (non-voided). There is no opening stock; the first stock-in creates it.
 - **BR-144:** Managers and receptionists see product, stock level, purchase price and sale price. They never see stock value, profit, or totals over more than today.
 
-## 14. Finance calculations (owner only)
+## 14. Finance calculations (owner only, except D-80)
 - **BR-150:** Income for a period = non-voided payments by `paid_on` + non-voided sales by local date.
 - **BR-151:** Expenses for a period = non-voided expenses by `spent_on`. This includes automatic stock-in expenses and trainer payouts.
 - **BR-152:** Profit = income − expenses. Bar purchase costs are counted **once**, through the stock-in expenses.
@@ -499,7 +499,7 @@ Every rule has an ID. Code comments and tests must reference these IDs, e.g. `//
 | Isplaćeno | Sum of non-voided salary-category expenses with this trainer in that month |
 | Razlika | Za isplatu − Isplaćeno |
 
-- **BR-157:** No value from §14 is ever returned to managers or receptionists.
+- **BR-157:** No value from §14 is ever returned to managers or receptionists, with one exception (D-80): a manager receives BR-150 income and BR-151 expenses **without salary categories**, for today, this week or this month only. BR-152 profit, BR-153 bar profit and BR-154 to BR-156 never reach a manager.
 
 ## 15. Notifications and jobs
 - **BR-160 (expiry reminder email):**

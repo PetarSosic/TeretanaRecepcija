@@ -21,7 +21,7 @@ export type Batch = {
   unassigned: number;
 };
 
-/** S-28. P-64: owners, managers and admins generate and print card batches. */
+/** S-28. P-64 (D-81): owners and admins generate and print card batches. */
 export function CardsScreen({ batches }: { batches: Batch[] }) {
   const [state, action, pending] = useActionState(generateCardBatch, idleState);
   useActionToast(state);

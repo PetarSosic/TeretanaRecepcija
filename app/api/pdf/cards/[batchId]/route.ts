@@ -5,14 +5,14 @@ import { gymDateOf } from "@/lib/format";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 
-// Doc 08 §3: the card sheet download. P-64 limits it to owners, managers and admins,
-// and RLS limits the batch to their own gym.
+// Doc 08 §3: the card sheet download. P-64 (D-81) limits it to owners and admins, and
+// RLS limits the batch to their own gym.
 export async function GET(
   _request: NextRequest,
   { params }: { params: Promise<{ batchId: string }> },
 ) {
   const staff = await getStaff();
-  if (!staff || staff.role === "receptionist")
+  if (!staff || (staff.role !== "owner" && staff.role !== "admin"))
     return new NextResponse(null, { status: 404 });
 
   const { batchId } = await params;

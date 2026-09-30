@@ -418,10 +418,11 @@ test("PERM-04: each role's menu lists only what it may open", async ({
     settings: [],
   });
 
+  // D-80: the manager has Finansije; D-81: but no Kartice to print.
   const manager = await signedIn(browser, staff.manager);
   expect(await menuItems(manager)).toEqual({
-    top: [...desk, "Statistika dolazaka", "Podešavanja"],
-    settings: ["Korisnici", "Treneri i raspored", "Kartice"],
+    top: [...desk, "Statistika dolazaka", "Finansije", "Podešavanja"],
+    settings: ["Korisnici", "Treneri i raspored"],
   });
 
   for (const who of [staff.owner, staff.admin]) {

@@ -15,6 +15,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
 import { Table, TableWrapper, Td, Th } from "@/components/ui/table";
@@ -331,10 +332,9 @@ function CreateForm({
       )}
       <div className="grid gap-1.5">
         <Label htmlFor="password">{me.users.temporaryPassword}</Label>
-        <Input
+        <PasswordInput
           id="password"
           name="password"
-          type="password"
           minLength={8}
           required
           autoComplete="new-password"
@@ -454,10 +454,9 @@ function PasswordForm({
       <input type="hidden" name="staffId" value={row.id} />
       <div className="grid gap-1.5">
         <Label htmlFor="new-password">{me.users.temporaryPassword}</Label>
-        <Input
+        <PasswordInput
           id="new-password"
           name="password"
-          type="password"
           minLength={8}
           required
           autoComplete="new-password"

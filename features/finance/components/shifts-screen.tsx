@@ -32,10 +32,11 @@ export type ShiftRow = {
   closed_by_name: string | null;
   /** Decimal text, as numeric(10,2) arrives (BR-003). */
   counted_cash: string | null;
-  report_path: string | null;
-  email_status: "not_sent" | "pending" | "sent" | "failed";
-  email_attempts: number;
-  emailed_at: string | null;
+  /** D-80: `fin_shifts` sends a manager none of the four below. */
+  report_path?: string | null;
+  email_status?: "not_sent" | "pending" | "sent" | "failed";
+  email_attempts?: number;
+  emailed_at?: string | null;
   cash_income: string;
   card_income: string;
   till_expenses: string;
@@ -57,8 +58,18 @@ const EMAIL_STATUS: Record<string, string> = {
   pending: me.finance.emailPending,
 };
 
-/** S-19 (F-16 for the owner): the shifts of the period, and the open one on top. */
-export function ShiftsScreen({ rows }: { rows: ShiftRow[] }) {
+/**
+ * S-19 (F-16 for the owner): the shifts of the period, and the open one on top.
+ * D-80: `readOnly` is the manager's view — no email status, [PDF], [Pošalji ponovo]
+ * or [Zaključi smjenu] (BR-118, P-12, D-81).
+ */
+export function ShiftsScreen({
+  rows,
+  readOnly = false,
+}: {
+  rows: ShiftRow[];
+  readOnly?: boolean;
+}) {
   const [closing, setClosing] = useState<ShiftRow | null>(null);
   const open = rows.find((row) => row.closed_at === null);
   const closed = rows.filter((row) => row.closed_at !== null);
@@ -79,9 +90,11 @@ export function ShiftsScreen({ rows }: { rows: ShiftRow[] }) {
                 {me.finance.expected}: {formatMoney(open.expected_cash)}
               </p>
             </div>
-            <Button onClick={() => setClosing(open)}>
-              {me.finance.closeShift}
-            </Button>
+            {readOnly ? null : (
+              <Button onClick={() => setClosing(open)}>
+                {me.finance.closeShift}
+              </Button>
+            )}
           </CardContent>
         </Card>
       ) : null}
@@ -104,10 +117,14 @@ export function ShiftsScreen({ rows }: { rows: ShiftRow[] }) {
                 <Th className="text-right">{me.finance.expected}</Th>
                 <Th className="text-right">{me.finance.counted}</Th>
                 <Th className="text-right">{me.finance.difference}</Th>
-                <Th>{me.finance.emailStatus}</Th>
-                <Th>
-                  <span className="sr-only">{me.users.actions}</span>
-                </Th>
+                {readOnly ? null : (
+                  <>
+                    <Th>{me.finance.emailStatus}</Th>
+                    <Th>
+                      <span className="sr-only">{me.users.actions}</span>
+                    </Th>
+                  </>
+                )}
               </tr>
             </thead>
             <tbody>
@@ -147,28 +164,32 @@ export function ShiftsScreen({ rows }: { rows: ShiftRow[] }) {
                       ? "—"
                       : formatMoney(row.difference)}
                   </Td>
-                  <Td>
-                    {EMAIL_STATUS[row.email_status]}
-                    {row.email_attempts > 0 ? (
-                      <span className="block text-xs text-muted-foreground">
-                        {row.email_attempts}×
-                      </span>
-                    ) : null}
-                  </Td>
-                  <Td>
-                    <div className="flex justify-end gap-2">
-                      {row.report_path ? (
-                        <Button asChild variant="outline" size="sm">
-                          <a href={`/api/pdf/shift/${row.id}`}>
-                            {me.finance.downloadPdf}
-                          </a>
-                        </Button>
-                      ) : null}
-                      {row.email_status !== "sent" ? (
-                        <ResendButton shiftId={row.id} />
-                      ) : null}
-                    </div>
-                  </Td>
+                  {readOnly ? null : (
+                    <>
+                      <Td>
+                        {EMAIL_STATUS[row.email_status ?? "not_sent"]}
+                        {row.email_attempts ? (
+                          <span className="block text-xs text-muted-foreground">
+                            {row.email_attempts}×
+                          </span>
+                        ) : null}
+                      </Td>
+                      <Td>
+                        <div className="flex justify-end gap-2">
+                          {row.report_path ? (
+                            <Button asChild variant="outline" size="sm">
+                              <a href={`/api/pdf/shift/${row.id}`}>
+                                {me.finance.downloadPdf}
+                              </a>
+                            </Button>
+                          ) : null}
+                          {row.email_status !== "sent" ? (
+                            <ResendButton shiftId={row.id} />
+                          ) : null}
+                        </div>
+                      </Td>
+                    </>
+                  )}
                 </tr>
               ))}
             </tbody>

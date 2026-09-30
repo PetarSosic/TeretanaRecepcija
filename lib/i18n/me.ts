@@ -73,6 +73,9 @@ export const me = {
     mismatch: "Lozinke se ne poklapaju.",
     tooShort: "Lozinka mora imati najmanje 8 znakova.",
     wrongCurrent: "Trenutna lozinka nije tačna.",
+    // D-82: the eye button inside every password field.
+    show: "Prikaži lozinku",
+    hide: "Sakrij lozinku",
   },
   account: {
     changePassword: "Promijeni lozinku",

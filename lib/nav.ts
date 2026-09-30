@@ -27,7 +27,8 @@ const ITEMS: readonly NavItem[] = [
   { label: me.nav.storage, href: "/storage", roles: ALL },
   { label: me.nav.closeShift, href: "/shift/close", roles: ["receptionist"] },
   { label: me.nav.visitStats, href: "/stats/visits", roles: STAFF_ABOVE_DESK },
-  { label: me.nav.finance, href: "/finance", roles: OWNERS },
+  // D-80: the manager has Pregled, Troškovi and Smjene under it.
+  { label: me.nav.finance, href: "/finance", roles: STAFF_ABOVE_DESK },
   {
     label: me.nav.settings,
     href: "/settings",
@@ -40,7 +41,8 @@ const ITEMS: readonly NavItem[] = [
         href: "/settings/trainers",
         roles: STAFF_ABOVE_DESK,
       },
-      { label: me.nav.cards, href: "/settings/cards", roles: STAFF_ABOVE_DESK },
+      // D-81: printing cards is a PDF download, and a manager downloads none.
+      { label: me.nav.cards, href: "/settings/cards", roles: OWNERS },
       { label: me.settings.plansTitle, href: "/settings/plans", roles: OWNERS },
       // D-76: Proizvodi is gone; products are added and edited on Magacin.
       { label: me.settings.gymTitle, href: "/settings/gym", roles: OWNERS },

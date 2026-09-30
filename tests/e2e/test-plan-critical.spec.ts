@@ -482,14 +482,15 @@ test("PERM-13: a replayed owner-only server action is refused for a manager", as
   const afterOwner = await expenseCount();
   expect(afterOwner).toBe(1);
 
+  // D-80: a manager reads S-17 but is offered no owner expense form (BR-133).
   const manager = await signedIn(browser, staff.manager);
-  const page = await manager.goto("/finance/expenses");
+  await manager.goto("/finance/expenses");
   await expect(
-    manager.getByText("404", { exact: false }).first(),
+    manager.getByRole("heading", { name: "Troškovi" }),
   ).toBeVisible();
-  console.log(
-    `[note] PERM-13 manager GET /finance/expenses HTTP ${page?.status()}`,
-  );
+  await expect(
+    manager.getByRole("button", { name: "Novi trošak" }),
+  ).toHaveCount(0);
 
   const headers = Object.fromEntries(
     Object.entries(action.headers()).filter(

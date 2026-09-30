@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import { PeriodPicker } from "@/features/finance/components/period-picker";
 import {
   StorageReport,
@@ -22,13 +23,17 @@ type Report = {
   stock_ins: StockInRow[];
 };
 
-/** S-20 (F-15 for the owner). The layout has already refused every other role. */
+/**
+ * S-20 (F-15 for the owner). The layout has already refused the receptionist; stock value
+ * and bar profit stay the owner's and the admin's (BR-144, D-80), so a manager gets 404.
+ */
 export default async function StorageReportPage({
   searchParams,
 }: {
   searchParams: Promise<{ period?: string; from?: string; to?: string }>;
 }) {
   const staff = await requireStaff();
+  if (staff.role !== "owner" && staff.role !== "admin") notFound();
   const period = periodFromParams(
     await searchParams,
     await gymToday(staff.gym_id),

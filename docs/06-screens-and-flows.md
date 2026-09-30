@@ -29,8 +29,8 @@ Routes are in English; every visible text is in Montenegrin (ijekavica). Text in
 | Magacin | `/storage` | ✓ (adds and edits products, D-76) | ✓ (adds and edits products, D-76) | ✓ |
 | Zaključi smjenu | `/shift/close` | ✗ | ✗ | ✓ |
 | Statistika dolazaka | `/stats/visits` | ✓ | ✓ | ✗ |
-| Finansije | `/finance/*` | ✓ | ✗ | ✗ |
-| Podešavanja | `/settings/*` | ✓ (all) | ✓ (Korisnici, Treneri i raspored, Kartice) | ✗ |
+| Finansije | `/finance/*` | ✓ | ✓ (Pregled, Troškovi, Smjene; D-80) | ✗ |
+| Podešavanja | `/settings/*` | ✓ (all) | ✓ (Korisnici, Treneri i raspored; D-81) | ✗ |
 
 The Podešavanja item for S-24 is labelled `Treneri i raspored`, the screen's title, so it is not confused with the top-level `Treneri` (S-29, D-72). Podešavanja has no `Proizvodi` item any more: products are added and edited on Magacin (D-76).
 
@@ -42,13 +42,14 @@ An `admin` sees everything an owner sees (D-58).
 
 ## S-01 Login — `/login`
 - **Fields:** `Korisničko ime ili email`, `Lozinka`.
+- **Show password (D-82):** every password field on every screen has an eye button at its right edge, labelled `Prikaži lozinku`, which shows the typed text and becomes `Sakrij lozinku`.
 - **Buttons:** [Prijavi se], and a link `Zaboravljena lozinka?`.
 - **Errors:** as in US-01.1 and US-01.2. A locked login or address shows `Previše neuspješnih pokušaja prijave. Pokušajte ponovo za <N> min.` (US-01.1 AC6, AC7, D-75).
 - **After login:** a receptionist goes through the shift logic (BR-111), which leads to S-02 or `/reception`.
 - **Info messages:** `?closed=1` shows `Smjena je zaključena.`; `?auto=1` shows `Smjena je automatski zaključena.`
 
 ### S-01b First-login password change — `/change-password`
-- **Fields:** `Nova lozinka`, `Ponovi lozinku` (≥ 8 characters, must match).
+- **Fields:** `Nova lozinka`, `Ponovi lozinku` (≥ 8 characters, must match), each with the D-82 eye button.
 - **Button:** [Sačuvaj].
 - **Access:** blocks every other route until the password is saved.
 - **Opened by:** the first login with a temporary password (`Prijavili ste se privremenom lozinkom. Postavite novu lozinku da nastavite.`) or the password-reset link, as `/change-password?reset=1` (`Otvorili ste link za novu lozinku. Postavite novu lozinku da nastavite.`, D-69).
@@ -216,12 +217,17 @@ An `admin` sees everything an owner sees (D-58).
   - Ističe u narednih 7 dana (members with a membership expiring in the next 7 days);
   - Članovi sa neplaćenim dolascima (members with unpaid visits).
 - **Sub-navigation:** Pregled · Troškovi · Treneri · Smjene · Magacin · Naknadni unos · Dnevnik izmjena.
+- **Manager (D-80):**
+  - the sub-navigation is only Pregled · Troškovi · Smjene; the other tabs answer 404;
+  - the period offers only `Danas`, `Ova sedmica` and `Ovaj mjesec`; any other period in the URL falls back to `Ovaj mjesec`;
+  - Pregled shows only the Prihod and Troškovi cards and the three tables by plan, by method and by category. Troškovi leave out salary categories. There is no chart and no Ističe or Neplaćeni list.
 
 ## S-17 Expenses — `/finance/expenses` (owner)
 - **Controls:** filters and [Novi trošak] (the BR-133 form).
 - **Total (D-63):** `Ukupno: <iznos>` above the table, for the listed expenses without the voided ones; when voided rows are listed, the note `Poništeni troškovi nisu uračunati.`
 - **Table:** Datum, Kategorija, Opis, Dobavljač, Račun, Način, Iz kase, Iznos, Unio/la, and actions.
 - **Button:** [Kategorije troškova] opens a dialog listing categories with inline rename, active toggle and [Dodaj].
+- **Manager (D-80):** read-only, with the D-80 periods. Salary-category expenses are not listed and not offered in the category filter. There is no [Novi trošak], [Kategorije troškova] or [Poništi].
 
 ## S-18 Trainers — `/finance/trainers` (owner)
 - **Controls:** a month selector (default: current month).
@@ -231,6 +237,7 @@ An `admin` sees everything an owner sees (D-58).
 ## S-19 Shifts — `/finance/shifts` (owner)
 - **Table:** Recepcioner, Početak, Kraj, Način zaključenja, Gotovina, Kartica, Očekivano, Prebrojano, Razlika, Email status, and actions [PDF] [Pošalji ponovo].
 - **Open shift:** shown on top, with [Zaključi smjenu] (BR-114).
+- **Manager (D-80):** the D-80 periods; no Email status column, no [PDF], no [Pošalji ponovo], and the open shift without [Zaključi smjenu] (P-12).
 
 ## S-20 Storage report — `/finance/storage` (owner)
 - **Per product:** stanje, vrijednost zalihe, and for the period: prodato kom, prihod, nabavna vrijednost prodatog, zarada.
@@ -256,7 +263,7 @@ An `admin` sees everything an owner sees (D-58).
 - **Admin only (D-59):** one more column, `Lozinka`, showing each account's stored password. Each row hides it behind a [Prikaži] toggle so the screen cannot be read over someone's shoulder, and it is never rendered for any other role.
 - **Locked login (D-75):** a login locked after failed sign-ins shows `Zaključan do <HH:mm>` in red under Aktivan, for every role that sees S-23. The owner and the admin also get [Otključaj] on that row (P-08), which shows `Nalog je otključan.`
 - **Actions:** [Novi korisnik] [Uredi] [Nova lozinka] [Otključaj] [Deaktiviraj/Aktiviraj], limited per P-03, P-04, P-07 and P-08. A row the caller may not manage shows no actions, and [Deaktiviraj] is not offered for the caller's own row or for the last active owner or admin.
-- **New user form:** Uloga, Ime i prezime, Korisničko ime, Privremena lozinka. The Administrator role asks for Email instead of Korisničko ime (D-57), and only an admin may choose Vlasnik or Administrator.
+- **New user form:** Uloga, Ime i prezime, Korisničko ime, Privremena lozinka. The Administrator role asks for Email instead of Korisničko ime (D-57), and only an admin may choose Vlasnik or Administrator. Privremena lozinka here and in [Nova lozinka] has the D-82 eye button.
 
 ## S-24 Trainers and schedule — `/settings/trainers` (owner, manager)
 **Sections:**
@@ -286,7 +293,7 @@ The screen `/settings/products` and its Podešavanja item are gone. It showed th
 
 **Read-only info:** `Posljednja rezervna kopija: <dd.mm.yyyy HH:mm> – uspješno` (or `– neuspješno: <greška>`, or `Još nije napravljena`).
 
-## S-28 Cards — `/settings/cards` (owner, manager)
+## S-28 Cards — `/settings/cards` (owner; D-81)
 - **Form:** `Broj kartica (1–100)` and [Generiši].
 - **Batch list:** as in US-03.1.
 

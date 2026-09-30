@@ -717,13 +717,14 @@ test("PERM-07: payment history on the profile — the desk sees today, the owner
   await owner.context().close();
 });
 
-test("PERM-10: the card sheet PDF opens for owner, admin and manager, 404 for the desk", async ({
+test("PERM-10: the card sheet PDF opens for owner and admin, 404 for manager and desk", async ({
   browser,
 }) => {
   for (const [who, allowed] of [
     [staff.owner, true],
     [staff.admin, true],
-    [staff.manager, true],
+    // D-81: a manager downloads no PDF.
+    [staff.manager, false],
     [staff.ana, false],
   ] as const) {
     const page = await signedIn(browser, who);

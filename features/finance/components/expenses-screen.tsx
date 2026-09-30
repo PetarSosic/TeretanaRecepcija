@@ -65,7 +65,10 @@ const METHOD_LABELS: Record<string, string> = {
   none: me.finance.methodNone,
 };
 
-/** S-17 (F-18): every expense of the period, the BR-133 form, and the BR-131 categories. */
+/**
+ * S-17 (F-18): every expense of the period, the BR-133 form, and the BR-131 categories.
+ * D-80: `readOnly` is the manager's view — the list, its filters and its total only.
+ */
 export function ExpensesScreen({
   rows,
   categories,
@@ -75,6 +78,7 @@ export function ExpensesScreen({
   period,
   today,
   prefill,
+  readOnly = false,
 }: {
   rows: ExpenseRow[];
   categories: Category[];
@@ -92,6 +96,8 @@ export function ExpensesScreen({
     amount: string;
     description: string;
   };
+  /** D-80: no [Novi trošak], [Kategorije troškova] or [Poništi]. */
+  readOnly?: boolean;
 }) {
   const [creating, setCreating] = useState(Boolean(prefill));
   const [managing, setManaging] = useState(false);
@@ -107,14 +113,16 @@ export function ExpensesScreen({
     <div className="grid gap-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h2 className="text-lg font-semibold">{me.finance.expensesTitle}</h2>
-        <div className="flex flex-wrap gap-2">
-          <Button variant="outline" onClick={() => setManaging(true)}>
-            {me.finance.editCategories}
-          </Button>
-          <Button onClick={() => setCreating(true)}>
-            {me.finance.newExpense}
-          </Button>
-        </div>
+        {readOnly ? null : (
+          <div className="flex flex-wrap gap-2">
+            <Button variant="outline" onClick={() => setManaging(true)}>
+              {me.finance.editCategories}
+            </Button>
+            <Button onClick={() => setCreating(true)}>
+              {me.finance.newExpense}
+            </Button>
+          </div>
+        )}
       </div>
 
       <Filters
@@ -153,9 +161,11 @@ export function ExpensesScreen({
                 <Th>{me.finance.fromTill}</Th>
                 <Th className="text-right">{me.finance.amount}</Th>
                 <Th>{me.finance.enteredBy}</Th>
-                <Th>
-                  <span className="sr-only">{me.users.actions}</span>
-                </Th>
+                {readOnly ? null : (
+                  <Th>
+                    <span className="sr-only">{me.users.actions}</span>
+                  </Th>
+                )}
               </tr>
             </thead>
             <tbody>
@@ -195,18 +205,20 @@ export function ExpensesScreen({
                     {formatMoney(row.amount)}
                   </Td>
                   <Td>{row.created_by_name}</Td>
-                  <Td className="text-right">
-                    {/* BR-135: a stock-in expense is voided with its movement (S-20). */}
-                    {!row.voided_at && !row.stock_movement_id ? (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setVoiding(row)}
-                      >
-                        {me.payments.void}
-                      </Button>
-                    ) : null}
-                  </Td>
+                  {readOnly ? null : (
+                    <Td className="text-right">
+                      {/* BR-135: a stock-in expense is voided with its movement (S-20). */}
+                      {!row.voided_at && !row.stock_movement_id ? (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setVoiding(row)}
+                        >
+                          {me.payments.void}
+                        </Button>
+                      ) : null}
+                    </Td>
+                  )}
                 </tr>
               ))}
             </tbody>
@@ -214,26 +226,30 @@ export function ExpensesScreen({
         </TableWrapper>
       )}
 
-      <ExpenseDialog
-        open={creating}
-        onOpenChange={setCreating}
-        categories={categories}
-        trainers={trainers}
-        today={today}
-        prefill={prefill}
-      />
+      {readOnly ? null : (
+        <>
+          <ExpenseDialog
+            open={creating}
+            onOpenChange={setCreating}
+            categories={categories}
+            trainers={trainers}
+            today={today}
+            prefill={prefill}
+          />
 
-      <Dialog open={managing} onOpenChange={setManaging}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>{me.finance.editCategories}</DialogTitle>
-            <DialogDescription>{me.settings.categories}</DialogDescription>
-          </DialogHeader>
-          <CategoriesSection categories={categories} heading={false} />
-        </DialogContent>
-      </Dialog>
+          <Dialog open={managing} onOpenChange={setManaging}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>{me.finance.editCategories}</DialogTitle>
+                <DialogDescription>{me.settings.categories}</DialogDescription>
+              </DialogHeader>
+              <CategoriesSection categories={categories} heading={false} />
+            </DialogContent>
+          </Dialog>
 
-      <VoidDialog expense={voiding} onDone={() => setVoiding(null)} />
+          <VoidDialog expense={voiding} onDone={() => setVoiding(null)} />
+        </>
+      )}
     </div>
   );
 }

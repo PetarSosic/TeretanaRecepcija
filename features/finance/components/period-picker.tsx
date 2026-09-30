@@ -21,9 +21,15 @@ const LABELS: Record<PeriodPreset, string> = {
 /**
  * US-17.1 AC1: the shared period control. The choice lives in the URL, so a period
  * survives a reload and can be sent to someone else, and every screen under /finance
- * reads it the same way.
+ * reads it the same way. D-80: a manager's picker offers only `MANAGER_PRESETS`.
  */
-export function PeriodPicker({ period }: { period: Period }) {
+export function PeriodPicker({
+  period,
+  presets = PERIOD_PRESETS,
+}: {
+  period: Period;
+  presets?: readonly PeriodPreset[];
+}) {
   const router = useRouter();
   const pathname = usePathname();
   const params = useSearchParams();
@@ -63,7 +69,7 @@ export function PeriodPicker({ period }: { period: Period }) {
             if (value !== "custom") go({ preset: value });
           }}
         >
-          {PERIOD_PRESETS.map((value) => (
+          {presets.map((value) => (
             <option key={value} value={value}>
               {LABELS[value]}
             </option>

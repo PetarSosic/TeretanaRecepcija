@@ -13,6 +13,7 @@ All features are **MVP**. Acceptance criteria (AC) are written so each one can b
 - AC5: Every role signs in this way. Only the admin, and the seeded owner account, sign in with an email (D-57).
 - AC6: After 5 failed sign-ins in a row for the same username or email (within 15 minutes, with no successful sign-in between), that login is locked for 15 minutes (D-75). While it is locked, every attempt shows `Previše neuspješnih pokušaja prijave. Pokušajte ponovo za <N> min.`, and the password is not checked at all, so even the right one is refused. A username or email that belongs to nobody is counted and locked the same way, so the message reveals no account (AC3). The failed attempts themselves still show the AC3 message, with no count of attempts left.
 - AC7: After 30 failed sign-ins in 15 minutes from one client address, every sign-in from that address is refused for 15 minutes with the AC6 message (D-75).
+- AC8: The password field has an eye button, `Prikaži lozinku` / `Sakrij lozinku`, that shows or hides what was typed. Every other password field in the app has it too (D-82).
 
 **US-01.2** As the admin, I log in with my email, and I can reset a forgotten password by email (D-57, D-58).
 - AC1: "Zaboravljena lozinka?" sends a reset link only to an account that has an email, which is the admin and the seeded owner account.
@@ -49,7 +50,7 @@ All features are **MVP**. Acceptance criteria (AC) are written so each one can b
 **US-02.4** As a receptionist, I can log out without closing my shift (BR-113). The confirmation dialog is shown first.
 
 ## F-03 Member cards
-**US-03.1** As an owner or manager, I generate a batch of unassigned cards and print them (S-28).
+**US-03.1** As an owner, I generate a batch of unassigned cards and print them (S-28). A manager may not (D-81).
 - AC1: Quantity 1–100. The codes follow BR-030 and are unique.
 - AC2: The PDF matches the S-28 layout. Printing it at 100 % scale gives cards of 85.6 × 54 mm.
 - AC3: The batch list shows date, quantity, how many are still unassigned, and a [Preuzmi PDF] button.
@@ -173,6 +174,12 @@ Covered by US-04.4, BR-078 and BR-079.
   - active members (count of members with at least one Aktivna membership today);
   - memberships expiring in the next 7 days (list);
   - members with unlinked unpaid visits (list).
+
+**US-17.2** As a manager, I see the gym's income and expenses for today, this week or this month, without profit or salaries (D-80).
+- AC1: Finansije shows me only Pregled, Troškovi and Smjene. The period offers only Danas, Ova sedmica and Ovaj mjesec (default Ovaj mjesec); every other period is refused by the database.
+- AC2: Pregled shows the Prihod and Troškovi cards and the breakdowns by plan, method and category. Troškovi and the category breakdown leave out salary categories. There is no Profit, Zarada na magacinu, active-member count, chart or member list.
+- AC3: Troškovi (S-17) lists the period's non-salary expenses, with its filters and `Ukupno`, read-only.
+- AC4: Smjene (S-19) lists the period's shifts with their totals, without the email status, the PDF, [Pošalji ponovo] or [Zaključi smjenu].
 
 ## F-18 Owner expenses and categories
 **US-18.1** As the owner, I record any expense (BR-133) and see all expenses with filters for period, category, method and "entered by" (S-17).

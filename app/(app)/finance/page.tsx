@@ -15,7 +15,11 @@ import {
   StatCards,
   type Summary,
 } from "@/features/finance/components/stat-cards";
-import { chartFromParams, periodFromParams } from "@/features/finance/period";
+import {
+  chartFromParams,
+  periodFromParams,
+  presetsFor,
+} from "@/features/finance/period";
 import { requireStaff } from "@/lib/auth";
 import { getErrorMessage } from "@/lib/errors";
 import { formatDate } from "@/lib/format";
@@ -58,7 +62,11 @@ const METHODS: Record<string, string> = {
   card: me.finance.methodCard,
 };
 
-/** S-16 (F-17). The layout above has already refused every role but owner and admin. */
+/**
+ * S-16 (F-17). The layout above has already refused the receptionist. D-80: a manager
+ * sees only the Prihod and Troškovi cards and the three breakdowns, for Danas, Ova
+ * sedmica or Ovaj mjesec; `fin_summary` sends them nothing else, and salaries not at all.
+ */
 export default async function FinancePage({
   searchParams,
 }: {
@@ -73,11 +81,30 @@ export default async function FinancePage({
   const staff = await requireStaff();
   const params = await searchParams;
   const today = await gymToday(staff.gym_id);
-  const period = periodFromParams(params, today);
+  const presets = presetsFor(staff.role);
+  const period = periodFromParams(params, today, presets);
+  const supabase = await createClient();
+
+  if (staff.role === "manager") {
+    const [summary, breakdown] = await Promise.all([
+      supabase.rpc("fin_summary", { p_from: period.from, p_to: period.to }),
+      supabase.rpc("fin_income_breakdown", {
+        p_from: period.from,
+        p_to: period.to,
+      }),
+    ]);
+    const totals = summary.data as Summary | null;
+    return (
+      <div className="grid grid-cols-1 gap-8">
+        <PeriodPicker period={period} presets={presets} />
+        {totals ? <StatCards summary={totals} /> : null}
+        <Breakdowns split={breakdown.data as Breakdown | null} />
+      </div>
+    );
+  }
+
   // D-68: the chart has its own year and month, and opens on the whole current year.
   const range = chartFromParams(params, today);
-
-  const supabase = await createClient();
   const [summary, breakdown, chart, expiring, unpaid] = await Promise.all([
     supabase.rpc("fin_summary", { p_from: period.from, p_to: period.to }),
     supabase.rpc("fin_income_breakdown", {
@@ -93,11 +120,6 @@ export default async function FinancePage({
   // SUSPECT-01: a rejected call answers with null data; say so instead of an empty chart.
   const chartFailure = chart.error ? getErrorMessage(rpcCode(chart.error)) : null;
   const chartData = chartFailure ? null : (chart.data as Chart | null);
-  const split = (breakdown.data as Breakdown | null) ?? {
-    by_plan: [],
-    by_method: [],
-    by_category: [],
-  };
   const expiringRows = (expiring.data as Expiring[] | null) ?? [];
   const unpaidRows = (unpaid.data as Unpaid[] | null) ?? [];
 
@@ -123,27 +145,7 @@ export default async function FinancePage({
         )}
       </section>
 
-      <div className="grid gap-8 lg:grid-cols-2">
-        <BreakdownTable
-          title={me.finance.byPlan}
-          rows={split.by_plan}
-          countLabel={me.finance.count}
-        />
-        <BreakdownTable
-          title={me.finance.byCategory}
-          rows={split.by_category}
-          countLabel={me.finance.count}
-        />
-      </div>
-
-      <BreakdownTable
-        title={me.finance.byMethod}
-        rows={split.by_method.map((row) => ({
-          ...row,
-          name: METHODS[row.name] ?? row.name,
-        }))}
-        countLabel={me.finance.count}
-      />
+      <Breakdowns split={breakdown.data as Breakdown | null} />
 
       <section>
         <h2 className="mb-3 text-lg font-semibold">
@@ -227,5 +229,35 @@ export default async function FinancePage({
         )}
       </section>
     </div>
+  );
+}
+
+/** S-16: income by plan and by method, and expenses by category (US-17.1 AC2). */
+function Breakdowns({ split }: { split: Breakdown | null }) {
+  const rows = split ?? { by_plan: [], by_method: [], by_category: [] };
+  return (
+    <>
+      <div className="grid gap-8 lg:grid-cols-2">
+        <BreakdownTable
+          title={me.finance.byPlan}
+          rows={rows.by_plan}
+          countLabel={me.finance.count}
+        />
+        <BreakdownTable
+          title={me.finance.byCategory}
+          rows={rows.by_category}
+          countLabel={me.finance.count}
+        />
+      </div>
+
+      <BreakdownTable
+        title={me.finance.byMethod}
+        rows={rows.by_method.map((row) => ({
+          ...row,
+          name: METHODS[row.name] ?? row.name,
+        }))}
+        countLabel={me.finance.count}
+      />
+    </>
   );
 }

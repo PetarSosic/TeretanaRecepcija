@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import {
   BackdatedScreen,
   type PlanOption,
@@ -25,9 +26,13 @@ type SlotRow = {
   trainers: { full_name: string } | null;
 };
 
-/** S-22 (F-23). The layout has already refused every role but owner and admin. */
+/**
+ * S-22 (F-23). The layout has already refused the receptionist; back-dated entries stay
+ * the owner's and the admin's (BR-120, D-80), so a manager gets 404 here.
+ */
 export default async function BackdatedPage() {
   const staff = await requireStaff();
+  if (staff.role !== "owner" && staff.role !== "admin") notFound();
   const today = await gymToday(staff.gym_id);
 
   const supabase = await createClient();

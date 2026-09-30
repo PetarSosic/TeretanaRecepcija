@@ -5,24 +5,36 @@ import { usePathname } from "next/navigation";
 import { me } from "@/lib/i18n/me";
 import { cn } from "@/lib/utils";
 
-/** S-16 sub-navigation: Pregled · Troškovi · Treneri · Smjene · Magacin · Naknadni unos · Dnevnik izmjena. */
+/**
+ * S-16 sub-navigation: Pregled · Troškovi · Treneri · Smjene · Magacin · Naknadni unos ·
+ * Dnevnik izmjena. D-80: a manager has only the tabs not marked `ownerOnly`.
+ */
 const TABS = [
-  { href: "/finance", label: me.finance.overview },
-  { href: "/finance/expenses", label: me.finance.expensesTab },
-  { href: "/finance/trainers", label: me.finance.trainersTab },
-  { href: "/finance/shifts", label: me.finance.shiftsTab },
-  { href: "/finance/storage", label: me.finance.storageTab },
-  { href: "/finance/backdated", label: me.finance.backdatedTab },
-  { href: "/finance/audit", label: me.finance.auditTab },
+  { href: "/finance", label: me.finance.overview, ownerOnly: false },
+  {
+    href: "/finance/expenses",
+    label: me.finance.expensesTab,
+    ownerOnly: false,
+  },
+  { href: "/finance/trainers", label: me.finance.trainersTab, ownerOnly: true },
+  { href: "/finance/shifts", label: me.finance.shiftsTab, ownerOnly: false },
+  { href: "/finance/storage", label: me.finance.storageTab, ownerOnly: true },
+  {
+    href: "/finance/backdated",
+    label: me.finance.backdatedTab,
+    ownerOnly: true,
+  },
+  { href: "/finance/audit", label: me.finance.auditTab, ownerOnly: true },
 ] as const;
 
-export function FinanceNav() {
+export function FinanceNav({ ownerTabs }: { ownerTabs: boolean }) {
   const pathname = usePathname();
+  const tabs = TABS.filter((tab) => ownerTabs || !tab.ownerOnly);
 
   return (
     <nav aria-label={me.finance.title} className="-mx-1 overflow-x-auto">
       <ul className="flex min-w-max gap-1 border-b">
-        {TABS.map((tab) => {
+        {tabs.map((tab) => {
           const active =
             tab.href === "/finance"
               ? pathname === "/finance"

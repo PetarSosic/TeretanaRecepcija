@@ -547,6 +547,21 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   jer je dugme [Otključaj] nestajalo sa zaključavanjem; poruka je premještena u tabelu i test
   prolazi. Korak 4, druga teretana i dvostruki klik: DB `0017_login_throttle`.
 
+### [AUTH-27] Oko u polju za lozinku (D-82)
+- **Prioritet:** Srednje
+- **Uloga / preduslovi:** bilo ko; ekran prijave, promjena lozinke, dijalozi na S-23
+- **Koraci:** upišite lozinku, kliknite oko („Prikaži lozinku“), pa ponovo („Sakrij lozinku“).
+  Ponovite na `/change-password` (sva polja) i u dijalozima [Novi korisnik] i [Nova lozinka].
+- **Test podaci:** `tajna-lozinka`
+- **Očekivani rezultat:** prvi klik prikazuje upisani tekst, drugi ga ponovo sakriva; upisana
+  vrijednost se ne mijenja. Klik na oko ne šalje formu. Prijava i čuvanje rade kao ranije.
+- **Gdje provjeriti:** UI
+- [x] Prošlo  [ ] Palo  Napomena: **30.09.2026 — PROŠLO.** `manager-finance.spec.ts` (dva testa):
+  na S-01 polje „Lozinka“, na `/change-password` „Trenutna lozinka“, „Nova lozinka“ i „Ponovi
+  lozinku“, i „Privremena lozinka“ u dijalozima [Novi korisnik] i [Nova lozinka] na S-23 — svako
+  svojim okom prelazi iz `password` u `text` i nazad, vrijednost ostaje ista, a klik ne mijenja
+  adresu (forma se ne šalje). Svi postojeći testovi prijave, promjene lozinke i S-23 prolaze.
+
 ---
 
 ### 3.2 PERM — dozvole i pristup rutama
@@ -572,12 +587,14 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Uloga / preduslovi:** prijavljen Menadžer
 - **Koraci:** kao PERM-01.
 - **Test podaci:** iste rute
-- **Očekivani rezultat:** 404 za svih **sedam** `/finance/...` ruta, za `/settings/plans`,
-  `/settings/products` (ukinuto, D-76), `/settings/gym`, `/shift/close` i `/shift/gate`.
-  Dozvoljeno: `/reception`, `/members`, `/payments/today`, `/storage`, `/stats/visits`,
-  `/settings/users`, `/settings/trainers`, `/settings/cards`.
+- **Očekivani rezultat:** 404 za `/finance/trainers`, `/finance/storage`, `/finance/audit`,
+  `/finance/backdated`, `/settings/cards` (D-81), `/settings/plans`, `/settings/products`
+  (ukinuto, D-76), `/settings/gym`, `/shift/close` i `/shift/gate`. Dozvoljeno: `/reception`,
+  `/members`, `/payments/today`, `/storage`, `/stats/visits`, `/settings/users`,
+  `/settings/trainers`, a od finansija `/finance`, `/finance/expenses` i `/finance/shifts` (D-80).
+  *29.09.2026 (D-80, D-81): menadžer dobija tri ekrana Finansija, a gubi Kartice — ponoviti test.*
 - **Gdje provjeriti:** UI
-- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-access.spec.ts`: menadžer otvara pultne ekrane, profil člana, `/stats/visits`, `/settings/users`, `/settings/trainers`, `/settings/cards`; 404 za svih 7 finansijskih ruta, `/settings/plans`, `/settings/products`, `/settings/gym`, `/shift/close` i `/shift/gate`. Raniji dokaz (22.09.): Dodatna UI matrica otvorila je sve statičke rute za recepcionera, menadžera, vlasnika i admina: dozvoljene imaju naslov, zabranjene 404. Profil konkretnog člana i svi detalji menija nisu dio matrice; /shift/gate za recepcionera pokriva shifts.spec.ts.
+- [x] Prošlo  [ ] Palo  Napomena: **30.09.2026 — PROŠLO (D-80, D-81).** `test-plan-access.spec.ts` (oba projekta): menadžer otvara pultne ekrane, profil člana, `/stats/visits`, `/settings/users`, `/settings/trainers`, `/finance`, `/finance/expenses` i `/finance/shifts`; 404 za `/finance/trainers`, `/finance/storage`, `/finance/audit`, `/finance/backdated`, `/settings/cards`, `/settings/plans`, `/settings/products`, `/settings/gym`, `/shift/close` i `/shift/gate`. Isto potvrđuju `finance.spec.ts` (Flow 10) i `manager-finance.spec.ts`. Raniji dokaz (23.09., prije D-80/D-81): 404 za svih 7 finansijskih ruta, `/settings/cards` otvoren.
 
 ### [PERM-03] Matrica pristupa — vlasnik i administrator
 - **Prioritet:** Kritično
@@ -595,14 +612,15 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Koraci:** za svaku ulogu prepišite stavke glavne navigacije i podmenija „Podešavanja“.
 - **Test podaci:** —
 - **Očekivani rezultat:** recepcioner: Recepcija, Članovi, Treneri, Uplate danas, Magacin,
-  Zaključi smjenu. Menadžer: + Statistika dolazaka, Podešavanja (Korisnici, Treneri i raspored,
-  Kartice). Vlasnik/Administrator: + Finansije i Podešavanja (Korisnici, Treneri i raspored,
+  Zaključi smjenu. Menadžer: + Statistika dolazaka, Finansije, Podešavanja (Korisnici, Treneri i
+  raspored). Vlasnik/Administrator: + Finansije i Podešavanja (Korisnici, Treneri i raspored,
   Kartice, Planovi, Podešavanja teretane); nema „Zaključi smjenu“.
   *29.09.2026 (D-76): stavka „Proizvodi“ je izbačena iz Podešavanja — ponoviti test.*
+  *29.09.2026 (D-80, D-81): menadžer dobija „Finansije“, a „Kartice“ mu nestaju — ponoviti test.*
   *29.09.2026 (D-72): dodata stavka „Treneri“, a „Treneri“ u Podešavanjima preimenovana u
   „Treneri i raspored“ — ponoviti test.*
 - **Gdje provjeriti:** UI
-- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `tests/e2e/test-plan-extra.spec.ts`: glavni meni i podmeni „Podešavanja“ upoređeni za recepcionera, menadžera, vlasnika i administratora (1366 px). Tačno očekivane stavke i redoslijed; vlasnik/administrator nemaju „Zaključi smjenu“. Mobilni meni nije posebno prepisan.
+- [x] Prošlo  [ ] Palo  Napomena: **30.09.2026 — PROŠLO (D-80, D-81).** `tests/e2e/test-plan-extra.spec.ts` (oba projekta): menadžer ima „Finansije“ između „Statistika dolazaka“ i „Podešavanja“, a u Podešavanjima samo Korisnici i Treneri i raspored, bez „Kartice“; recepcioner, vlasnik i administrator nepromijenjeni. Raniji dokaz (23.09.): tačne stavke i redoslijed za sve četiri uloge na 1366 px. Mobilni meni nije posebno prepisan.
 
 ### [PERM-05] Menadžer ne smije da mijenja vlasnika ni administratora (AS-5, P-03)
 - **Prioritet:** Kritično
@@ -661,9 +679,9 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Uloga / preduslovi:** postoji serija kartica
 - **Koraci:** otvorite `/api/pdf/cards/<batchId>` kao vlasnik, menadžer i recepcioner.
 - **Test podaci:** id serije iz S-28
-- **Očekivani rezultat:** vlasnik, administrator i menadžer dobijaju PDF; recepcioner 404.
+- **Očekivani rezultat:** vlasnik i administrator dobijaju PDF; menadžer (D-81) i recepcioner 404.
 - **Gdje provjeriti:** browser
-- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-high-a.spec.ts`: `/api/pdf/cards/<batchId>` vraća PDF vlasniku, administratoru i menadžeru, a 404 bez PDF-a recepcioneru. Raniji dokaz (22.09.): E2E cards.spec.ts: vlasnik preuzima PDF, recepcioner dobija 404. Admin/menadžer nisu zasebno preuzeli PDF.
+- [x] Prošlo  [ ] Palo  Napomena: **30.09.2026 — PROŠLO (D-81).** `test-plan-high-a.spec.ts`: `/api/pdf/cards/<batchId>` vraća PDF vlasniku i administratoru, a 404 bez PDF-a menadžeru i recepcioneru; isto `manager-finance.spec.ts`. Raniji dokaz (23.09., prije D-81): PDF je dobijao i menadžer.
 
 ### [PERM-11] Izmišljeni i tuđi identifikatori u URL-u
 - **Prioritet:** Kritično (bezbjednost)
@@ -703,10 +721,11 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
      kako izgleda zahtjev server akcije.
   2. Kao menadžer pokušajte da otvorite istu stranicu (`/finance/expenses`).
 - **Test podaci:** —
-- **Očekivani rezultat:** menadžer dobija 404 na stranici; i da nekako pošalje zahtjev, server
-  akcija odgovara „Nemate dozvolu za ovu radnju.“ jer se uloga provjerava i na serveru i u bazi.
+- **Očekivani rezultat:** menadžer vidi stranicu samo za čitanje, bez [Novi trošak] (D-80); i da
+  nekako pošalje zahtjev, server akcija odgovara „Nemate dozvolu za ovu radnju.“ jer se uloga
+  provjerava i na serveru i u bazi.
 - **Gdje provjeriti:** UI, Network tab
-- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO (bezbjednost) uz odstupanje u poruci.** `test-plan-critical.spec.ts`: menadžer na `/finance/expenses` dobija stranicu 404 (HTTP status je 200 zbog streaminga, vidi §9.6). Snimljen zahtjev server akcije `saveExpense` ponovljen sa menadžerovom sesijom vraća HTTP 500 i opštu grešku umjesto „Nemate dozvolu za ovu radnju.“ (`requireOwner` baca izuzetak). Ništa nije upisano u bazu. Raniji dokaz (22.09.): E2E finance.spec.ts: zabranjene rute; DB 0012: RPC/finansijske tabele nedostupne pogrešnim ulogama. Prepravljeni Next server-action zahtjev nije poslat.
+- [x] Prošlo  [ ] Palo  Napomena: **30.09.2026 — PROŠLO (bezbjednost) uz isto odstupanje u poruci.** `test-plan-critical.spec.ts`: menadžer na `/finance/expenses` vidi „Troškovi“ bez [Novi trošak] (D-80). Snimljeni zahtjev server akcije `saveExpense` ponovljen sa menadžerovom sesijom vraća HTTP 500 i opštu grešku, ne „Nemate dozvolu za ovu radnju.“ (`requireOwner` baca izuzetak, kao 23.09.). Ništa nije upisano u bazu. Raniji dokaz (23.09., prije D-80): menadžer je na toj stranici dobijao 404.
 
 ---
 
@@ -2254,13 +2273,13 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 
 ### [CARD-01] Generisanje serije kartica
 - **Prioritet:** Visoko
-- **Uloga / preduslovi:** Vlasnik ili Menadžer
+- **Uloga / preduslovi:** Vlasnik ili Administrator (D-81: menadžer više ne štampa kartice)
 - **Koraci:** `/settings/cards` → „Broj kartica (1–100)“ = `10` → [Generiši].
 - **Test podaci:** `10`
 - **Očekivani rezultat:** „Kartice su generisane.“ U tabeli „Serije“ je novi red sa datumom,
   brojem kartica i brojem praznih (10).
 - **Gdje provjeriti:** UI
-- [x] Prošlo  [ ] Palo  Napomena: **22.09.2026 — PROŠLO.** E2E cards.spec.ts + DB 0004: 100 jedinstvenih desetocifrenih kodova, bez vodeće nule, prazne kartice i serija.
+- [x] Prošlo  [ ] Palo  Napomena: **30.09.2026 — PROŠLO (D-81).** E2E `cards.spec.ts` (vlasnik generiše 100 kartica), `test-plan-high-d.spec.ts` CARD-02/03 sada kao vlasnik, DB `0004_cards`: menadžeru `generate_card_batch` vraća `E_FORBIDDEN`. Raniji dokaz (22.09.): 100 jedinstvenih desetocifrenih kodova, bez vodeće nule, prazne kartice i serija.
 
 ### [CARD-02] Granice broja kartica
 - **Prioritet:** Visoko
@@ -2521,6 +2540,26 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** „Izaberite člana.“
 - **Gdje provjeriti:** UI
 - [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-extra.spec.ts`: kartica „Dolazak“, vremena 10:00–11:00, bez člana → „Izaberite člana.“; ništa nije upisano u bazu.
+
+### [FIN-18] Menadžer na Finansijama (D-80)
+- **Prioritet:** Kritično
+- **Uloga / preduslovi:** Menadžer; danas postoje prihod, običan trošak i isplata trenerki (Plate),
+  i zaključena smjena sa poslatim izvještajem
+- **Koraci:** 1) Otvorite „Finansije“. 2) Probajte izbor perioda i `/finance?period=last_month`.
+  3) Otvorite „Troškovi“. 4) Otvorite „Smjene“. 5) Ručno otvorite `/finance/trainers`,
+  `/finance/storage`, `/finance/audit`, `/finance/backdated`, `/api/pdf/shift/<id>`.
+- **Test podaci:** —
+- **Očekivani rezultat:** 1) Podmeni ima samo Pregled, Troškovi, Smjene; kartice samo Prihod i
+  Troškovi, bez Profita, Zarade na magacinu, Aktivnih članova i grafikona; Troškovi i tabela po
+  kategoriji bez plata. 2) Period nudi samo Danas, Ova sedmica, Ovaj mjesec; drugi period pada na
+  Ovaj mjesec. 3) Lista bez plata, `Ukupno` bez plata, nema [Novi trošak], [Kategorije troškova]
+  ni [Poništi]. 4) Smjene bez kolone „Email“, [PDF], [Pošalji ponovo] i [Zaključi smjenu].
+  5) Sve 404. Vlasnik za isti dan i dalje vidi Profit, plate i PDF.
+- **Gdje provjeriti:** UI; Network tab (`fin_summary` menadžeru vraća samo `income` i `expenses`)
+- [x] Prošlo  [ ] Palo  Napomena: **30.09.2026 — PROŠLO.** `manager-finance.spec.ts` (5 testova za D-80/D-81)
+  i DB `0019_manager_finance` (31 tvrdnja: tri dozvoljena perioda, ostali `E_FORBIDDEN`, plate
+  izostavljene iz zbira, liste i kategorija, `fin_shifts` bez putanje izvještaja i statusa emaila,
+  vlasnik nepromijenjen).
 
 ---
 
@@ -3912,6 +3951,24 @@ listao mjesec po mjesec od danas (MEM-06).
 | Cijeli E2E na dev serveru, oba projekta | **313 prošlo**, 3 palo, 3 nije pokrenuto (serijski nastavci palih), 153 preskočeno. Pali: E2E-01 i CARD-02 (N-30, prije popravke) i UX-04 (dugme Next.js dev alata, vidi 9.12) |
 | Produkcijski build (`E2E_PRODUCTION=1`): flows, high-d, medium-b, shifts, trainer-roster, members, forms | **57/57** (27 preskočeno — mobilne varijante), uključujući E2E-01, CARD-02 i UX-04 |
 | Zaostale `E2E` teretane u bazi | 0 |
+
+### 9.15 Dopuna — menadžer na Finansijama, bez PDF-a, oko u polju za lozinku (D-80–D-82), 29.–30.09.2026
+
+**D-80:** menadžer dobija „Finansije“ sa Pregled, Troškovi i Smjene, za Danas, Ova sedmica ili
+Ovaj mjesec, bez profita i bez plata (FIN-18, migracija 0035). **D-81:** menadžer ne preuzima
+nijedan PDF, pa ni listu kartica (PERM-10, CARD-01). **D-82:** oko u svakom polju za lozinku
+(AUTH-27). Odluke su prvobitno nosile brojeve D-77–D-79; kad je 30.09. povučen upstream koji je
+te brojeve već dao filteru rasporeda, podebljanom terminu i datumu rođenja (9.14), prenumerisane
+su u D-80–D-82. Komentari u već primijenjenoj migraciji 0035 i dalje kažu D-77/D-78.
+
+| Provjera 30.09.2026 | Rezultat |
+|---|---|
+| `npm run lint`, `npm run typecheck` | PROŠLO |
+| `npm run test` (prije povlačenja upstreama); poslije: `tests/unit/period.test.ts` | 201 PROŠLO (1 preskočen); poslije **37/37** |
+| `npm run test:db` | **20/20 fajlova**, uključujući `0019_manager_finance` (31 tvrdnja) |
+| E2E samo za izmijenjeno, oba projekta: `manager-finance`, `finance`, `cards`, `auth` | **35 prošlo**, 7 preskočeno (mobilne varijante) |
+| E2E samo za izmijenjeno: PERM-01/02/03, PERM-04, PERM-10, PERM-13, CARD-02/03, SET-01, SET-05/06, ekrani S-16–S-23 i S-28 | **25 prošlo**, 7 preskočeno (mobilne varijante) |
+| Cijeli E2E paket | nije pušten ovaj put (prekinut na zahtjev; pokrivena samo izmijenjena mjesta) |
 
 *Kraj plana. Novi rezultati upisani su uz slučajeve; neoznačeni kvadratići nisu automatski prolaz.*
 

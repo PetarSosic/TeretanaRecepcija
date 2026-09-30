@@ -5,7 +5,7 @@ import { Loader2 } from "lucide-react";
 import { FieldError, FormError } from "@/components/common/form-message";
 import { useToast } from "@/components/common/toast";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { Label } from "@/components/ui/label";
 import { idleState } from "@/lib/action-state";
 import { me } from "@/lib/i18n/me";
@@ -32,10 +32,9 @@ export function ChangePasswordForm({ firstLogin }: { firstLogin: boolean }) {
       {firstLogin ? null : (
         <div className="grid gap-1.5">
           <Label htmlFor="current">{me.password.current}</Label>
-          <Input
+          <PasswordInput
             id="current"
             name="current"
-            type="password"
             autoComplete="current-password"
             required
             aria-invalid={Boolean(state.fieldErrors?.current)}
@@ -48,10 +47,9 @@ export function ChangePasswordForm({ firstLogin }: { firstLogin: boolean }) {
       )}
       <div className="grid gap-1.5">
         <Label htmlFor="next">{me.password.next}</Label>
-        <Input
+        <PasswordInput
           id="next"
           name="next"
-          type="password"
           autoComplete="new-password"
           required
           minLength={8}
@@ -62,10 +60,9 @@ export function ChangePasswordForm({ firstLogin }: { firstLogin: boolean }) {
       </div>
       <div className="grid gap-1.5">
         <Label htmlFor="repeat">{me.password.repeat}</Label>
-        <Input
+        <PasswordInput
           id="repeat"
           name="repeat"
-          type="password"
           autoComplete="new-password"
           required
           minLength={8}

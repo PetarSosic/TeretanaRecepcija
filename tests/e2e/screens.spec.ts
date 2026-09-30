@@ -47,7 +47,8 @@ const SCREENS = [
   },
   { path: "/settings/users", name: "S-23 Korisnici", role: "manager" },
   { path: "/settings/trainers", name: "S-24 Treneri", role: "manager" },
-  { path: "/settings/cards", name: "S-28 Kartice", role: "manager" },
+  // D-81: printing cards is the owner's now.
+  { path: "/settings/cards", name: "S-28 Kartice", role: "owner" },
   { path: "/finance", name: "S-16 Finansije", role: "owner" },
   { path: "/finance/expenses", name: "S-17 Troškovi", role: "owner" },
   { path: "/finance/trainers", name: "S-18 Treneri", role: "owner" },

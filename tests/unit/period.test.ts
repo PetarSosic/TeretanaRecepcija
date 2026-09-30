@@ -1,9 +1,12 @@
 import { describe, expect, it } from "vitest";
 import {
+  MANAGER_PRESETS,
+  PERIOD_PRESETS,
   chartFromParams,
   isDate,
   periodFromParams,
   periodInstants,
+  presetsFor,
   resolvePeriod,
 } from "@/features/finance/period";
 
@@ -34,6 +37,32 @@ describe("US-17.1 AC1: period parameters (FIN-02)", () => {
   it("accepts 29.02 only in a leap year", () => {
     expect(isDate("2028-02-29")).toBe(true);
     expect(isDate("2026-02-29")).toBe(false);
+  });
+});
+
+describe("D-80: the manager's periods", () => {
+  it("offers a manager Danas, Ova sedmica and Ovaj mjesec only", () => {
+    expect(presetsFor("manager")).toEqual(["today", "week", "month"]);
+    for (const role of ["owner", "admin"] as const)
+      expect(presetsFor(role)).toBe(PERIOD_PRESETS);
+  });
+
+  it.each([
+    ["today", { preset: "today", from: TODAY, to: TODAY }],
+    ["week", { preset: "week", from: "2026-09-21", to: "2026-09-27" }],
+    ["month", MONTH],
+  ])("keeps %s", (period, expected) => {
+    expect(periodFromParams({ period }, TODAY, MANAGER_PRESETS)).toEqual(
+      expected,
+    );
+  });
+
+  it.each([
+    [{ period: "last_month" }],
+    [{ period: "year" }],
+    [{ period: "custom", from: "2026-09-01", to: "2026-09-15" }],
+  ])("falls back to Ovaj mjesec for %j", (params) => {
+    expect(periodFromParams(params, TODAY, MANAGER_PRESETS)).toEqual(MONTH);
   });
 });
 
