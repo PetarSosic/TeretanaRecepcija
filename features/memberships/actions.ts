@@ -28,7 +28,6 @@ export async function sellMembership(
   const { error } = await supabase.rpc("sell_membership", {
     p_member: parsed.data.memberId,
     ...saleArguments(parsed.data),
-    p_start_override: parsed.data.startOverride,
   });
   if (error) {
     const code = rpcCode(error);

@@ -150,6 +150,7 @@ RPCs raise `P0001` with the message `E_<CODE>`. `lib/errors.ts` maps each code t
 | E_CATEGORY_NOT_ALLOWED | `Ova kategorija nije dozvoljena.` |
 | E_SELF_DEACTIVATE | `Ne možete deaktivirati sopstveni nalog.` (D-60) |
 | E_LAST_ACCOUNT | `Mora ostati bar jedan aktivan nalog ove uloge. Prvo dodajte zamjenu.` (D-60) |
+| E_PERIOD_TOO_LONG | `Period je predug. Statistika se prikazuje za najviše 400 dana.` (D-94) |
 | E_VALIDATION | Field-specific text from Zod |
 
 ## 6. Server actions (thin wrappers)

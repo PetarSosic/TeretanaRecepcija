@@ -1134,6 +1134,8 @@ export const me = {
     E_SELF_DEACTIVATE: "Ne možete deaktivirati sopstveni nalog.",
     E_LAST_ACCOUNT:
       "Mora ostati bar jedan aktivan nalog ove uloge. Prvo dodajte zamjenu.",
+    E_PERIOD_TOO_LONG:
+      "Period je predug. Statistika se prikazuje za najviše 400 dana.",
     E_VALIDATION: "Provjerite unesene podatke.",
     phone: "Unesite ispravan broj telefona sa pozivnim brojem.",
   },

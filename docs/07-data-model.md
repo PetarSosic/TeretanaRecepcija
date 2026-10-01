@@ -511,7 +511,7 @@ All RPCs are `security definer`. Each one:
 | `scan_card(p_code text)` → json `{result, member, open_visit, options, candidates, unpaid_count}` | all | BR-070–073 (check-out happens inside, unless the guard applies), BR-072a |
 | `check_in(p_member uuid, p_type visit_type, p_membership uuid, p_trainer uuid, p_slot uuid, p_manual bool)` → json | all | BR-071–079 |
 | `check_out(p_visit uuid, p_confirmed bool)` → json | all | BR-072, BR-072a |
-| `register_member(p_card_code, p_first, p_last, p_phone, p_email, p_dob, p_plan, p_trainer, p_amount, p_sessions, p_method, p_check_in bool, p_class_time time default null)` → json | all | BR-033, BR-040–043, BR-050–060, BR-058a |
+| `register_member(p_card_code, p_first, p_last, p_phone, p_email, p_dob, p_plan, p_trainer, p_amount, p_sessions, p_method, p_check_in bool, p_class_time time default null, p_start_override date default null)` → json | all (owner for `p_start_override`, N-31) | BR-033, BR-040–043, BR-050–060, BR-058a |
 | `find_duplicates(p_phone, p_email)` → rows | all | BR-043 |
 | `update_member(p_member, …)` | all | BR-045 |
 | `anonymize_member(p_member)` | owner | BR-046 |
@@ -564,7 +564,7 @@ For managers, `shift_summary` must verify that the requested shift is the curren
 
 The four functions marked D-80 start with `assert_finance_period(p_from, p_to)` instead of the owner check. It admits the owner and the admin for any range, and a manager only for exactly today, this week (Monday to Sunday) or this month by `gym_today()`; anything else raises `E_FORBIDDEN`.
 
-**Statistics** (owner, manager): `visit_stats(p_from, p_to)`.
+**Statistics** (owner, manager): `visit_stats(p_from, p_to)`; a period over 400 days raises `E_PERIOD_TOO_LONG` (D-94).
 
 **Trainer roster** (all roles, D-72): `trainer_roster()` → json `{today, weekday, times, members, extras}`: every trainer's active group class times, the group memberships valid today with their fixed class time and today's check-in, and today's check-ins to a class by members not on its list (BR-027). It returns no amounts.
 

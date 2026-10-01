@@ -557,6 +557,23 @@ test("STAT-05: an anonymized member's visits count, but not in the top list", as
   expect(rows).toContain(`#${member.Drugi.number} E2E Drugi Posjetilac 2`);
 });
 
+test("STAT-03 (D-94): a period over 400 days names the limit, 400 days still show", async ({
+  page,
+}) => {
+  await signIn(page, staff.owner.identifier);
+  const today = gymDate(0).iso;
+  await page.goto(`/stats/visits?period=custom&from=${gymDate(-401).iso}&to=${today}`);
+  await expect(
+    page.getByText("Period je predug. Statistika se prikazuje za najviše 400 dana."),
+  ).toBeVisible();
+  await expect(page.getByText("Nema dolazaka u izabranom periodu.")).toHaveCount(0);
+  await expect(page.getByText("Provjerite unesene podatke.")).toHaveCount(0);
+
+  await page.goto(`/stats/visits?period=custom&from=${gymDate(-400).iso}&to=${today}`);
+  await expect(page.locator("p", { hasText: /^Ukupno dolazaka$/ })).toBeVisible();
+  await expect(page.getByText("Period je predug.", { exact: false })).toHaveCount(0);
+});
+
 test("E2E-04: a new employee from creation to deactivation", async ({
   page,
   browser,

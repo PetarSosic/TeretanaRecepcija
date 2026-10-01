@@ -56,7 +56,8 @@ export default async function VisitStatsPage({
 
   const supabase = await createClient();
   // SUSPECT-01: a rejected call answers with null data, so an unread error would read
-  // as an empty period — a period over 400 days (doc 08 §9) is the case that happens.
+  // as an empty period — a period over 400 days (doc 08 §9) is the case that happens,
+  // and D-94 gives it its own message (E_PERIOD_TOO_LONG).
   const { data, error } = await supabase.rpc("visit_stats", {
     p_from: period.from,
     p_to: period.to,

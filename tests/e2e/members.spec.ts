@@ -501,3 +501,57 @@ test("BR-046: the owner anonymizes, and the profile becomes read-only", async ({
     page.getByRole("button", { name: "Nova članarina" }),
   ).toHaveCount(0);
 });
+
+test("N-31: the owner's own start on S-05 is the start that is saved", async ({
+  page,
+}) => {
+  // BR-001: three days before the gym's today, never the machine's date.
+  const parts = Object.fromEntries(
+    new Intl.DateTimeFormat("en-GB", {
+      timeZone: "Europe/Podgorica",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    })
+      .formatToParts(new Date())
+      .map(({ type, value }) => [type, value]),
+  );
+  const start = new Date(`${parts.year}-${parts.month}-${parts.day}T12:00:00Z`);
+  start.setUTCDate(start.getUTCDate() - 3);
+  const iso = start.toISOString().slice(0, 10);
+  const typed = iso.split("-").reverse().join(".");
+
+  await signIn(page, owner);
+  await page.goto("/members");
+  await page.getByRole("button", { name: "Novi član" }).click();
+  const dialog = page.getByRole("dialog");
+  await scan(page, "Skenirajte praznu karticu", cards[2]);
+  await expect(dialog.getByText("Kartica je prazna i spremna.")).toBeVisible({
+    timeout: 20_000,
+  });
+  await dialog.getByLabel("Ime", { exact: true }).fill("E2E Vesna");
+  await dialog.getByLabel("Prezime").fill("Početak");
+  await dialog.getByLabel("Telefon").fill("067 765 432");
+  await dialog.getByLabel("Email").fill("vesna@e2e.invalid");
+  await dialog.getByLabel("Datum rođenja", { exact: true }).fill("12.06.1990");
+  await dialog.getByLabel("Vrsta članarine").selectOption(mjesecnaId);
+  await dialog.getByRole("button", { name: "Promijeni početak" }).click();
+  await dialog.getByLabel("Početak", { exact: true }).fill(typed);
+  await expect(dialog.getByText("Početak je odredio vlasnik.")).toBeVisible();
+  await dialog.getByText("Gotovina", { exact: true }).click();
+  await dialog.getByRole("button", { name: "Sačuvaj" }).click();
+  await expect(dialog.getByText(/je kreiran\./)).toBeVisible({
+    timeout: 15_000,
+  });
+
+  const { data: membership } = await adminClient()
+    .from("memberships")
+    .select("start_date, start_reason, members!inner(last_name)")
+    .eq("gym_id", gymId)
+    .eq("members.last_name", "Početak")
+    .single<{ start_date: string; start_reason: string }>();
+  expect(membership).toMatchObject({
+    start_date: iso,
+    start_reason: "Početak je odredio vlasnik.",
+  });
+});

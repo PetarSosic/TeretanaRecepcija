@@ -115,7 +115,7 @@ select is(
 
 select throws_ok(
   $$select visit_stats(current_date - 500, current_date)$$,
-  'E_VALIDATION', 'Doc 08 §9: a period longer than a year is refused');
+  'E_PERIOD_TOO_LONG', 'Doc 08 §9, D-94: a period over 400 days is refused with its own code');
 select throws_ok(
   $$select visit_stats(current_date, current_date - 1)$$,
   'E_VALIDATION', 'A period that ends before it begins is refused');
