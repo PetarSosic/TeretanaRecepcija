@@ -388,7 +388,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Očekivani rezultat:** **obje** radnje daju istu poruku: „Ako nalog postoji, poslali smo link za
   promjenu lozinke na taj email.“ Email stiže samo u drugom slučaju.
 - **Gdje provjeriti:** UI; sanduče administratora
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — DJELOMIČNO.** Dodatna UI provjera nepostojećeg emaila vraća očekivanu neutralnu poruku. Reset postojećeg email naloga i prijem reset linka nisu potvrđeni; testovi poslovnog emaila ne dokazuju Supabase Auth/SMTP.
+- [x] Prošlo  [ ] Palo  Napomena: **01.10.2026 — PROŠLO na produkciji** (vidi §9.19): obje adrese daju istu poruku; mejl za postojeći nalog stigao za ~2 s. **22.09.2026 — DJELOMIČNO.** Dodatna UI provjera nepostojećeg emaila vraća očekivanu neutralnu poruku. Reset postojećeg email naloga i prijem reset linka nisu potvrđeni; testovi poslovnog emaila ne dokazuju Supabase Auth/SMTP.
 
 ### [AUTH-14] Link iz emaila vodi na promjenu lozinke
 - **Prioritet:** Visoko
@@ -403,7 +403,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   Nakon čuvanja otvaraju se Finansije, a prijava novom lozinkom uspijeva. Drugo otvaranje istog
   linka vodi na `/login`.
 - **Gdje provjeriti:** UI, adresna linija, email
-- [ ] Prošlo  [ ] Palo  Napomena: **22.09.2026 — NIJE IZVRŠENO.** Nije dostupan stvarni recovery link iz sandučeta testnog Auth naloga. Slanje poslovnih emailova kroz Resend nije ovaj tok.
+- [x] Prošlo  [ ] Palo  Napomena: **01.10.2026 — PROŠLO na produkciji** (vidi §9.19): link iz pravog mejla, otvoren u drugom pregledaču, vodi preko `/auth/callback?token_hash=…&type=recovery` na `/change-password?reset=1`; sve kako je opisano. **22.09.2026 — NIJE IZVRŠENO.** Nije dostupan stvarni recovery link iz sandučeta testnog Auth naloga. Slanje poslovnih emailova kroz Resend nije ovaj tok.
 
 ### [AUTH-15] Neispravan ili istekao kod u callbacku
 - **Prioritet:** Srednje
@@ -4136,6 +4136,21 @@ prodaje. Recepcioner i dalje ne može da pomjeri početak (`E_FORBIDDEN`). Nalaz
 simulaciji pod oznakom N-29, koja se sudarala sa N-29 iz 9.13. `SIMULACIJA_PLAN.md` je obrisan na
 zahtjev 01.10.2026.
 
+**AUTH-13 i AUTH-14 na produkciji (`teretana-recepcija.vercel.app`, baza `paakuxiufzmdobpooqdi`) — PROŠLO.**
+Za test je napravljen privremeni admin nalog „Privremeni admin AUTH-14“ na Resendovoj probnoj
+adresi `delivered+auth14@resend.dev` (`seed-admin` sa `.env.auth14`); pravi nalozi nisu dirani.
+Mejl je pročitan kroz Resend API, a nalog je poslije testa obrisan.
+- AUTH-13: `nepostoji@primjer.com` i adresa naloga daju istu poruku „Ako nalog postoji, poslali
+  smo link za promjenu lozinke na taj email.“ Mejl stiže samo za postojeći nalog, ~2 s poslije
+  zahtjeva, od „KP Fitness“ <noreply@stamenkovicc.com>.
+- Šablon iz README (Supabase, korak 5) je podešen na produkciji: naslov je „KP Fitness — nova
+  lozinka“, a link je `https://teretana-recepcija.vercel.app/auth/callback?token_hash=…&type=recovery`.
+- AUTH-14, u drugom pregledaču: 307 `/auth/callback` → 200 `/change-password?reset=1`, tekst
+  „Otvorili ste link za novu lozinku. Postavite novu lozinku da nastavite.“, bez polja „Trenutna
+  lozinka“. `/finance` vraća na promjenu lozinke. Poslije čuvanja (`AdminNova123`) otvaraju se
+  Finansije. U trećem pregledaču isti link vodi na `/login`, a prijava novom lozinkom otvara
+  `/finance`.
+
 **Odluke vlasnika 01.10.2026:** §7.10 (kartice) i §7.11 (jedan pult) su riješeni. UX-09 je
 PROŠLO: ručnu instalaciju je provjerio tim. U §7.8 je precrtano pitanje koje je D-65 riješio još
 24.09.
@@ -4153,7 +4168,7 @@ PROŠLO: ručnu instalaciju je provjerio tim. U §7.8 je precrtano pitanje koje 
 **OTVORENO — nastaviti sljedeći put:**
 
 - [x] Primijeniti 0043 i 0044 na produkciju (`paakuxiufzmdobpooqdi`), pa tek onda push — **urađeno 01.10.2026.**
-- [ ] AUTH-13 i AUTH-14 na produkciji: pravi mejl za reset i link iz njega (čeka odluku koji nalog).
+- [x] AUTH-13 i AUTH-14 na produkciji: pravi mejl za reset i link iz njega — **PROŠLO 01.10.2026** (privremeni nalog obrisan poslije testa).
 - [ ] Ručno proći S-16 (bilans i novčani tok), S-20 i S-30 kao vlasnik, i S-16 kao menadžer (iz 9.18).
 
 *Kraj plana. Novi rezultati upisani su uz slučajeve; neoznačeni kvadratići nisu automatski prolaz.*
