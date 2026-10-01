@@ -645,9 +645,16 @@ export const me = {
     classTimeNone: "nije upisan",
     classTimeSaved: "Termin sačuvan.",
     // BR-052 reason texts that the preview shows before the RPC stores them; the
-    // database writes the same words (migration 0012).
+    // database writes the same words (migrations 0012 and 0047).
     reasonToday: "Počinje danas",
-    reasonOwner: "Početak je odredio vlasnik.",
+    // BR-052 step 4 (D-97): a start chosen by staff names their role; the admin counts
+    // as the owner.
+    reasonOverride: {
+      admin: "Početak je odredio vlasnik.",
+      owner: "Početak je odredio vlasnik.",
+      manager: "Početak je odredio menadžer.",
+      receptionist: "Početak je odredio recepcioner.",
+    },
     status: {
       active: "Aktivna",
       upcoming: "Buduća",

@@ -129,8 +129,8 @@ export async function previewMembership(input: {
     };
   }
 
-  // A new member (S-05) has no history, so BR-052 step 3 applies; an owner's own date
-  // (step 4) replaces whatever was computed.
+  // A new member (S-05) has no history, so BR-052 step 3 applies; a date chosen by
+  // staff (step 4, any role since D-97) replaces whatever was computed.
   const start =
     startOverride ??
     computed?.startDate ??
@@ -158,7 +158,7 @@ export async function previewMembership(input: {
     startDate: start,
     endDate: end as string,
     reason: startOverride
-      ? me.memberships.reasonOwner
+      ? me.memberships.reasonOverride[staff.role]
       : me.memberships.reasonToday,
     warning: startOverride ? null : (computed?.warning ?? null),
   };

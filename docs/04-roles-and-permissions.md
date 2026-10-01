@@ -32,7 +32,8 @@
 | P-24 | Anonymize a member | ✓ | ✗ | ✗ | BR-046 |
 | P-25 | Sell or renew a membership at list price (open shift required) | ✓ | ✓ | ✓ | BR-092 |
 | P-26 | Enter the amount and sessions for Personalni (≥ minimum) | ✓ | ✓ | ✓ | BR-059 |
-| P-27 | Change a list-price amount or override a start date | ✓ | ✗ | ✗ | BR-052, BR-059 |
+| P-27 | Change a list-price amount | ✓ | ✗ | ✗ | BR-059 |
+| P-27a | Override the start date of a membership being sold (S-05, S-08) | ✓ | ✓ | ✓ | BR-052, D-97 |
 | P-28 | Sell day passes; replace a lost card | ✓ | ✓ | ✓ | BR-034, BR-100 |
 | P-29 | View today's payments and sales (not back-dated) | ✓ (all dates) | ✓ | ✓ | |
 | P-30 | Correct method or note; void with reason | ✓ (any record) | open shift | open shift | BR-094, BR-095 |

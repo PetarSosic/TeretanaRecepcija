@@ -1,6 +1,6 @@
 -- N-31 (BR-052 step 4): on S-05 "Novi član" the owner's own start date is saved, as it
--- is on S-08; a receptionist still cannot move the start. Without a date, registration
--- starts today as before.
+-- is on S-08; since D-97 a receptionist's is too, with a reason that names them. Without
+-- a date, registration starts today as before.
 select plan(13);
 
 -- Fixtures ------------------------------------------------------------------------
@@ -27,12 +27,13 @@ insert into plan_finance (plan_id, gym_id, gym_fixed_amount, trainer_share_pct) 
   ('26262626-0000-0000-0000-00000000f001', '26262626-0000-0000-0000-00000000b001', 0, null);
 
 insert into card_batches (id, gym_id, quantity, created_by)
-values ('26262626-0000-0000-0000-000000010001', '26262626-0000-0000-0000-00000000b001', 3,
+values ('26262626-0000-0000-0000-000000010001', '26262626-0000-0000-0000-00000000b001', 4,
         '26262626-0000-0000-0000-00000000c002');
 insert into cards (gym_id, code, batch_id) values
   ('26262626-0000-0000-0000-00000000b001', '2626000001', '26262626-0000-0000-0000-000000010001'),
   ('26262626-0000-0000-0000-00000000b001', '2626000002', '26262626-0000-0000-0000-000000010001'),
-  ('26262626-0000-0000-0000-00000000b001', '2626000003', '26262626-0000-0000-0000-000000010001');
+  ('26262626-0000-0000-0000-00000000b001', '2626000003', '26262626-0000-0000-0000-000000010001'),
+  ('26262626-0000-0000-0000-00000000b001', '2626000004', '26262626-0000-0000-0000-000000010001');
 
 insert into shifts (id, gym_id, staff_id)
 values ('26262626-0000-0000-0000-000000040001', '26262626-0000-0000-0000-00000000b001',
@@ -51,21 +52,6 @@ select ok(
     'register_member(text, text, text, text, text, date, uuid, uuid, numeric, integer, payment_method, boolean, time, date)',
     'execute'),
   'N-31: signed-in staff may call it, anonymous callers may not');
-
--- BR-052 step 4: only the owner moves the start ---------------------------------------
-set local request.jwt.claims = '{"sub": "26262626-0000-0000-0000-00000000a001"}';
-set local role authenticated;
-select throws_ok(
-  format($$select register_member('2626000001', 'Ana', 'Anić', '067 111 222', 'ana@pgtap.invalid',
-      '1995-05-05', '26262626-0000-0000-0000-00000000f001', null, null, null, 'cash', false, null,
-      %L::date)$$,
-    gym_today('26262626-0000-0000-0000-00000000b001') - 3),
-  'P0001', 'E_FORBIDDEN', 'BR-052 step 4: a receptionist cannot choose another start');
-
-reset role;
-select is(
-  (select count(*)::int from members where gym_id = '26262626-0000-0000-0000-00000000b001'),
-  0, 'N-31: the refused registration saved no member');
 
 -- The owner's start in the past -------------------------------------------------------
 set local request.jwt.claims = '{"sub": "26262626-0000-0000-0000-00000000a002"}';
@@ -128,5 +114,19 @@ select is(
    -> 'membership' ->> 'start_date')::date,
   gym_today('26262626-0000-0000-0000-00000000b001'),
   'BR-052: a registration without a date starts today, as before');
+
+-- D-97: the receptionist's own start -----------------------------------------------------
+select is(
+  (register_member('2626000004', 'Una', 'Ranije', '067 111 555', 'una@pgtap.invalid', '1995-05-05',
+     '26262626-0000-0000-0000-00000000f001', null, null, null, 'cash', false, null,
+     gym_today('26262626-0000-0000-0000-00000000b001') - 3)
+   -> 'membership' ->> 'start_date')::date,
+  gym_today('26262626-0000-0000-0000-00000000b001') - 3,
+  'D-97: a receptionist registers a member with a start three days ago');
+reset role;
+select is(
+  (select ms.start_reason from memberships ms join members m on m.id = ms.member_id
+   where m.gym_id = '26262626-0000-0000-0000-00000000b001' and m.member_number = 4),
+  'Početak je odredio recepcioner.', 'D-97: the reason names the receptionist');
 
 select * from finish();

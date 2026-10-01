@@ -30,7 +30,10 @@ export type SaleCatalog = {
   classTimes: ClassTime[];
   personalMin: string;
   cardFee: string;
-  /** BR-059 and BR-052 step 4: the owner (and admin, D-58) may change amount and start. */
+  /**
+   * BR-059: the owner (and admin, D-58) may change a list-price amount. The start date
+   * (BR-052 step 4) is every role's since D-97.
+   */
   isOwner: boolean;
 };
 

@@ -1425,18 +1425,21 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Gdje provjeriti:** UI
 - [x] Prošlo  [ ] Palo  Napomena: **24.09.2026 — PROŠLO.** `test-plan-medium-a.spec.ts`: neplaćeni dolazak od prije 20 dana unesen naknadnim unosom (vlasnik). Prodaja `Nedeljna` (7 dana) na profilu prikazuje „Neplaćeni dolasci su stariji od trajanja ove članarine i ostaju neplaćeni.“ i „Počinje danas“, 24.09.2026–01.10.2026. Poslije čuvanja dolazak ostaje neplaćen i nepovezan sa članarinom. Kraj je 01.10, jer BR-051 i E5 daju D + 7 (02.09 → 09.09). Raniji dokaz (22.09.): DB 0006/0007: datumi BR-052, prestari dolasci, vlasnikova prava, E14 kraj mjeseca, limiti/statusi, smjena i finansijski snapshot. Ovo potvrđuje baznu logiku, ne sve korake/poruke UI slučaja.
 
-### [MSHIP-05] Samo vlasnik smije da pomjeri početak (BR-052 korak 4)
+### [MSHIP-05] Svaka uloga smije da pomjeri početak (BR-052 korak 4, D-97)
 - **Prioritet:** Visoko
 - **Uloga / preduslovi:** prvo recepcioner, zatim vlasnik
-- **Koraci:** u dijalogu prodaje potražite [Promijeni početak]; kao vlasnik ga upotrijebite i
-  unesite datum `01.01.2026`.
+- **Koraci:** u dijalogu prodaje upotrijebite [Promijeni početak] i unesite datum `01.01.2026`,
+  prvo kao recepcioner, zatim kao vlasnik.
 - **Test podaci:** `01.01.2026`
-- **Očekivani rezultat:** recepcioner nema tu mogućnost (ili je odbijena porukom
-  „Nemate dozvolu za ovu radnju.“). Vlasniku se, čim unese datum, „Važi do“ preračunava i
-  obrazloženje glasi „Početak je odredio vlasnik.“
+- **Očekivani rezultat:** obje uloge imaju [Promijeni početak]. Čim se unese datum, „Važi do“
+  se preračunava (`01.02.2026`), a obrazloženje glasi „Početak je odredio recepcioner.“
+  odnosno „Početak je odredio vlasnik.“ (menadžer: „Početak je odredio menadžer.“).
   Neispravan datum (`32.13.2026`) daje „Unesite datum u formatu dd.mm.gggg.“
 - **Gdje provjeriti:** UI
-- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-high-c.spec.ts`: recepcioner u prodaji nema [Promijeni početak]; vlasnik ga ima, unos datuma odmah preračunava „Važi do“ i obrazloženje je „Početak je odredio vlasnik.“; `32.13.2026` → „Unesite datum u formatu dd.mm.gggg.“ i ništa se ne čuva. Raniji dokaz (22.09.): DB 0006/0007: datumi BR-052, prestari dolasci, vlasnikova prava, E14 kraj mjeseca, limiti/statusi, smjena i finansijski snapshot. Ovo potvrđuje baznu logiku, ne sve korake/poruke UI slučaja. **01.10.2026 — N-31 popravljeno:** isto važi i na S-05 „Novi član“; vlasnikov početak se ranije nije čuvao (vidi §9.19).
+- [ ] Prošlo  [ ] Palo  Napomena: **01.10.2026 — D-97 je promijenio očekivani rezultat**
+  (do tada recepcioner nije imao [Promijeni početak]); `test-plan-high-c.spec.ts` je ažuriran,
+  ali E2E još nije pušten, a baza je provjerena u `0029_staff_start_override` (vidi §9.22).
+  Ranije, po starom pravilu: **23.09.2026 — PROŠLO.** `test-plan-high-c.spec.ts`: recepcioner u prodaji nema [Promijeni početak]; vlasnik ga ima, unos datuma odmah preračunava „Važi do“ i obrazloženje je „Početak je odredio vlasnik.“; `32.13.2026` → „Unesite datum u formatu dd.mm.gggg.“ i ništa se ne čuva. Raniji dokaz (22.09.): DB 0006/0007: datumi BR-052, prestari dolasci, vlasnikova prava, E14 kraj mjeseca, limiti/statusi, smjena i finansijski snapshot. Ovo potvrđuje baznu logiku, ne sve korake/poruke UI slučaja. **01.10.2026 — N-31 popravljeno:** isto važi i na S-05 „Novi član“; vlasnikov početak se ranije nije čuvao (vidi §9.19).
 
 ### [MSHIP-06] Iznos može da mijenja samo vlasnik (BR-059)
 - **Prioritet:** Kritično
@@ -4260,6 +4263,23 @@ podešavanja) i zapisi noćnih poslova (`job_runs`). Rezervna kopija obrisanog, 
 `kp-test-podaci-backup-2026-10-01.json`, pored foldera projekta, samo na ovom računaru.
 Provjereno poslije: 2 Auth korisnika, 0 fajlova u Storage-u. Kategorija troška „Voda“ (iz seeda)
 je neaktivna i nije dirana.
+
+### 9.22 Dopuna — početak članarine mijenja svaka uloga (D-97), 01.10.2026
+
+**D-97 (odluka Mihajla 01.10.2026):** pored vlasnika i admina, i menadžer i recepcioner pri
+prodaji (S-05 „Novi član“ i S-08 prodaja/produženje) imaju [Promijeni početak] i mogu da
+izaberu bilo koji datum, raniji ili kasniji od izračunatog, kao vlasnik. „Važi do“ se računa od
+izabranog početka, neplaćeni dolasci od tog dana do danas se vezuju za članarinu, a obrazloženje
+imenuje ulogu: „Početak je odredio vlasnik.“ (vlasnik i admin), „… menadžer.“ ili
+„… recepcioner.“. Iznos po cjenovniku (BR-059) i naknadni unos (BR-120) ostaju samo vlasnikovi.
+Migracija 0047 mijenja samo tu provjeru u `membership_sale`.
+
+| Provjera 01.10.2026 | Rezultat |
+|---|---|
+| `npm run lint`, `npm run typecheck`, unit (`tests/unit`), `npm run build` | PROŠLO (216 unit) |
+| pgTAP sa migracijom 0047 u transakciji koja se poništava (produkcija) | **30/30 fajlova**; novo `0029_staff_start_override` (14 provjera); `0006` bez stare provjere „samo vlasnik“ (83), `0026` sa recepcionerovim početkom (13). Bez 0047 padaju tačno `0026` i `0029` (`E_FORBIDDEN`) |
+| Migracija 0047 na produkciji | primijenjena 01.10.2026 **prije** push-a; provjereno: jedna `membership_sale`, tijelo identično fajlu 0047, prava ista kao prije (`authenticated` i `anon` bez prava), podaci nedirnuti. Poslije toga `npm run test:db` (produkcija, poništava se): **30/30** |
+| E2E (`test-plan-high-c` MSHIP-05) | ažuriran, **nije pušten**: na produkciji su sada pravi korisnici, pa E2E samo na dev bazi |
 
 *Kraj plana. Novi rezultati upisani su uz slučajeve; neoznačeni kvadratići nisu automatski prolaz.*
 

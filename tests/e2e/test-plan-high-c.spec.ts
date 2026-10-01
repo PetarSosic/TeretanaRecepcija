@@ -325,15 +325,19 @@ function note(text: string) {
   console.log(`[note] ${text}`);
 }
 
-test("MSHIP-05 and MSHIP-13: only the owner moves the start, and month ends are right", async ({
+test("MSHIP-05 and MSHIP-13: every role moves the start, and month ends are right", async ({
   browser,
 }) => {
+  // D-97: the receptionist may choose the start too, and the reason names them.
   const desk = await signedIn(browser, staff.ana);
   const deskSale = await openSale(desk, plan.mjesecna);
   await expect(deskSale.getByLabel("Važi do")).not.toHaveText("—");
+  await deskSale.getByRole("button", { name: "Promijeni početak" }).click();
+  await deskSale.getByLabel("Početak").fill("01.01.2026");
+  await expect(deskSale.getByLabel("Važi do")).toHaveText("01.02.2026");
   await expect(
-    deskSale.getByRole("button", { name: "Promijeni početak" }),
-  ).toHaveCount(0);
+    deskSale.getByText("Početak je odredio recepcioner."),
+  ).toBeVisible();
   await desk.context().close();
 
   const owner = await signedIn(browser, staff.owner);

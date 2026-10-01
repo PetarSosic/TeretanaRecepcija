@@ -511,11 +511,11 @@ All RPCs are `security definer`. Each one:
 | `scan_card(p_code text)` → json `{result, member, open_visit, options, candidates, unpaid_count}` | all | BR-070–073 (check-out happens inside, unless the guard applies), BR-072a |
 | `check_in(p_member uuid, p_type visit_type, p_membership uuid, p_trainer uuid, p_slot uuid, p_manual bool)` → json | all | BR-071–079 |
 | `check_out(p_visit uuid, p_confirmed bool)` → json | all | BR-072, BR-072a |
-| `register_member(p_card_code, p_first, p_last, p_phone, p_email, p_dob, p_plan, p_trainer, p_amount, p_sessions, p_method, p_check_in bool, p_class_time time default null, p_start_override date default null)` → json | all (owner for `p_start_override`, N-31) | BR-033, BR-040–043, BR-050–060, BR-058a |
+| `register_member(p_card_code, p_first, p_last, p_phone, p_email, p_dob, p_plan, p_trainer, p_amount, p_sessions, p_method, p_check_in bool, p_class_time time default null, p_start_override date default null)` → json | all (`p_start_override` too, N-31, D-97) | BR-033, BR-040–043, BR-050–060, BR-058a |
 | `find_duplicates(p_phone, p_email)` → rows | all | BR-043 |
 | `update_member(p_member, …)` | all | BR-045 |
 | `anonymize_member(p_member)` | owner | BR-046 |
-| `sell_membership(p_member, p_plan, p_trainer, p_amount, p_sessions, p_method, p_start_override date default null, p_class_time time default null)` | all (override: owner) | BR-050–060, BR-058a, BR-092 |
+| `sell_membership(p_member, p_plan, p_trainer, p_amount, p_sessions, p_method, p_start_override date default null, p_class_time time default null)` | all (override too, D-97) | BR-050–060, BR-058a, BR-092 |
 | `set_membership_class_time(p_membership uuid, p_class_time time)` → membership | all | BR-058a (D-71) |
 | `sell_day_passes(p_qty, p_method)` | all | BR-100 |
 | `replace_card(p_member, p_new_code, p_method)` | all | BR-034 |

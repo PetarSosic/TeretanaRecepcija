@@ -1,7 +1,7 @@
 -- M-06: members and memberships. The worked examples E1, E2, E4, E13 and E14, BR-052
 -- with unpaid visits from fixtures (E3 and E5, date logic only), the sale, registration,
 -- editing, anonymization and card replacement RPCs, and the doc 07 §6 visibility.
-select plan(84);
+select plan(83);
 
 -- Fixtures ------------------------------------------------------------------------
 insert into auth.users (id, email) values
@@ -366,11 +366,7 @@ select throws_ok(
   $$select sell_membership('66666666-0000-0000-0000-000000020004',
       '66666666-0000-0000-0000-00000000f001', null, 50, null, 'cash')$$,
   'P0001', 'E_AMOUNT_LOCKED', 'BR-059: a receptionist cannot change a list price');
-select throws_ok(
-  $$select sell_membership('66666666-0000-0000-0000-000000020004',
-      '66666666-0000-0000-0000-00000000f001', null, null, null, 'cash',
-      gym_today('66666666-0000-0000-0000-00000000b001') + 5)$$,
-  'P0001', 'E_FORBIDDEN', 'BR-052 step 4: only the owner overrides the start date');
+-- BR-052 step 4: since D-97 every role may choose the start (0029_staff_start_override).
 select throws_ok(
   $$select sell_membership('66666666-0000-0000-0000-000000020004',
       '66666666-0000-0000-0000-00000000f006', null, null, null, 'cash')$$,

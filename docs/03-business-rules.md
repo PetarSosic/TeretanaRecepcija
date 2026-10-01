@@ -174,7 +174,7 @@ Every rule has an ID. Code comments and tests must reference these IDs, e.g. `//
      - **If E ≥ D:** start = V, and all those visits dated ≤ E are linked to the new membership and use up its sessions. Reason: `Počinje od prvog neplaćenog dolaska <V>`.
      - **If E < D:** the visits stay unlinked, and processing continues with step 3. The screen warns: `Neplaćeni dolasci su stariji od trajanja ove članarine i ostaju neplaćeni.`
   3. **Otherwise:** start = D. Reason: `Počinje danas`.
-  4. **Owner override:** only the owner can override the computed start date. A back-dated sale by the owner uses the owner's chosen date, and steps 1–3 are shown as a suggestion only.
+  4. **Start override (D-97):** any staff role (owner, manager, receptionist) can override the computed start date at sale with any date, earlier or later. The last valid day follows from the chosen start (BR-051), and the member's unlinked unpaid visits of covered types dated from the chosen start up to today are linked to the new membership. The reason names the role: `Početak je odredio vlasnik.` (owner and admin), `Početak je odredio menadžer.` or `Početak je odredio recepcioner.`. A back-dated sale by the owner uses the owner's chosen date, and steps 1–3 are shown as a suggestion only.
 
 > ASSUMPTION (AS-8): When there is no comparable membership, all unlinked unpaid visits of covered types qualify.
 

@@ -145,7 +145,7 @@ An `admin` sees everything an owner sees (D-58).
 4. `Iznos (€)`:
    - read-only for list-price plans (the owner sees an edit pencil);
    - required for Personalni, with the hint `Minimalno <min> €`.
-5. `Početak`: read-only, with the BR-052 reason text underneath (the owner sees an edit pencil). `Važi do`: read-only and calculated.
+5. `Početak`: read-only, with the BR-052 reason text underneath, and an edit pencil [Promijeni početak] for every role (D-97). `Važi do`: read-only and calculated.
 6. `Način plaćanja`: two large buttons, Gotovina and Platna kartica.
 7. A summary line: `<plan> · <Početak>–<Važi do> · <iznos> · <način>`.
 

@@ -35,7 +35,7 @@ export function saleArguments(value: SaleFields) {
     p_amount: value.amount,
     p_sessions: value.planKind === "personal" ? value.sessions : null,
     p_method: value.method,
-    // BR-052 step 4: the owner's own start; S-05 sends it too since N-31.
+    // BR-052 step 4: a start chosen by staff (any role, D-97); S-05 sends it too (N-31).
     p_start_override: value.startOverride,
   };
 }

@@ -105,7 +105,7 @@ export function MembershipFields({
     : [];
   const override = editingStart ? parseDateInput(startText) : null;
 
-  // US-08.1 AC2: recompute whenever the plan or the owner's start date changes. Only the
+  // US-08.1 AC2: recompute whenever the plan or the chosen start date changes. Only the
   // newest answer is kept, so a slow reply never overwrites a later choice.
   useEffect(() => {
     if (!planId) return;
@@ -344,7 +344,8 @@ export function MembershipFields({
                   >
                     {preview ? formatDate(preview.startDate) : "—"}
                   </output>
-                  {catalog.isOwner && preview ? (
+                  {/* BR-052 step 4: every role may choose the start (D-97). */}
+                  {preview ? (
                     <Button
                       type="button"
                       variant="outline"
