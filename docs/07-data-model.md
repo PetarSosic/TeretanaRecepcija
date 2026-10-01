@@ -552,7 +552,7 @@ For managers, `shift_summary` must verify that the requested shift is the curren
 - `fin_statement(p_from, p_to)` — the owner's income statement and cash flow (D-92): `income` {`memberships`, `training`, `storage`, `other`, `total`}, `cogs`, `gross_profit`, `operating` [{`name`, `total`}], `operating_total`, `profit`, `cash_flow` {`received`, `goods_paid`, `other_paid`, `net_change`}, `stock_value`, `stock_value_date` (BR-150 to BR-153, BR-158, BR-159). A period that ends before it starts raises `E_VALIDATION`;
 - `fin_income_breakdown(p_from, p_to)` — also a manager (D-80), whose `by_category` leaves out salary categories;
 - `fin_chart(p_year, p_month default null)` — the S-16 chart (D-68): the year's twelve months, or the month's days, each with income and expenses, `null` after today; plus the totals and the first year that holds any money. A slot's expenses are its operating expenses plus the cost of the goods sold in it (D-92);
-- `fin_expenses(p_from, p_to, filters)` — also a manager (D-80), without salary-category rows; each row names its `recurring_expense_id` (D-93);
+- `fin_expenses(p_from, p_to, filters)` — also a manager (D-80), without salary-category rows; each row names its `recurring_expense_id` (D-93) and who entered it, `created_by` (D-96, S-12);
 - `fin_recurring_expenses()` — S-30 (D-93): `items` (with `category_name`, `is_salary`, `last_posted` and `has_postings`) and the active ones' `salary_total`, `other_total` and `total` a month;
 - `fin_trainer_stats(p_month date)`;
 - `fin_trainer_payments(p_trainer, p_month)`;

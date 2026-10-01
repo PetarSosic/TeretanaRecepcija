@@ -1792,6 +1792,19 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 
 ---
 
+### [PAY-17] Menadžer na „Uplate danas“ vidi troškove kao na Finansijama (D-96)
+- **Prioritet:** Srednje
+- **Uloga / preduslovi:** menadžer; danas postoje trošak koji je unio vlasnik, isplata plate i trošak
+  koji je unio sam menadžer
+- **Koraci:** `/payments/today` → sekcija troškova; zatim `/finance/expenses` → Danas.
+- **Test podaci:** —
+- **Očekivani rezultat:** naslov sekcije je „Troškovi danas“ (ne „Moji troškovi danas“). Na listi
+  su svi današnji troškovi osim plata, isti kao na Finansijama → Troškovi → Danas. [Poništi] je
+  uključeno samo na menadžerovom trošku iz otvorene smjene; na ostalima je isključeno. Recepcioner
+  i dalje vidi samo svoje (PERM-06).
+- **Gdje provjeriti:** UI
+- [ ] Prošlo  [ ] Palo  Napomena:
+
 ### 3.8 STO — magacin (S-13, BR-140 do BR-144)
 
 ### [STO-01] Unos nove robe iz kase

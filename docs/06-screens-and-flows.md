@@ -172,11 +172,11 @@ An `admin` sees everything an owner sees (D-58).
 **Sections:**
 1. `Uplate` (payments).
 2. `Prodaja iz magacina` (bar sales).
-3. `Moji troškovi danas` (for the owner: `Troškovi danas`).
+3. `Moji troškovi danas` (for the owner and the manager: `Troškovi danas`; the manager's list is S-17's Danas, without salaries, D-96).
 
 **Each row:** time, description, method, amount, entered by, and actions [Ispravi] [Poništi] (enabled per BR-094). Voided rows are struck through, with the reason in a tooltip.
 
-**Footer:** open-shift totals — cash, card, till expenses, expected cash. Visible to the owner, managers and the shift's receptionist (P-14). Managers receive only these aggregate totals; expense rows still follow BR-134.
+**Footer:** open-shift totals — cash, card, till expenses, expected cash. Visible to the owner, managers and the shift's receptionist (P-14). Managers receive only these aggregate totals; expense rows follow BR-134 (for a manager every non-salary expense of today, voidable only when their own, D-96).
 
 **Empty text:** `Danas još nema uplata.`
 

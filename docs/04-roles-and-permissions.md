@@ -38,7 +38,7 @@
 | P-30 | Correct method or note; void with reason | ✓ (any record) | open shift | open shift | BR-094, BR-095 |
 | P-31 | Correct an amount | ✓ | ✗ | ✗ | BR-094 |
 | P-32 | Enter a desk expense (non-salary category, from till) | ✓ | ✓ | ✓ | BR-132 |
-| P-33 | View expenses | all | own, today; on S-17 every non-salary expense of Danas, Ova sedmica or Ovaj mjesec, read-only (D-80) | own, today | BR-134, D-80 |
+| P-33 | View expenses | all | every non-salary expense, read-only: of today on S-12 (D-96), of Danas, Ova sedmica or Ovaj mjesec on S-17 (D-80) | own, today | BR-134, D-80, D-96 |
 | P-34 | Void an expense | ✓ (any) | own, open shift | own, open shift | BR-135 |
 | **Magacin** | | | | | |
 | P-40 | View products, stock level, purchase and sale price | ✓ | ✓ | ✓ | BR-144 |

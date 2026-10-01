@@ -429,7 +429,7 @@ Every rule has an ID. Code comments and tests must reference these IDs, e.g. `//
 | VAT included | Optional: Da / Ne / not set |
 | Trainer | Only for a salary category, optional. Marks the expense as a payout to that trainer. |
 
-- **BR-134:** Managers and receptionists see only the expenses **they** created **today**. The owner sees all. D-80 adds one view for a manager: S-17 lists every expense of today, this week or this month **except salary categories**, read-only.
+- **BR-134:** Receptionists see only the expenses **they** created **today**. The owner sees all. A manager sees every expense **except salary categories**, read-only: on S-17 for today, this week or this month (D-80), and on S-12 for today (D-96); a manager's direct read of the table is still only their own of today.
 - **BR-135:** An expense void requires a reason. The owner can void any expense; others only their own records of the open shift (AS-14).
 - **BR-136 (fixed expenses, owner only, D-93):** the owner describes a cost that repeats every month — rent, internet, a staff salary — once, on S-30, and it is posted as an expense on the 1st of every month.
   - **Fields:**

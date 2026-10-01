@@ -125,6 +125,7 @@ export function PaymentsToday({
   openShiftId,
   shiftTotals,
   isOwner,
+  seesAllExpenses,
   staffId,
 }: {
   payments: TodayPayment[];
@@ -134,6 +135,8 @@ export function PaymentsToday({
   /** P-14: the open shift's totals, when this person may see them. */
   shiftTotals: ShiftTotalsOnly | null;
   isOwner: boolean;
+  /** BR-134 and D-96: the owner, the admin and the manager list everyone's expenses. */
+  seesAllExpenses: boolean;
   staffId: string;
 }) {
   const [editing, setEditing] = useState<Editing>(null);
@@ -298,7 +301,7 @@ export function PaymentsToday({
 
       <section aria-labelledby="expenses-title">
         <h2 id="expenses-title" className="mb-3 text-lg font-semibold">
-          {isOwner
+          {seesAllExpenses
             ? me.payments.sectionExpenses
             : me.payments.sectionMyExpenses}
         </h2>

@@ -261,6 +261,25 @@ test("D-80: S-17 is read-only for the manager and lists no salary", async ({
   ).not.toContainText(["E2E Plate"]);
 });
 
+test("D-96: S-12 lists today's expenses for the manager as S-17 does, read-only", async ({
+  page,
+}) => {
+  await signIn(page, manager);
+  await page.goto("/payments/today");
+  const section = page.locator("section", {
+    has: page.getByRole("heading", { name: "Troškovi danas" }),
+  });
+  // The owner's expense is listed, the salary is not, and only the owner voids it.
+  const row = section.getByRole("row", { name: /E2E struja danas/ });
+  await expect(row).toBeVisible();
+  await expect(row).toContainText("40,00 €");
+  await expect(row.getByRole("button", { name: /^Poništi / })).toBeDisabled();
+  await expect(section).not.toContainText("E2E isplata trenerki");
+  await expect(
+    page.getByRole("heading", { name: "Moji troškovi danas" }),
+  ).toHaveCount(0);
+});
+
 test("D-80, D-81: S-19 lists the manager's shifts without the report or its email", async ({
   page,
 }) => {
