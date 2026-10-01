@@ -570,9 +570,8 @@ export const me = {
     charge: "Naplati",
     sold: "Prodaja je sačuvana.",
     unitCost: "Nabavna cijena po komadu (sa fakture)",
-    payment: "Plaćanje",
-    fromTill: "Iz kase",
-    outsideTill: "Van kase",
+    // D-95: the description Nova roba suggests, the same the database writes by itself.
+    stockInDescription: "Nabavka: {product} × {qty}",
     received: "Roba je evidentirana.",
     outOfStock: "Nema na stanju.",
     sectionSales: "Prodaja iz magacina",

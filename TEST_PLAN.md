@@ -1798,7 +1798,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Prioritet:** Visoko
 - **Uloga / preduslovi:** otvorena smjena
 - **Koraci:** `/storage` → [Nova roba] za proizvod `Voda` → Količina `24`, Nabavna cijena po komadu
-  `0,35`, Plaćanje `Iz kase` → sačuvajte.
+  `0,35`, označite `Iz kase` (D-95; ranije dugme „Plaćanje: Iz kase“) → sačuvajte.
 - **Test podaci:** kao gore
 - **Očekivani rezultat:** „Roba je evidentirana.“ Stanje postaje 24, nabavna cijena proizvoda
   postaje 0,35 €. Na `/payments/today` se pojavljuje trošak kategorije „Roba za prodaju“ od 8,40 €.
@@ -1808,7 +1808,8 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 ### [STO-02] Unos robe van kase
 - **Prioritet:** Visoko
 - **Uloga / preduslovi:** može i bez otvorene smjene
-- **Koraci:** [Nova roba] → Količina `12`, cijena `0,30`, Plaćanje `Van kase` → sačuvajte.
+- **Koraci:** [Nova roba] → Količina `12`, cijena `0,30`, Način `Van kase`, bez `Iz kase` (D-95) →
+  sačuvajte.
 - **Test podaci:** —
 - **Očekivani rezultat:** stanje raste za 12; trošak je zabilježen bez načina plaćanja
   („Van kase“) i **ne** umanjuje očekivanu gotovinu u smjeni.
@@ -1915,6 +1916,27 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   > **Ponoviti (D-76):** ekran Proizvodi je ukinut, a tekst praznog magacina je promijenjen.
 - **Gdje provjeriti:** UI
 - [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-extra.spec.ts`: jedini proizvod deaktiviran kroz `/settings/products` → `/storage` prikazuje „Nema proizvoda. Vlasnik dodaje proizvode u Podešavanjima.“ Proizvod vraćen u aktivno stanje.
+
+### [STO-13] Nova roba ima polja troška, bez kategorije (D-95)
+- **Prioritet:** Visoko
+- **Uloga / preduslovi:** recepcioner sa otvorenom smjenom, zatim vlasnik
+- **Koraci:**
+  1. Recepcioner: `/storage` → [Nova roba] za `Voda`. Pogledajte polja. Količina `6`, cijena
+     `0,40`, Način `Platna kartica`, PDV uračunat `Da`, Dobavljač `Veletrgovina`, Račun `R-1` →
+     sačuvajte.
+  2. Vlasnik: [Nova roba] za `Voda` → Količina `2`, Opis `Faktura za vodu`, Datum prije tri dana,
+     Način `Van kase`, Račun `R-2` → sačuvajte.
+  3. Vlasnik: [Nova roba] → označite `Iz kase`.
+- **Test podaci:** kao gore
+- **Očekivani rezultat:**
+  1. Nema polja „Kategorija“. Datum je današnji i ne može se mijenjati. Opis glasi „Nabavka: Voda“,
+     a čim se upiše količina „Nabavka: Voda × 6“. Ukupno 2,40 €. Trošak „Roba za prodaju“ od
+     2,40 € ima današnji datum, način platna kartica, dobavljača, račun i PDV „Da“.
+  2. Datum se može promijeniti. Trošak od 0,80 € ima datum od prije tri dana i opis „Faktura za
+     vodu“, „Van kase“, i nije vezan za smjenu. Stanje robe raste odmah.
+  3. Datum se vraća na danas, a Način na Gotovina, i ne mogu se mijenjati.
+- **Gdje provjeriti:** UI; `/finance/expenses` (vlasnik)
+- [ ] Prošlo  [ ] Palo  Napomena:
 
 ---
 
@@ -4170,6 +4192,31 @@ PROŠLO: ručnu instalaciju je provjerio tim. U §7.8 je precrtano pitanje koje 
 - [x] Primijeniti 0043 i 0044 na produkciju (`paakuxiufzmdobpooqdi`), pa tek onda push — **urađeno 01.10.2026.**
 - [x] AUTH-13 i AUTH-14 na produkciji: pravi mejl za reset i link iz njega — **PROŠLO 01.10.2026** (privremeni nalog obrisan poslije testa).
 - [ ] Ručno proći S-16 (bilans i novčani tok), S-20 i S-30 kao vlasnik, i S-16 kao menadžer (iz 9.18).
+
+### 9.20 Dopuna — Nova roba sa poljima troška (D-95), 01.10.2026
+
+**D-95 (zahtjev vlasnika 01.10.2026):** dijalog [Nova roba] na S-13 dobija polja S-17 [Novi
+trošak] bez „Kategorija“, jer je proizvod već izabran klikom, a kategorija je uvijek „Roba za
+prodaju“. Ostaju Količina i Nabavna cijena po komadu (sa fakture) sa „Ukupno“. Dodaju se:
+- Opis: popunjen sa „Nabavka: <proizvod> × <količina>“ i prati količinu dok se ne promijeni;
+- Datum: dan plaćanja; raniji dan bira samo vlasnik ili admin, ostalima je današnji i zaključan;
+- Način (Gotovina, Platna kartica, Van kase), PDV uračunat, Dobavljač i Račun;
+- Iz kase: danas, gotovina, otvorena smjena; bez smjene je isključeno.
+
+Datum određuje samo trošak, odnosno novčani tok. Roba ulazi na stanje odmah, a trošak sa ranijim
+datumom nije vezan za smjenu. Migracija 0045 mijenja `stock_in`; poziv sa prva četiri parametra
+radi kao i ranije, pa je migracija primijenjena na produkciju prije koda.
+
+**Razlika u odnosu na stari dijalog:** ranije se moralo izabrati „Iz kase“ ili „Van kase“. Sada je,
+kao kod troška, unaprijed izabran Način „Gotovina“, a „Iz kase“ nije označeno.
+
+| Provjera 01.10.2026 | Rezultat |
+|---|---|
+| `npm run lint`, `npm run typecheck`, `next build` | PROŠLO |
+| `npm run test` | `tests/unit/storage.test.ts` **7/7** (3 nova za D-95); ostalo prolazi osim `tests/integration/backup.test.ts` („Invalid API key“: u `.env.local` je produkcijski URL sa starim service ključem) |
+| Migracija 0045 na produkciji (`paakuxiufzmdobpooqdi`) | primijenjena; prije toga provjereno da je `stock_in` na produkciji isti kao u 0016 |
+| `npm run test:db` (produkcija, svaki fajl u transakciji koja se poništava) | **28/28 fajlova**; novo `0027_stock_in_fields` (23 provjere); prvi put 5 palo zbog očekivanja u testu (`concat_ws` piše `t`/`f`), funkcija je bila ispravna |
+| E2E: novi „D-95“ u `storage.spec.ts`; prilagođeni `storage`, `test-plan-critical`, `-high-d`, `-medium-a`, `-medium-b` („Iz kase“ je checkbox, „Van kase“ je Način) | **nije pušteno** — `.env.local` pokazuje na produkciju; čeka odluku |
 
 *Kraj plana. Novi rezultati upisani su uz slučajeve; neoznačeni kvadratići nisu automatski prolaz.*
 

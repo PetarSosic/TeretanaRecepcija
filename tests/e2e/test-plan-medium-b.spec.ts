@@ -484,7 +484,7 @@ test("E2E-08: a new price, a new product — old sales keep 79 €, the new one 
   const stockIn = owner.getByRole("dialog");
   await stockIn.getByLabel("Količina").fill("12");
   await stockIn.getByLabel("Nabavna cijena po komadu (sa fakture)").fill("0,60");
-  await stockIn.getByText("Van kase", { exact: true }).click();
+  await stockIn.getByLabel("Način", { exact: true }).selectOption("none");
   await stockIn.getByRole("button", { name: "Sačuvaj" }).click();
   await expect(owner.getByText("Roba je evidentirana.").first()).toBeVisible();
   await expect(owner.getByTestId("stock-E2E Izotonik")).toHaveText("12");

@@ -240,8 +240,11 @@ test("SHIFT-07: with no open shift every money button is disabled with the reaso
   await expect(sale).toHaveAttribute("title", NO_SHIFT);
   await page.getByRole("button", { name: "Nova roba" }).first().click();
   const dialog = page.getByRole("dialog");
-  await expect(dialog.getByRole("radio", { name: "Iz kase" })).toBeDisabled();
-  await expect(dialog.getByRole("radio", { name: "Van kase" })).toBeEnabled();
+  // D-95: without a shift only "Iz kase" is closed; Van kase stays a method.
+  await expect(
+    dialog.getByRole("checkbox", { name: /^Iz kase/ }),
+  ).toBeDisabled();
+  await expect(dialog.getByLabel("Način", { exact: true })).toBeEnabled();
   await expect(dialog.getByText(NO_SHIFT).first()).toBeVisible();
   await page.keyboard.press("Escape");
 

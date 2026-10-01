@@ -186,7 +186,7 @@ An `admin` sees everything an owner sees (D-58).
   - [Dodaj proizvod] beside the title, and [Uredi] on each row. Both open the product dialog: Naziv, Nabavna cijena (€), Prodajna cijena (€), Aktivan, with the info text `Promjena cijene važi samo za nove prodaje.` (BR-004, BR-140).
   - Under the table, when any product is inactive, [Prikaži neaktivne (N)] shows the table `Neaktivni proizvodi` (Proizvod, Nabavna cijena, Prodajna cijena, [Uredi]). Ticking Aktivan there brings a product back. The button then reads [Sakrij neaktivne (N)].
 - **Prodaja dialog:** quantity (max = stock), `Ukupno`, and the method buttons.
-- **Nova roba dialog:** quantity, `Nabavna cijena po komadu (sa fakture)` (minimum €0.01; validation: `Nabavna cijena mora biti najmanje 0,01 €.`), the choice `Plaćanje: Iz kase / Van kase`, and `Ukupno`.
+- **Nova roba dialog (D-95):** `Količina`, `Nabavna cijena po komadu (sa fakture)` (minimum €0.01; validation: `Nabavna cijena mora biti najmanje 0,01 €.`) and `Ukupno`, then the fields of S-17 [Novi trošak] without `Kategorija`: `Opis` (prefilled `Nabavka: <proizvod> × <količina>`), `Datum` (owner and admin only; disabled at today for the manager and the receptionist), `Način` (Gotovina / Platna kartica / Van kase), `PDV uračunat`, `Dobavljač`, `Račun` and `Iz kase` (disabled without an open shift). BR-141.
 - **Empty text:** `Nema proizvoda. Dodaje ih vlasnik ili menadžer.`
 
 ## S-14 Close shift — `/shift/close` (receptionist)

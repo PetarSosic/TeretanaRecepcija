@@ -130,7 +130,11 @@ async function stockIn(
   const dialog = page.getByRole("dialog");
   await dialog.getByLabel("Količina").fill(quantity);
   await dialog.getByLabel("Nabavna cijena po komadu (sa fakture)").fill(cost);
-  if (payment) await dialog.getByText(payment, { exact: true }).click();
+  // D-95: "Iz kase" is a checkbox, "Van kase" a method.
+  if (payment === "Iz kase")
+    await dialog.getByRole("checkbox", { name: /^Iz kase/ }).check();
+  if (payment === "Van kase")
+    await dialog.getByLabel("Način", { exact: true }).selectOption("none");
   await dialog.getByRole("button", { name: "Sačuvaj" }).click();
   return dialog;
 }
@@ -285,7 +289,9 @@ test("STO-11: the desk sees no stock value or profit; the owner's report does", 
   await desk.goto("/storage");
   await expect(stock(desk)).toHaveText("36");
   // Under a full-suite load the table can still be streaming in after the first cell.
-  await expect(desk.getByRole("columnheader", { name: "Proizvod" })).toBeVisible();
+  await expect(
+    desk.getByRole("columnheader", { name: "Proizvod" }),
+  ).toBeVisible();
   const headers = (await desk.getByRole("columnheader").allInnerTexts()).map(
     (h) => h.trim(),
   );

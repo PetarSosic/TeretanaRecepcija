@@ -91,7 +91,7 @@ test("D-55 and E18: goods arrive from the till at the invoice price", async ({
 
   // D-55: a free delivery is refused by the form, and nothing is written.
   await dialog.getByLabel("Nabavna cijena po komadu (sa fakture)").fill("0");
-  await dialog.getByText("Iz kase", { exact: true }).click();
+  await dialog.getByRole("checkbox", { name: /^Iz kase/ }).check();
   await dialog.getByRole("button", { name: "Sačuvaj" }).click();
   await expect(
     dialog.getByText("Nabavna cijena mora biti najmanje 0,01 €."),
@@ -200,7 +200,7 @@ test("E23 and D-92: a sale costs its purchase price; the goods bought are a paym
   await expect(
     goods.getByLabel("Nabavna cijena po komadu (sa fakture)"),
   ).toHaveValue("28,00");
-  await goods.getByText("Van kase", { exact: true }).click();
+  await goods.getByLabel("Način", { exact: true }).selectOption("none");
   await goods.getByRole("button", { name: "Sačuvaj" }).click();
   await expect(page.getByText("Roba je evidentirana.")).toBeVisible();
   await page.getByRole("button", { name: "Prodaja E2E Whey" }).click();
@@ -263,5 +263,100 @@ test("E23 and D-92: a sale costs its purchase price; the goods bought are a paym
     "9",
     "252,00 €",
   ]);
+  await ownerPage.context().close();
+});
+
+/** BR-001: a day of the gym, never the machine's, as yyyy-mm-dd. */
+function gymDate(days: number): string {
+  const parts = Object.fromEntries(
+    new Intl.DateTimeFormat("en-GB", {
+      timeZone: "Europe/Podgorica",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    })
+      .formatToParts(new Date())
+      .map(({ type, value }) => [type, value]),
+  );
+  const date = new Date(`${parts.year}-${parts.month}-${parts.day}T12:00:00Z`);
+  date.setUTCDate(date.getUTCDate() + days);
+  return date.toISOString().slice(0, 10);
+}
+
+async function stockInExpense(invoice: string) {
+  const { data } = await adminClient()
+    .from("expenses")
+    .select(
+      "spent_on, description, amount::text, method, paid_from_till, supplier, vat_included, shift_id",
+    )
+    .eq("gym_id", gymId)
+    .eq("invoice_number", invoice)
+    .single();
+  return data;
+}
+
+test("D-95: Nova roba takes the expense fields; only the owner moves the date", async ({
+  browser,
+}) => {
+  // The desk: the same fields, the date fixed to today, the description suggested.
+  const desk = await (await browser.newContext()).newPage();
+  await openStorage(desk);
+  await desk.getByRole("button", { name: "Nova roba E2E Voda" }).click();
+  const goods = desk.getByRole("dialog");
+  await expect(goods.getByLabel("Kategorija")).toHaveCount(0);
+  await expect(goods.getByLabel("Datum")).toBeDisabled();
+  await expect(goods.getByLabel("Datum")).toHaveValue(gymDate(0));
+  await expect(goods.getByLabel("Opis")).toHaveValue("Nabavka: E2E Voda");
+  await goods.getByLabel("Količina").fill("6");
+  await expect(goods.getByLabel("Opis")).toHaveValue("Nabavka: E2E Voda × 6");
+  await goods.getByLabel("Nabavna cijena po komadu (sa fakture)").fill("0,40");
+  await expect(goods.getByText("Ukupno: 2,40 €")).toBeVisible();
+  await goods.getByLabel("Način", { exact: true }).selectOption("card");
+  await goods.getByLabel("PDV uračunat").selectOption("yes");
+  await goods.getByLabel("Dobavljač").fill("E2E Veletrgovina");
+  await goods.getByLabel("Račun").fill("E2E-R-1");
+  await goods.getByRole("button", { name: "Sačuvaj" }).click();
+  await expect(desk.getByText("Roba je evidentirana.").first()).toBeVisible();
+  expect(await stockInExpense("E2E-R-1")).toMatchObject({
+    spent_on: gymDate(0),
+    description: "Nabavka: E2E Voda × 6",
+    amount: "2.40",
+    method: "card",
+    paid_from_till: false,
+    supplier: "E2E Veletrgovina",
+    vat_included: true,
+  });
+  await desk.context().close();
+
+  // The owner: an earlier payment day and an own description; no shift for that day.
+  const ownerPage = await (await browser.newContext()).newPage();
+  await ownerPage.goto("/login");
+  await ownerPage.getByLabel("Korisničko ime ili email").fill(owner.identifier);
+  await ownerPage.getByLabel("Lozinka", { exact: true }).fill(PASSWORD);
+  await ownerPage.getByRole("button", { name: "Prijavi se" }).click();
+  await ownerPage.waitForURL((url) => !url.pathname.startsWith("/login"));
+  await ownerPage.goto("/storage");
+  await ownerPage.getByRole("button", { name: "Nova roba E2E Voda" }).click();
+  const owned = ownerPage.getByRole("dialog");
+  await owned.getByLabel("Količina").fill("2");
+  await owned.getByLabel("Opis").fill("E2E faktura za vodu");
+  await expect(owned.getByLabel("Datum")).toBeEnabled();
+  await owned.getByLabel("Datum").fill(gymDate(-3));
+  await owned.getByLabel("Način", { exact: true }).selectOption("none");
+  await owned.getByLabel("Račun").fill("E2E-R-2");
+  await owned.getByRole("button", { name: "Sačuvaj" }).click();
+  await expect(
+    ownerPage.getByText("Roba je evidentirana.").first(),
+  ).toBeVisible();
+  expect(await stockInExpense("E2E-R-2")).toMatchObject({
+    spent_on: gymDate(-3),
+    description: "E2E faktura za vodu",
+    amount: "0.80",
+    method: null,
+    paid_from_till: false,
+    supplier: null,
+    vat_included: null,
+    shift_id: null,
+  });
   await ownerPage.context().close();
 });

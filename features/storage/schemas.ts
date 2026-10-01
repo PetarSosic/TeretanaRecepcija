@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { checkbox, isoDate } from "@/features/finance/schemas";
 import { parseMoneyInput } from "@/lib/format";
 import { me } from "@/lib/i18n/me";
 
@@ -21,24 +22,51 @@ export const saleSchema = z.object({
 });
 
 /**
- * BR-141 and D-55: 1–10,000 units at a purchase price of at least €0.01, paid from the
- * till or outside it.
+ * BR-141 and D-55: 1–10,000 units at a purchase price of at least €0.01. D-95: the rest
+ * is the owner's expense form (BR-133) without the category; an empty description is
+ * written as "Nabavka: <proizvod> × <količina>", and an empty date means today.
  */
-export const stockInSchema = z.object({
-  productId: z.string().uuid(),
-  quantity: quantity(10000),
-  unitCost: z
-    .string()
-    .trim()
-    .refine((value) => /^\d{1,8}([.,]\d{1,2})?$/.test(value), {
-      message: me.errors.E_STOCK_COST_INVALID,
-    })
-    .transform((value) => parseMoneyInput(value))
-    .refine((value) => Number(value) >= 0.01, {
-      message: me.errors.E_STOCK_COST_INVALID,
+export const stockInSchema = z
+  .object({
+    productId: z.string().uuid(),
+    quantity: quantity(10000),
+    unitCost: z
+      .string()
+      .trim()
+      .refine((value) => /^\d{1,8}([.,]\d{1,2})?$/.test(value), {
+        message: me.errors.E_STOCK_COST_INVALID,
+      })
+      .transform((value) => parseMoneyInput(value))
+      .refine((value) => Number(value) >= 0.01, {
+        message: me.errors.E_STOCK_COST_INVALID,
+      }),
+    description: z
+      .string()
+      .trim()
+      .refine((value) => value === "" || value.length >= 2, {
+        message: me.finance.descriptionInvalid,
+      })
+      .refine((value) => value.length <= 200, {
+        message: me.finance.descriptionInvalid,
+      }),
+    spentOn: z.preprocess(
+      (value) =>
+        typeof value === "string" && value.trim() === "" ? null : value,
+      isoDate.nullable(),
+    ),
+    method: z.enum(["cash", "card", "none"], {
+      message: me.errors.E_VALIDATION,
     }),
-  payment: z.enum(["till", "outside"], { message: me.errors.E_VALIDATION }),
-});
+    fromTill: checkbox,
+    supplier: z.string().trim().max(100, me.finance.supplierInvalid),
+    invoice: z.string().trim().max(50, me.finance.invoiceInvalid),
+    vat: z.enum(["yes", "no", "unset"]),
+  })
+  // BR-133: money out of the till is cash; the RPC forces it again.
+  .refine((value) => !value.fromTill || value.method === "cash", {
+    message: me.errors.E_VALIDATION,
+    path: ["method"],
+  });
 
 export const correctSaleSchema = z.object({
   movementId: z.string().uuid(),

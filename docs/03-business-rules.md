@@ -460,20 +460,24 @@ Every rule has an ID. Code comments and tests must reference these IDs, e.g. `//
   - current purchase price ≥ 0;
   - active flag.
   - Seed: **Voda**, purchase €0.30, sale €1.50.
-- **BR-141 (stock-in, any role).** Inputs:
-  - product (active);
+- **BR-141 (stock-in, any role).** Inputs (D-95: the owner's expense form of BR-133 without the category, plus the quantity and the price):
+  - product (active), chosen by clicking [Nova roba] in its row;
   - quantity 1–10,000;
-  - purchase price per unit (prefilled with the current price, editable, ≥ €0.01, "as written on the invoice"); free deliveries are not allowed (D-55);
-  - payment: **Iz kase** (from the till) or **Van kase** (outside the till), required.
+  - purchase price per unit (prefilled with the current price, editable, ≥ €0.01, "as written on the invoice"); free deliveries are not allowed (D-55); `Ukupno` = quantity × price is shown;
+  - description: prefilled `Nabavka: <proizvod> × <količina>` and following the quantity until edited; 2–200 characters; left empty, that text is written;
+  - date: the day the goods were **paid**, ≤ gym today; only the owner and the admin may choose an earlier day, for every other role it is today;
+  - method: Gotovina, Platna kartica or Van kase (`null`, AS-17);
+  - Iz kase: checkbox; if ticked, the date is today, the method cash, and an open shift is required;
+  - supplier ≤ 100 characters, invoice number ≤ 50 characters, VAT included Da / Ne / not set, all optional.
 
   In one transaction:
-  1. Stock increases.
+  1. Stock increases **now**, whatever the date (the date dates the payment only).
   2. The product's current purchase price becomes the entered price.
   3. An expense is created automatically:
      - category "Roba za prodaju";
-     - description `Nabavka: <proizvod> × <količina>`;
+     - the description, date, method, Iz kase, supplier, invoice number and VAT above;
      - amount = quantity × price;
-     - method cash with `paid_from_till = true` if Iz kase, otherwise method "Van kase" (`null`) with `paid_from_till = false`.
+     - attached to the open shift when its date is today, to no shift for an earlier day.
 
   "Iz kase" requires an open shift.
 

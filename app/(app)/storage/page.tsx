@@ -5,6 +5,7 @@ import {
 } from "@/features/storage/components/storage-screen";
 import type { EditableProduct } from "@/features/storage/components/product-editor";
 import { requireStaff } from "@/lib/auth";
+import { gymToday } from "@/lib/gym-date";
 import { me } from "@/lib/i18n/me";
 import { createClient } from "@/lib/supabase/server";
 
@@ -20,7 +21,7 @@ export default async function StoragePage() {
   const staff = await requireStaff();
   const canEdit = staff.role !== "receptionist";
   const supabase = await createClient();
-  const [{ data, error }, { data: inactive }] = await Promise.all([
+  const [{ data, error }, { data: inactive }, today] = await Promise.all([
     supabase
       .rpc("storage_products")
       .select(
@@ -37,6 +38,7 @@ export default async function StoragePage() {
           .order("name")
           .returns<EditableProduct[]>()
       : Promise.resolve({ data: null }),
+    gymToday(staff.gym_id),
   ]);
   if (error) console.error(`storage_products: ${error.message}`);
   return (
@@ -44,6 +46,9 @@ export default async function StoragePage() {
       products={(data ?? []) as StorageProduct[]}
       inactive={inactive ?? []}
       canEdit={canEdit}
+      today={today}
+      // D-95: an earlier payment day for Nova roba is the owner's and the admin's.
+      canBackdate={staff.role === "owner" || staff.role === "admin"}
     />
   );
 }

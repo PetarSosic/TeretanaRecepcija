@@ -527,7 +527,7 @@ All RPCs are `security definer`. Each one:
 | `post_recurring_expenses(p_gym, p_today date default null)` → number posted | other functions only | BR-136 |
 | `job_recurring_expenses()` → number posted, for every gym | pg_cron only | BR-136, BR-162 |
 | `void_expense(p_expense, p_reason)` | per BR-135 | BR-135 |
-| `stock_in(p_product, p_qty, p_unit_cost, p_from_till bool)` | all | BR-141 |
+| `stock_in(p_product, p_qty, p_unit_cost, p_from_till bool, p_method default null, p_spent_on date default null, p_description default null, p_supplier default null, p_invoice default null, p_vat bool default null)` | all (owner/admin for an earlier `p_spent_on`, D-95) | BR-141 |
 | `stock_sale(p_product, p_qty, p_method)` | all | BR-142 |
 | `correct_sale(p_movement, p_method)`, `void_stock_movement(p_movement, p_reason)` | per BR-094 and BR-095 | |
 | `backdated_visit(…)`, `backdated_membership(…, p_class_time time default null)`, `backdated_day_passes(…)`, `backdated_card_fee(…)` | owner | BR-120, BR-058a |

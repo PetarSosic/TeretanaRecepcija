@@ -10,7 +10,7 @@ const optionalUuid = z.preprocess(
   z.string().uuid().nullable(),
 );
 
-const isoDate = z
+export const isoDate = z
   .string()
   .trim()
   .refine((value) => /^\d{4}-\d{2}-\d{2}$/.test(value), {
@@ -25,7 +25,7 @@ const time = z
   });
 
 /** The same tolerant checkbox reading the settings forms use (doc 08 §6). */
-const checkbox = z
+export const checkbox = z
   .union([
     z.literal("on"),
     z.literal("true"),

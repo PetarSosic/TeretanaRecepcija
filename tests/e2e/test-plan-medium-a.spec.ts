@@ -733,7 +733,7 @@ test("STO-10: a stock-in expense is voided only with its stock-in", async ({
   const dialog = desk.getByRole("dialog");
   await dialog.getByLabel("Količina").fill("10");
   await dialog.getByLabel("Nabavna cijena po komadu (sa fakture)").fill("0,30");
-  await dialog.getByText("Iz kase", { exact: true }).click();
+  await dialog.getByRole("checkbox", { name: /^Iz kase/ }).check();
   await dialog.getByRole("button", { name: "Sačuvaj" }).click();
   await expect(desk.getByText("Roba je evidentirana.").first()).toBeVisible();
 

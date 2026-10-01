@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select } from "@/components/ui/select";
 import { Table, TableWrapper, Td, Th } from "@/components/ui/table";
 import { formatMoney, parseMoneyInput } from "@/lib/format";
 import { me } from "@/lib/i18n/me";
@@ -70,10 +71,16 @@ export function StorageScreen({
   products,
   inactive,
   canEdit,
+  today,
+  canBackdate,
 }: {
   products: StorageProduct[];
   inactive: EditableProduct[];
   canEdit: boolean;
+  /** BR-001: the gym's today, the default and the latest payment day of Nova roba. */
+  today: string;
+  /** D-95: the owner and the admin may give Nova roba an earlier payment day. */
+  canBackdate: boolean;
 }) {
   const [dialog, setDialog] = useState<Dialogs>(null);
   const close = useCallback(() => setDialog(null), []);
@@ -246,7 +253,12 @@ export function StorageScreen({
         <SaleDialog product={dialog.product} onClose={close} />
       ) : null}
       {dialog?.kind === "stockIn" ? (
-        <StockInDialog product={dialog.product} onClose={close} />
+        <StockInDialog
+          product={dialog.product}
+          today={today}
+          canBackdate={canBackdate}
+          onClose={close}
+        />
       ) : null}
     </>
   );
@@ -327,14 +339,21 @@ function SaleDialog({
 }
 
 /**
- * S-13 Nova roba (BR-141, D-55): the invoice price per unit (at least €0.01), and whether
- * it was paid from the till, which needs the open shift (BR-092), or outside it.
+ * S-13 Nova roba (BR-141, D-55, D-95): the invoice price per unit (at least €0.01) and
+ * `Ukupno`, then the owner's expense form (BR-133) without the category. The
+ * description follows the quantity until it is edited. Only the owner and the admin
+ * (`canBackdate`) choose an earlier payment day; "Iz kase" is today, cash and needs the
+ * open shift (BR-092).
  */
 function StockInDialog({
   product,
+  today,
+  canBackdate,
   onClose,
 }: {
   product: StorageProduct;
+  today: string;
+  canBackdate: boolean;
   onClose: () => void;
 }) {
   const [state, onSubmit, pending] = useFormAction(receiveStock);
@@ -343,7 +362,8 @@ function StockInDialog({
   const [unitCost, setUnitCost] = useState(
     product.current_purchase_price.replace(".", ","),
   );
-  const [payment, setPayment] = useState<"till" | "outside" | null>(null);
+  const [description, setDescription] = useState<string | null>(null);
+  const [fromTill, setFromTill] = useState(false);
   useActionToast(state, onClose);
   const errors = state.fieldErrors ?? {};
 
@@ -354,23 +374,19 @@ function StockInDialog({
   } catch {
     total = null;
   }
-
-  const options = [
-    {
-      value: "till" as const,
-      label: me.storage.fromTill,
-      disabled: !hasOpenShift,
-    },
-    {
-      value: "outside" as const,
-      label: me.storage.outsideTill,
-      disabled: false,
-    },
-  ];
+  const count = Number(quantity);
+  const suggested = me.storage.stockInDescription
+    .replace("{product}", product.name)
+    .replace(
+      " × {qty}",
+      Number.isInteger(count) && count >= 1 ? ` × ${count}` : "",
+    );
+  // The date is fixed to today from the till, and for every role but the owner's.
+  const dateLocked = fromTill || !canBackdate;
 
   return (
     <Dialog open onOpenChange={(open) => !open && onClose()}>
-      <DialogContent>
+      <DialogContent className="max-h-[90dvh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{me.storage.stockIn}</DialogTitle>
           <DialogDescription>{product.name}</DialogDescription>
@@ -378,86 +394,167 @@ function StockInDialog({
         <form onSubmit={onSubmit} className="grid gap-4" noValidate>
           <input type="hidden" name="productId" value={product.id} />
           <FormError>{state.error}</FormError>
-          <div className="grid gap-2">
-            <Label htmlFor="stock-in-quantity">{me.storage.quantity}</Label>
-            <Input
-              id="stock-in-quantity"
-              name="quantity"
-              type="number"
-              min={1}
-              max={10000}
-              inputMode="numeric"
-              value={quantity}
-              onChange={(event) => setQuantity(event.target.value)}
-              aria-invalid={Boolean(errors.quantity)}
-              aria-describedby="stock-in-quantity-error"
-            />
-            <FieldError id="stock-in-quantity-error">
-              {errors.quantity}
-            </FieldError>
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="stock-in-cost">{me.storage.unitCost}</Label>
-            <Input
-              id="stock-in-cost"
-              name="unitCost"
-              inputMode="decimal"
-              value={unitCost}
-              onChange={(event) => setUnitCost(event.target.value)}
-              aria-invalid={Boolean(errors.unitCost)}
-              aria-describedby="stock-in-cost-error"
-            />
-            <FieldError id="stock-in-cost-error">{errors.unitCost}</FieldError>
-          </div>
-          <fieldset
-            className="grid gap-2"
-            aria-describedby="stock-in-payment-error"
-          >
-            <legend className="mb-2 text-sm font-medium">
-              {me.storage.payment}
-            </legend>
-            <div className="grid grid-cols-2 gap-2">
-              {options.map((option) => (
-                <label
-                  key={option.value}
-                  title={
-                    option.disabled ? me.errors.E_NO_OPEN_SHIFT : undefined
-                  }
-                  className={cn(
-                    "flex h-12 cursor-pointer items-center justify-center rounded-lg border bg-card text-sm font-medium has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring",
-                    payment === option.value &&
-                      "border-primary bg-primary text-primary-foreground",
-                    option.disabled && "cursor-not-allowed opacity-60",
-                  )}
-                >
-                  <input
-                    type="radio"
-                    name="payment"
-                    value={option.value}
-                    checked={payment === option.value}
-                    disabled={option.disabled}
-                    onChange={() => setPayment(option.value)}
-                    className="sr-only"
-                  />
-                  {option.label}
-                </label>
-              ))}
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid gap-1.5">
+              <Label htmlFor="stock-in-quantity">{me.storage.quantity}</Label>
+              <Input
+                id="stock-in-quantity"
+                name="quantity"
+                type="number"
+                min={1}
+                max={10000}
+                inputMode="numeric"
+                value={quantity}
+                onChange={(event) => setQuantity(event.target.value)}
+                aria-invalid={Boolean(errors.quantity)}
+                aria-describedby="stock-in-quantity-error"
+              />
+              <FieldError id="stock-in-quantity-error">
+                {errors.quantity}
+              </FieldError>
             </div>
-            {!hasOpenShift ? (
-              <p className="text-sm text-muted-foreground">
-                {me.errors.E_NO_OPEN_SHIFT}
-              </p>
-            ) : null}
-            <FieldError id="stock-in-payment-error">
-              {errors.payment}
-            </FieldError>
-          </fieldset>
+            <div className="grid gap-1.5">
+              <Label htmlFor="stock-in-cost">{me.storage.unitCost}</Label>
+              <Input
+                id="stock-in-cost"
+                name="unitCost"
+                inputMode="decimal"
+                value={unitCost}
+                onChange={(event) => setUnitCost(event.target.value)}
+                aria-invalid={Boolean(errors.unitCost)}
+                aria-describedby="stock-in-cost-error"
+              />
+              <FieldError id="stock-in-cost-error">
+                {errors.unitCost}
+              </FieldError>
+            </div>
+          </div>
           <p className="text-lg font-semibold" aria-live="polite">
             {me.storage.total.replace(
               "{amount}",
               total ? formatMoney(total) : "—",
             )}
           </p>
+
+          <div className="grid gap-1.5">
+            <Label htmlFor="stock-in-description">
+              {me.finance.description}
+            </Label>
+            <Input
+              id="stock-in-description"
+              name="description"
+              value={description ?? suggested}
+              onChange={(event) => setDescription(event.target.value)}
+              aria-invalid={Boolean(errors.description)}
+              aria-describedby="stock-in-description-error"
+            />
+            <FieldError id="stock-in-description-error">
+              {errors.description}
+            </FieldError>
+          </div>
+
+          <div className="grid gap-1.5">
+            <Label htmlFor="stock-in-date">{me.finance.date}</Label>
+            {dateLocked ? (
+              <Input id="stock-in-date" type="date" value={today} disabled />
+            ) : (
+              <Input
+                id="stock-in-date"
+                name="spentOn"
+                type="date"
+                max={today}
+                defaultValue={today}
+                aria-invalid={Boolean(errors.spentOn)}
+                aria-describedby="stock-in-date-error"
+              />
+            )}
+            <FieldError id="stock-in-date-error">{errors.spentOn}</FieldError>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid gap-1.5">
+              <Label htmlFor="stock-in-method">{me.finance.method}</Label>
+              {fromTill ? (
+                <>
+                  <Select id="stock-in-method" value="cash" disabled>
+                    <option value="cash">{me.finance.methodCash}</option>
+                  </Select>
+                  {/* A disabled select sends nothing, so the forced value goes with it. */}
+                  <input type="hidden" name="method" value="cash" />
+                </>
+              ) : (
+                <Select id="stock-in-method" name="method" defaultValue="cash">
+                  <option value="cash">{me.finance.methodCash}</option>
+                  <option value="card">{me.finance.methodCard}</option>
+                  <option value="none">{me.finance.methodNone}</option>
+                </Select>
+              )}
+              <FieldError id="stock-in-method-error">
+                {errors.method}
+              </FieldError>
+            </div>
+            <div className="grid gap-1.5">
+              <Label htmlFor="stock-in-vat">{me.finance.vat}</Label>
+              <Select id="stock-in-vat" name="vat" defaultValue="unset">
+                <option value="unset">{me.finance.vatUnset}</option>
+                <option value="yes">{me.finance.vatYes}</option>
+                <option value="no">{me.finance.vatNo}</option>
+              </Select>
+            </div>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid gap-1.5">
+              <Label htmlFor="stock-in-supplier">{me.finance.supplier}</Label>
+              <Input
+                id="stock-in-supplier"
+                name="supplier"
+                aria-invalid={Boolean(errors.supplier)}
+                aria-describedby="stock-in-supplier-error"
+              />
+              <FieldError id="stock-in-supplier-error">
+                {errors.supplier}
+              </FieldError>
+            </div>
+            <div className="grid gap-1.5">
+              <Label htmlFor="stock-in-invoice">{me.finance.invoice}</Label>
+              <Input
+                id="stock-in-invoice"
+                name="invoice"
+                aria-invalid={Boolean(errors.invoice)}
+                aria-describedby="stock-in-invoice-error"
+              />
+              <FieldError id="stock-in-invoice-error">
+                {errors.invoice}
+              </FieldError>
+            </div>
+          </div>
+
+          <label
+            className={cn(
+              "flex items-start gap-2 text-sm",
+              !hasOpenShift && "cursor-not-allowed opacity-60",
+            )}
+          >
+            <input
+              type="checkbox"
+              name="fromTill"
+              checked={fromTill}
+              disabled={!hasOpenShift}
+              onChange={(event) => setFromTill(event.target.checked)}
+              className="mt-0.5 size-4"
+            />
+            <span>
+              {me.finance.fromTill}
+              <span className="block text-xs text-muted-foreground">
+                {hasOpenShift
+                  ? me.finance.fromTillHint
+                  : me.errors.E_NO_OPEN_SHIFT}
+              </span>
+            </span>
+          </label>
+
           <DialogFooter>
             <DialogClose asChild>
               <Button type="button" variant="outline">
