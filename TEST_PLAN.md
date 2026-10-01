@@ -1436,7 +1436,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   obrazloženje glasi „Početak je odredio vlasnik.“
   Neispravan datum (`32.13.2026`) daje „Unesite datum u formatu dd.mm.gggg.“
 - **Gdje provjeriti:** UI
-- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-high-c.spec.ts`: recepcioner u prodaji nema [Promijeni početak]; vlasnik ga ima, unos datuma odmah preračunava „Važi do“ i obrazloženje je „Početak je odredio vlasnik.“; `32.13.2026` → „Unesite datum u formatu dd.mm.gggg.“ i ništa se ne čuva. Raniji dokaz (22.09.): DB 0006/0007: datumi BR-052, prestari dolasci, vlasnikova prava, E14 kraj mjeseca, limiti/statusi, smjena i finansijski snapshot. Ovo potvrđuje baznu logiku, ne sve korake/poruke UI slučaja.
+- [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-high-c.spec.ts`: recepcioner u prodaji nema [Promijeni početak]; vlasnik ga ima, unos datuma odmah preračunava „Važi do“ i obrazloženje je „Početak je odredio vlasnik.“; `32.13.2026` → „Unesite datum u formatu dd.mm.gggg.“ i ništa se ne čuva. Raniji dokaz (22.09.): DB 0006/0007: datumi BR-052, prestari dolasci, vlasnikova prava, E14 kraj mjeseca, limiti/statusi, smjena i finansijski snapshot. Ovo potvrđuje baznu logiku, ne sve korake/poruke UI slučaja. **01.10.2026 — N-31 popravljeno:** isto važi i na S-05 „Novi član“; vlasnikov početak se ranije nije čuvao (vidi §9.19).
 
 ### [MSHIP-06] Iznos može da mijenja samo vlasnik (BR-059)
 - **Prioritet:** Kritično
@@ -2609,10 +2609,11 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Uloga / preduslovi:** Vlasnik (vidi SUSPECT-01)
 - **Koraci:** ručno u adresi: `/stats/visits?period=custom&from=2024-01-01&to=2026-09-21`.
 - **Test podaci:** period duži od 400 dana
-- **Očekivani rezultat:** **jasna poruka o grešci.** Ako ekran umjesto toga prikaže
-  „Nema dolazaka u izabranom periodu.“ iako dolazaka ima, to je pogrešno i treba zabilježiti kao bug.
+- **Očekivani rezultat:** „Period je predug. Statistika se prikazuje za najviše 400 dana.“ (D-94).
+  Ako ekran umjesto toga prikaže „Nema dolazaka u izabranom periodu.“ iako dolazaka ima, to je
+  pogrešno i treba zabilježiti kao bug. Period od tačno 400 dana se prikazuje.
 - **Gdje provjeriti:** UI; serverska konzola (`npm run dev`)
-- [x] Prošlo  [ ] Palo  Napomena: **22.09.2026 — PROŠLO.** Dodatni UI: custom period 2020-01-01–2026-09-22 daje Provjerite unesene podatke., a ne lažno Nema dolazaka.
+- [x] Prošlo  [ ] Palo  Napomena: **22.09.2026 — PROŠLO.** Dodatni UI: custom period 2020-01-01–2026-09-22 daje Provjerite unesene podatke., a ne lažno Nema dolazaka. **01.10.2026 — PROŠLO (D-94):** vidi §9.19.
 
 ### [STAT-04] Automatska odjava se broji kao dolazak, ali ne u prosjek (BR-082)
 - **Prioritet:** Srednje
@@ -2959,7 +2960,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   otvara u svom prozoru, bez adresne trake; prijava vodi na početni ekran uloge kao u browseru.
   Bez interneta prozor pokazuje offline stranicu browsera; ništa se ne čuva u kešu.
 - **Gdje provjeriti:** UI; DevTools → Application → Manifest (bez grešaka)
-- [ ] Prošlo  [ ] Palo  Napomena: **30.09.2026 — automatski dio PROŠAO.** `pwa.spec.ts`:
+- [x] Prošlo  [ ] Palo  Napomena: **01.10.2026 — PROŠLO.** Ručnu instalaciju na uređajima provjerio je tim i javio 01.10.2026; u ovoj sesiji nije ponovljena. **30.09.2026 — automatski dio PROŠAO.** `pwa.spec.ts`:
   `/manifest.webmanifest` i sve ikone stižu bez prijave (200, bez preusmjerenja na `/login`),
   veličine PNG-ova odgovaraju manifestu, Chrome ne prijavljuje greške manifesta ni prepreke za
   instalaciju (osim „in-incognito“, koju daje sam Playwright). Kad se ukloni izuzetak u proxy-ju,
@@ -3147,7 +3148,7 @@ potvrđuje ili opovrgava.
 
 - **POTVRĐENO** (provjereno uživo, 21.09.2026). Vlasnik, period 01.01.2020 – danas (preko 400 dana): ekran pokazuje „Nema dolazaka u izabranom periodu.“ iako RPC odbija zahtjev sa `E_VALIDATION`. Uzrok je tačno kako je opisano — `const { data } = await supabase.rpc(...)` ne čita `error`. **Ozbiljnost: visoka** — vlasnik može zaključiti da nema prometa. Popravka: pročitati `error` i prikazati poruku umjesto praznog stanja.
 
-- **POPRAVLJENO 21.09.2026.** `app/(app)/stats/visits/page.tsx` sada čita `error` i prikazuje poruku umjesto praznog stanja. Provjereno uživo: period od preko 400 dana daje „Provjerite unesene podatke.“, a ne više „Nema dolazaka“. *Tekst poruke ostaje otvoreno pitanje §7.4 — sada se bar vidi da je zahtjev odbijen.*
+- **POPRAVLJENO 21.09.2026.** `app/(app)/stats/visits/page.tsx` sada čita `error` i prikazuje poruku umjesto praznog stanja. Provjereno uživo: period od preko 400 dana daje „Provjerite unesene podatke.“, a ne više „Nema dolazaka“. *Tekst poruke ostaje otvoreno pitanje §7.4 — sada se bar vidi da je zahtjev odbijen.* **01.10.2026 (D-94):** poruka je sada „Period je predug. Statistika se prikazuje za najviše 400 dana.“ (kod `E_PERIOD_TOO_LONG`, migracija 0044).
 
 ### [SUSPECT-02] Datum rođenja u budućnosti nema svoju poruku
 - **Gdje:** `features/members/schemas.ts:27` (komentar kaže da „today“ provjerava RPC)
@@ -3286,7 +3287,8 @@ odluku donosi vlasnik.
    u mala. Nije jasno da li korisnik koji otkuca `Marija` treba da vidi grešku ili tiho prihvatanje.
 3. **Gornja granica iznosa** za prebrojanu gotovinu pri preuzimanju smjene i za cijene u
    podešavanjima nije određena (vidi SUSPECT-05 i SUSPECT-11). Koja poruka treba da se prikaže?
-4. **Period duži od 400 dana** na statistici je odbijen u bazi, ali ekran za to nema poruku
+4. **Riješeno 01.10.2026 (D-94): ekran kaže „Period je predug. Statistika se prikazuje za najviše 400 dana.“**
+   ~~**Period duži od 400 dana**~~ na statistici je odbijen u bazi, ali ekran za to nema poruku
    (SUSPECT-01). Šta korisnik treba da vidi?
 5. **Ponašanje pri isteku sesije** (kada Supabase token istekne nakon dužeg stajanja) nije opisano:
    da li korisnik treba da vidi poruku „sesija je istekla“ ili samo ekran prijave?
@@ -3295,13 +3297,16 @@ odluku donosi vlasnik.
    se ne odredi.
 7. **Minimalna cijena personalnog treninga po treneru (OQ-2)**: sada je jedna za cijelu teretanu
    (80 €). Treba li različita po treneru?
-8. **Primaoci izvještaja smjene (OQ-6)**: sada ide samo na adresu iz podešavanja. Treba li da ide i
+8. **Riješeno 24.09.2026 (D-65): izvještaj uvijek ide i svakom aktivnom vlasniku sa emailom.**
+   ~~**Primaoci izvještaja smjene (OQ-6)**~~: sada ide samo na adresu iz podešavanja. Treba li da ide i
    vlasniku kada aplikacija krene uživo?
 9. **Hosting za produkciju (OQ-5)**: Vercel Hobby plan je za nekomercijalnu upotrebu. Nije odlučeno
    gdje se aplikacija hostuje kada teretana počne da je koristi.
-10. **Dozvoljeni format kartice:** kôd je tačno 10 cifara i ne počinje nulom. Nije napisano šta
+10. **Riješeno 01.10.2026 (odluka vlasnika): kartice su riješene, pravilo formata ostaje.**
+    ~~**Dozvoljeni format kartice:**~~ kôd je tačno 10 cifara i ne počinje nulom. Nije napisano šta
     raditi ako štampar isporuči kartice u drugom formatu.
-11. **Ponašanje pri dva pulta u isto vrijeme:** BR-110 dozvoljava samo jednu otvorenu smjenu po
+11. **Riješeno 01.10.2026 (odluka vlasnika): teretana ima samo jedan pult; BR-110 ostaje.**
+    ~~**Ponašanje pri dva pulta u isto vrijeme:**~~ BR-110 dozvoljava samo jednu otvorenu smjenu po
     teretani. Nije opisano šta ako teretana ikad bude imala dva pulta istovremeno.
 
 ---
@@ -4091,9 +4096,9 @@ ništa od ovoga. Migracije 0041 i 0042 su primijenjene na bazu 30.09.2026.
 
 **OTVORENO — nastaviti sljedeći put (bilo koji računar):**
 
-- [ ] Prije 23:00 ponovo pustiti recepcijske testove i FIN-05, desktop:
+- [x] Prije 23:00 ponovo pustiti recepcijske testove i FIN-05, desktop:
       `npx playwright test tests/e2e/reception.spec.ts tests/e2e/test-plan-high-a.spec.ts tests/e2e/test-plan-high-g.spec.ts tests/e2e/test-plan-medium-a.spec.ts tests/e2e/test-plan-rest.spec.ts --project=desktop`.
-      Ako padnu i danju, to je pravi problem i treba ga istražiti.
+      Ako padnu i danju, to je pravi problem i treba ga istražiti. — **urađeno 01.10.2026, vidi §9.19.**
 - [x] Obrisati ručne testne podatke iz prave teretane (KP Fitness) — **urađeno 30.09.2026.**
       Obrisano: 6 članova sa članarinama, 7 uplata, 7 dolazaka, 7 smjena (i 7 PDF-ova u
       Storage-u), 4 troška (i „Suplementi“ 1.545 €), 3 kretanja robe, 7 kartica u 2 serije,
@@ -4103,6 +4108,53 @@ ništa od ovoga. Migracije 0041 i 0042 su primijenjene na bazu 30.09.2026.
       kategorije, Voda, podešavanja), vlasnik i Admin. Rezervna kopija obrisanog je u
       `kp-test-podaci-backup.json`, pored foldera projekta, samo na računaru na kojem je rađeno.
 - [ ] Ručno proći S-16 (bilans i novčani tok), S-20 i S-30 kao vlasnik, i S-16 kao menadžer.
+
+### 9.19 Dopuna — recepcija danju, period statistike, vlasnikov početak na S-05 (D-94, N-31), 01.10.2026
+
+**Recepcija i FIN-05 danju (OTVORENO iz 9.18).** Pušteno u 09:54, desktop, na dev bazi ovog
+računara (`wtvkvtrdvvkdgemiazkn`). REC-17, REC-21, Flow 3 i E3 i E2E-04 su **PROŠLI**: sinoćni
+padovi su bili noćni posao u 23:00. Sinoćni paket je radio na bazi na kojoj poslovi zaista rade;
+Resend pokazuje izvještaje smjena „E2E …“ poslate između 23:24 i 23:35. Pet drugih padova imalo
+je jedan uzrok: dev baza nije imala migracije **0041 i 0042**, primijenjene 30.09. samo na bazu
+drugog računara. Zato čišćenje test teretane nije našlo tabelu `recurring_expenses` (Flow 4,
+PERM-10, UX-03, SHIFT-06), a FIN-05 je dobio 504,00 € umjesto 504,60 € (bez troška prodate
+robe, D-92). Kod nije bio pogrešan. Migracije 0041–0044 su primijenjene na dev bazu i paket je
+ponovljen (tabela ispod).
+
+**D-94 — period duži od 400 dana (§7.4, SUSPECT-01, STAT-03), odluka vlasnika 01.10.2026.**
+`visit_stats` za takav period sada vraća `E_PERIOD_TOO_LONG` umjesto opšteg `E_VALIDATION`, a
+S-15 piše „Period je predug. Statistika se prikazuje za najviše 400 dana.“ umjesto „Provjerite
+unesene podatke.“ (migracija 0044, `lib/i18n/me.ts`). Granica se ne mijenja: 400 dana se i dalje
+prikazuje, 401 ne.
+
+**N-31 — vlasnikov „Početak“ na S-05 „Novi član“ se nije čuvao — popravljeno.** Forma dijeli
+polja sa prodajom članarine (S-08), pa vlasnik vidi [Promijeni početak] i pregled računa sa
+njegovim datumom. Ipak, `registerMember` taj datum nije slao, a `register_member` ga nije ni
+primao: članarina je počinjala na izračunati dan. Sada `register_member` prima `p_start_override`
+kao `sell_membership` (migracija 0043, BR-052 korak 4), a `saleArguments` ga šalje za obje
+prodaje. Recepcioner i dalje ne može da pomjeri početak (`E_FORBIDDEN`). Nalaz je bio upisan u
+simulaciji pod oznakom N-29, koja se sudarala sa N-29 iz 9.13. `SIMULACIJA_PLAN.md` je obrisan na
+zahtjev 01.10.2026.
+
+**Odluke vlasnika 01.10.2026:** §7.10 (kartice) i §7.11 (jedan pult) su riješeni. UX-09 je
+PROŠLO: ručnu instalaciju je provjerio tim. U §7.8 je precrtano pitanje koje je D-65 riješio još
+24.09.
+
+| Provjera 01.10.2026 | Rezultat |
+|---|---|
+| `npm run lint`, `npm run typecheck` | PROŠLO |
+| `npm run test` | **214 PROŠLO** (1 preskočen) |
+| `npm run test:db` (dev baza, migracije 0041–0044) | **27/27 fajlova**; novo `0026_register_start` (13 provjera), `0013` očekuje `E_PERIOD_TOO_LONG` |
+| E2E prvi prolaz (dev baza bez 0041/0042): reception, high-a, high-g, medium-a, rest, desktop | 31 prošlo, 5 palo — uzrok gore |
+| E2E drugi prolaz: isti fajlovi + `members.spec.ts`, desktop; novo STAT-03 (D-94) i N-31 | **45/45 PROŠLO** (4,4 min), uključujući Flow 4, PERM-10, UX-03, SHIFT-06, FIN-05 (504,60 €), REC-17, REC-21, E2E-04 |
+| Zaostale `E2E` teretane u dev bazi | 5 iz prvog prolaza (čišćenje palo na `recurring_expenses`) obrisane `deleteTestGym`; sada **0** |
+| Migracije 0043 i 0044 na produkciji (`paakuxiufzmdobpooqdi`) | primijenjene 01.10.2026 **prije** push-a (kod sa N-31 šalje `p_start_override`, pa bez 0043 upis novog člana pada); provjereno: jedna `register_member` sa `p_start_override`, bez prava za `anon`; `visit_stats` vraća `E_PERIOD_TOO_LONG` |
+
+**OTVORENO — nastaviti sljedeći put:**
+
+- [x] Primijeniti 0043 i 0044 na produkciju (`paakuxiufzmdobpooqdi`), pa tek onda push — **urađeno 01.10.2026.**
+- [ ] AUTH-13 i AUTH-14 na produkciji: pravi mejl za reset i link iz njega (čeka odluku koji nalog).
+- [ ] Ručno proći S-16 (bilans i novčani tok), S-20 i S-30 kao vlasnik, i S-16 kao menadžer (iz 9.18).
 
 *Kraj plana. Novi rezultati upisani su uz slučajeve; neoznačeni kvadratići nisu automatski prolaz.*
 
