@@ -4249,6 +4249,18 @@ dodaje `created_by` u redove `fin_expenses`.
 
 > AUTH-01 puštati samo na dev bazi: na produkciji koristi pravi vlasnikov nalog.
 
+**Brisanje test podataka sa produkcije — 01.10.2026 (zahtjev vlasnika).** Iz teretane KP Fitness
+obrisano je sve od jutrošnjeg ručnog testiranja: nalozi „Test“ (recepcioner) i „menadzer“ sa
+Auth korisnicima, 1 smjena i njen PDF, 4 kretanja robe (Voda ponovo na stanju 0), 4 troška (tri
+nabavke i Higijeničar 800 €), fiksni troškovi Higijeničar i Julija, serija sa 1 karticom, 17
+stavki dnevnika izmjena, rezervna kopija od 27.09 (zip i zapis) i brojači neuspjelih prijava.
+Prije brisanja skripta je provjerila da teretana nema nijednog člana, uplatu, članarinu ni
+dolazak. Ostali su vlasnik, Admin, seed (planovi, treneri, programi, raspored, kategorije, Voda,
+podešavanja) i zapisi noćnih poslova (`job_runs`). Rezervna kopija obrisanog, bez lozinki, je u
+`kp-test-podaci-backup-2026-10-01.json`, pored foldera projekta, samo na ovom računaru.
+Provjereno poslije: 2 Auth korisnika, 0 fajlova u Storage-u. Kategorija troška „Voda“ (iz seeda)
+je neaktivna i nije dirana.
+
 *Kraj plana. Novi rezultati upisani su uz slučajeve; neoznačeni kvadratići nisu automatski prolaz.*
 
 
