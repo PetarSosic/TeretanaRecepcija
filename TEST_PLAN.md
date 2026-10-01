@@ -1936,7 +1936,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
      vodu“, „Van kase“, i nije vezan za smjenu. Stanje robe raste odmah.
   3. Datum se vraća na danas, a Način na Gotovina, i ne mogu se mijenjati.
 - **Gdje provjeriti:** UI; `/finance/expenses` (vlasnik)
-- [ ] Prošlo  [ ] Palo  Napomena:
+- [x] Prošlo  [ ] Palo  Napomena: **01.10.2026 — PROŠLO.** `storage.spec.ts` „D-95“ na produkcijskoj bazi: koraci 1 i 2 kako je opisano (provjereno i u bazi); korak 3 pokriva `0027_stock_in_fields` (Iz kase → danas, gotovina, otvorena smjena). Vidi §9.20.
 
 ---
 
@@ -4216,7 +4216,7 @@ kao kod troška, unaprijed izabran Način „Gotovina“, a „Iz kase“ nije o
 | `npm run test` | `tests/unit/storage.test.ts` **7/7** (3 nova za D-95); ostalo prolazi osim `tests/integration/backup.test.ts` („Invalid API key“: u `.env.local` je produkcijski URL sa starim service ključem) |
 | Migracija 0045 na produkciji (`paakuxiufzmdobpooqdi`) | primijenjena; prije toga provjereno da je `stock_in` na produkciji isti kao u 0016 |
 | `npm run test:db` (produkcija, svaki fajl u transakciji koja se poništava) | **28/28 fajlova**; novo `0027_stock_in_fields` (23 provjere); prvi put 5 palo zbog očekivanja u testu (`concat_ws` piše `t`/`f`), funkcija je bila ispravna |
-| E2E: novi „D-95“ u `storage.spec.ts`; prilagođeni `storage`, `test-plan-critical`, `-high-d`, `-medium-a`, `-medium-b` („Iz kase“ je checkbox, „Van kase“ je Način) | **nije pušteno** — `.env.local` pokazuje na produkciju; čeka odluku |
+| E2E na produkcijskoj bazi (`--env-file=.env.paak`), desktop: `storage`, `test-plan-critical`, `-high-d`, `-medium-a`, `-medium-b` | Prva dva prolaza: 4 pala na prijavi. U `.env.local` je bio produkcijski URL sa dev javnim ključem („Invalid API key“), a prvi put i prolazno „JWT issued at future“ pri pravljenju test teretane. Kod nije bio uzrok. Treći prolaz, sa ispravnim ključem: **30 prošlo**, 1 palo (D-95: `getByLabel("Datum")` je našao i checkbox čiji opis počinje sa „Datum…“; ispravljeno na tačan naziv). Ponovljen `storage.spec.ts`: **5/5**. Zaostalih E2E teretana na produkciji: 0 |
 
 *Kraj plana. Novi rezultati upisani su uz slučajeve; neoznačeni kvadratići nisu automatski prolaz.*
 

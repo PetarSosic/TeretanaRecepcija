@@ -303,18 +303,24 @@ test("D-95: Nova roba takes the expense fields; only the owner moves the date", 
   await openStorage(desk);
   await desk.getByRole("button", { name: "Nova roba E2E Voda" }).click();
   const goods = desk.getByRole("dialog");
-  await expect(goods.getByLabel("Kategorija")).toHaveCount(0);
-  await expect(goods.getByLabel("Datum")).toBeDisabled();
-  await expect(goods.getByLabel("Datum")).toHaveValue(gymDate(0));
-  await expect(goods.getByLabel("Opis")).toHaveValue("Nabavka: E2E Voda");
+  await expect(goods.getByLabel("Kategorija", { exact: true })).toHaveCount(0);
+  await expect(goods.getByLabel("Datum", { exact: true })).toBeDisabled();
+  await expect(goods.getByLabel("Datum", { exact: true })).toHaveValue(
+    gymDate(0),
+  );
+  await expect(goods.getByLabel("Opis", { exact: true })).toHaveValue(
+    "Nabavka: E2E Voda",
+  );
   await goods.getByLabel("Količina").fill("6");
-  await expect(goods.getByLabel("Opis")).toHaveValue("Nabavka: E2E Voda × 6");
+  await expect(goods.getByLabel("Opis", { exact: true })).toHaveValue(
+    "Nabavka: E2E Voda × 6",
+  );
   await goods.getByLabel("Nabavna cijena po komadu (sa fakture)").fill("0,40");
   await expect(goods.getByText("Ukupno: 2,40 €")).toBeVisible();
   await goods.getByLabel("Način", { exact: true }).selectOption("card");
-  await goods.getByLabel("PDV uračunat").selectOption("yes");
-  await goods.getByLabel("Dobavljač").fill("E2E Veletrgovina");
-  await goods.getByLabel("Račun").fill("E2E-R-1");
+  await goods.getByLabel("PDV uračunat", { exact: true }).selectOption("yes");
+  await goods.getByLabel("Dobavljač", { exact: true }).fill("E2E Veletrgovina");
+  await goods.getByLabel("Račun", { exact: true }).fill("E2E-R-1");
   await goods.getByRole("button", { name: "Sačuvaj" }).click();
   await expect(desk.getByText("Roba je evidentirana.").first()).toBeVisible();
   expect(await stockInExpense("E2E-R-1")).toMatchObject({
@@ -339,11 +345,11 @@ test("D-95: Nova roba takes the expense fields; only the owner moves the date", 
   await ownerPage.getByRole("button", { name: "Nova roba E2E Voda" }).click();
   const owned = ownerPage.getByRole("dialog");
   await owned.getByLabel("Količina").fill("2");
-  await owned.getByLabel("Opis").fill("E2E faktura za vodu");
-  await expect(owned.getByLabel("Datum")).toBeEnabled();
-  await owned.getByLabel("Datum").fill(gymDate(-3));
+  await owned.getByLabel("Opis", { exact: true }).fill("E2E faktura za vodu");
+  await expect(owned.getByLabel("Datum", { exact: true })).toBeEnabled();
+  await owned.getByLabel("Datum", { exact: true }).fill(gymDate(-3));
   await owned.getByLabel("Način", { exact: true }).selectOption("none");
-  await owned.getByLabel("Račun").fill("E2E-R-2");
+  await owned.getByLabel("Račun", { exact: true }).fill("E2E-R-2");
   await owned.getByRole("button", { name: "Sačuvaj" }).click();
   await expect(
     ownerPage.getByText("Roba je evidentirana.").first(),
