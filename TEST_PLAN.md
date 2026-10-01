@@ -1803,7 +1803,7 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
   uključeno samo na menadžerovom trošku iz otvorene smjene; na ostalima je isključeno. Recepcioner
   i dalje vidi samo svoje (PERM-06).
 - **Gdje provjeriti:** UI
-- [ ] Prošlo  [ ] Palo  Napomena:
+- [x] Prošlo  [ ] Palo  Napomena: **01.10.2026 — PROŠLO.** `manager-finance.spec.ts` „D-96“ na produkcijskoj bazi: „Troškovi danas“, vlasnikov trošak 40,00 € sa isključenim [Poništi], bez isplate plate i bez naslova „Moji troškovi danas“. PERM-06 (recepcioner) ponovo prošao. Vidi §9.21.
 
 ### 3.8 STO — magacin (S-13, BR-140 do BR-144)
 
@@ -4230,6 +4230,24 @@ kao kod troška, unaprijed izabran Način „Gotovina“, a „Iz kase“ nije o
 | Migracija 0045 na produkciji (`paakuxiufzmdobpooqdi`) | primijenjena; prije toga provjereno da je `stock_in` na produkciji isti kao u 0016 |
 | `npm run test:db` (produkcija, svaki fajl u transakciji koja se poništava) | **28/28 fajlova**; novo `0027_stock_in_fields` (23 provjere); prvi put 5 palo zbog očekivanja u testu (`concat_ws` piše `t`/`f`), funkcija je bila ispravna |
 | E2E na produkcijskoj bazi (`--env-file=.env.paak`), desktop: `storage`, `test-plan-critical`, `-high-d`, `-medium-a`, `-medium-b` | Prva dva prolaza: 4 pala na prijavi. U `.env.local` je bio produkcijski URL sa dev javnim ključem („Invalid API key“), a prvi put i prolazno „JWT issued at future“ pri pravljenju test teretane. Kod nije bio uzrok. Treći prolaz, sa ispravnim ključem: **30 prošlo**, 1 palo (D-95: `getByLabel("Datum")` je našao i checkbox čiji opis počinje sa „Datum…“; ispravljeno na tačan naziv). Ponovljen `storage.spec.ts`: **5/5**. Zaostalih E2E teretana na produkciji: 0 |
+
+### 9.21 Dopuna — menadžer na „Uplate danas“ (D-96), 01.10.2026
+
+**D-96 (zahtjev vlasnika 01.10.2026):** od D-80 menadžer na Finansije → Troškovi vidi sve
+troškove osim plata, a na „Uplate danas“ samo svoje (BR-134). Isti dan je tako na dva ekrana
+izgledao različito. Sada sekcija „Troškovi danas“ na S-12 menadžeru prikazuje isto što i S-17 za
+Danas, preko `fin_expenses`. [Poništi] ostaje samo na menadžerovom trošku iz otvorene smjene
+(BR-135). Recepcioner i vlasnik se ne mijenjaju, kao ni polisa nad tabelom. Migracija 0046 samo
+dodaje `created_by` u redove `fin_expenses`.
+
+| Provjera 01.10.2026 | Rezultat |
+|---|---|
+| `npm run lint`, `npm run typecheck`, unit (`tests/unit`) | PROŠLO (216); `tests/integration` nije pušten, jer bi sa produkcijskim ključem napravio test teretanu na produkciji |
+| Migracija 0046 na produkciji | primijenjena; prije toga provjereno da je `fin_expenses` isti kao u 0042 |
+| `npm run test:db` (produkcija, u transakciji koja se poništava) | **29/29 fajlova**; novo `0028_fin_expenses_created_by` (6 provjera) |
+| E2E na produkcijskoj bazi, desktop: `manager-finance`, `payments`, `close-shift`, `test-plan-access` | **13 prošlo**, uključujući „D-96“. AUTH-01 je pao jer se prijavljuje na pravi vlasnikov nalog dev lozinkom, a na produkciji je lozinka druga; zbog toga se 6 testova iza njega nije pokrenulo. Ponovljen `test-plan-access` bez AUTH-01: **6/6**, uključujući PERM-06. Zaostalih E2E teretana: 0 |
+
+> AUTH-01 puštati samo na dev bazi: na produkciji koristi pravi vlasnikov nalog.
 
 *Kraj plana. Novi rezultati upisani su uz slučajeve; neoznačeni kvadratići nisu automatski prolaz.*
 
