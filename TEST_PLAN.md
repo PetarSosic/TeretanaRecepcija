@@ -4304,8 +4304,8 @@ cio iznos teretani; „nije definisano“ ostaje za stare prodaje (`finance.spec
 |---|---|
 | `npm run lint`, `npm run typecheck`, unit (`tests/unit`), `npm run build` | PROŠLO (220 unit) |
 | pgTAP sa migracijom 0051 u transakciji koja se poništava (produkcija) | **33/33 fajla**; `0031_personal_gym_fee` prepisan za D-101 (15 provjera: obavezno, minimum 40 €, stari obrazac odbijen, S-05, S-22, dio trenera 0); `0006` (83) prodaje Personalni preko fiksnog dijela |
-| Migracija 0051 na produkciji | **nije primijenjena**: čeka odobrenje, jer mora ići zajedno sa deploy-em |
-| E2E (`members`, `pause-gym-fee`, `test-plan-forms` MSHIP-07, `test-plan-high-c` MSHIP-09/10, `test-plan-rest` MSHIP-11, `test-plan-high-f` FIN-11) | ažurirani, **nisu pušteni**: lokalni server zove RPC na produkciji, pa trebaju migraciju 0051 |
+| Migracija 0051 na produkciji | primijenjena 02.10.2026 uz odobrenje vlasnika, odmah prije push-a (`f27300d`, Vercel produkcija READY); provjereno: po jedna `membership_sale` i `backdated_membership`, tijela identična fajlu 0051, prava ista kao prije; `npm run test:db` poslije primjene **33/33** |
+| E2E na produkcijskoj bazi, desktop, svaki spec u svojoj E2E teretani koju briše: `members` (8), `pause-gym-fee` (3), MSHIP-07, MSHIP-09/10, MSHIP-11, „the desk's day“ + FIN-11 | **16 prošlo**. MSHIP-10: `0` → „Fiksni dio za teretanu ne može biti manji od 80,00 €.“; FIN-11: Julija Prihod 100,00 €, Za trenera 0,00 €, Za teretanu 100,00 €. Poslije: u bazi je samo teretana KP Fitness |
 
 *Kraj plana. Novi rezultati upisani su uz slučajeve; neoznačeni kvadratići nisu automatski prolaz.*
 
