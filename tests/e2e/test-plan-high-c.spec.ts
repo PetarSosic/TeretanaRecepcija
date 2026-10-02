@@ -634,9 +634,10 @@ test("PAY-06, PAY-07 and PAY-14: desk expense bounds, no salary category, a void
     if (await dialog.count()) await page.keyboard.press("Escape");
     return { saved, shown };
   }
-  const AMOUNT = "Unesite iznos od 0,01 do 10.000,00 €.";
+  // D-98: the desk sends the BR-133 form, so its messages and its €100,000 limit.
+  const AMOUNT = "Unesite iznos između 0,01 i 100.000,00 €.";
   const cases: [string, Parameters<typeof attempt>[0], string | "saved"][] = [
-    ["bez kategorije", { category: null }, "Izaberite kategoriju."],
+    ["bez kategorije", { category: null }, "Provjerite unesene podatke."],
     ["opis 1", { description: "a" }, "Unesite opis (2–200 znakova)."],
     [
       "opis 201",
@@ -645,8 +646,8 @@ test("PAY-06, PAY-07 and PAY-14: desk expense bounds, no salary category, a void
     ],
     ["iznos 0", { amount: "0" }, AMOUNT],
     ["iznos 0,01", { amount: "0,01" }, "saved"],
-    ["iznos 10000", { amount: "10000" }, "saved"],
-    ["iznos 10000,01", { amount: "10000,01" }, AMOUNT],
+    ["iznos 100000", { amount: "100000" }, "saved"],
+    ["iznos 100000,01", { amount: "100000,01" }, AMOUNT],
     ["iznos -5", { amount: "-5" }, AMOUNT],
     ["iznos 12,345", { amount: "12,345" }, AMOUNT],
     ["iznos abc", { amount: "abc" }, AMOUNT],
@@ -701,7 +702,7 @@ test("PAY-06, PAY-07 and PAY-14: desk expense bounds, no salary category, a void
         .locator("xpath=following-sibling::dd")
         .textContent()) ?? ""
     ).trim();
-  expect(await till()).toBe("10.000,01 €");
+  expect(await till()).toBe("100.000,01 €");
   await page.goto("/payments/today");
   const row = page.locator("tr", { hasText: "0,01 €" });
   await row.getByRole("button", { name: /^Poništi / }).click();
@@ -713,6 +714,6 @@ test("PAY-06, PAY-07 and PAY-14: desk expense bounds, no salary category, a void
     page.locator("tr[data-voided=true]", { hasText: "0,01 €" }),
   ).toHaveClass(/line-through/);
   await page.goto("/shift/close");
-  expect(await till()).toBe("10.000,00 €");
+  expect(await till()).toBe("100.000,00 €");
   console.log(`[note] all: ${notes.join(" | ")}`);
 });

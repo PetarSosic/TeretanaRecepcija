@@ -2,7 +2,8 @@
 
 import { useCallback, useState } from "react";
 import { Loader2, Minus, Plus } from "lucide-react";
-import { FieldError, FormError } from "@/components/common/form-message";
+import { useAppState } from "@/components/common/app-state";
+import { FormError } from "@/components/common/form-message";
 import {
   MethodButtons,
   type PaymentMethod,
@@ -15,14 +16,17 @@ import {
   Dialog,
   DialogClose,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select } from "@/components/ui/select";
+import {
+  ExpenseDialog,
+  type Trainer,
+} from "@/features/finance/components/expense-dialog";
+import type { Category } from "@/features/settings/components/categories-section";
 import { formatMoney, parseMoneyInput } from "@/lib/format";
 import { me } from "@/lib/i18n/me";
 import { recordDeskExpense, sellDayPasses } from "../actions";
@@ -140,108 +144,24 @@ function DayPassForm({ price, onDone }: { price: string; onDone: () => void }) {
   );
 }
 
-export type ExpenseCategory = { id: string; name: string };
-
-/** S-11 (F-14, BR-132): paid from the till, today; active non-salary categories only. */
-export function DeskExpenseDialog({
-  categories,
-  ...props
-}: OpenProps & { categories: ExpenseCategory[] }) {
+/**
+ * S-11 (F-14, D-98): the desk's [Trošak] is the BR-133 form of S-17. With a shift open it
+ * starts on "Iz kase", which is what the desk mostly pays. Salary categories reach only
+ * the owner (D-37).
+ */
+export function DeskExpenseDialog(
+  props: OpenProps & {
+    categories: Category[];
+    trainers: Trainer[];
+    today: string;
+  },
+) {
+  const { hasOpenShift } = useAppState();
   return (
-    <Dialog open={props.open} onOpenChange={props.onOpenChange}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>{me.deskExpense.title}</DialogTitle>
-          <DialogDescription>
-            {me.deskExpense.fixedNote}
-          </DialogDescription>
-        </DialogHeader>
-        {props.open ? (
-          <DeskExpenseForm
-            categories={categories}
-            onDone={() => props.onOpenChange(false)}
-          />
-        ) : null}
-      </DialogContent>
-    </Dialog>
-  );
-}
-
-function DeskExpenseForm({
-  categories,
-  onDone,
-}: {
-  categories: ExpenseCategory[];
-  onDone: () => void;
-}) {
-  const [state, onSubmit, pending] = useFormAction(recordDeskExpense);
-  const close = useCallback(() => onDone(), [onDone]);
-  useActionToast(state, close);
-  const errors = state.fieldErrors ?? {};
-
-  return (
-    <form onSubmit={onSubmit} className="grid gap-4" noValidate>
-      <FormError>{state.error}</FormError>
-      <div className="grid gap-2">
-        <Label htmlFor="expense-category">{me.deskExpense.category}</Label>
-        <Select
-          id="expense-category"
-          name="categoryId"
-          defaultValue=""
-          aria-invalid={Boolean(errors.categoryId)}
-          aria-describedby="expense-category-error"
-        >
-          <option value="" disabled>
-            {me.deskExpense.categoryRequired}
-          </option>
-          {categories.map((category) => (
-            <option key={category.id} value={category.id}>
-              {category.name}
-            </option>
-          ))}
-        </Select>
-        <FieldError id="expense-category-error">{errors.categoryId}</FieldError>
-      </div>
-      <div className="grid gap-2">
-        <Label htmlFor="expense-description">
-          {me.deskExpense.description}
-        </Label>
-        <Input
-          id="expense-description"
-          name="description"
-          autoComplete="off"
-          aria-invalid={Boolean(errors.description)}
-          aria-describedby="expense-description-error"
-        />
-        <FieldError id="expense-description-error">
-          {errors.description}
-        </FieldError>
-      </div>
-      <div className="grid gap-2">
-        <Label htmlFor="expense-amount">{me.deskExpense.amount}</Label>
-        <Input
-          id="expense-amount"
-          name="amount"
-          inputMode="decimal"
-          autoComplete="off"
-          aria-invalid={Boolean(errors.amount)}
-          aria-describedby="expense-amount-error"
-        />
-        <FieldError id="expense-amount-error">{errors.amount}</FieldError>
-      </div>
-      <DialogFooter>
-        <DialogClose asChild>
-          <Button type="button" variant="outline">
-            {me.common.cancel}
-          </Button>
-        </DialogClose>
-        <MoneyButton type="submit" disabled={pending}>
-          {pending ? (
-            <Loader2 aria-hidden="true" className="animate-spin" />
-          ) : null}
-          {me.common.save}
-        </MoneyButton>
-      </DialogFooter>
-    </form>
+    <ExpenseDialog
+      {...props}
+      action={recordDeskExpense}
+      defaultFromTill={hasOpenShift}
+    />
   );
 }

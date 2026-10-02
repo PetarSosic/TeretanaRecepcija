@@ -145,7 +145,7 @@ Covered by US-04.4, BR-078 and BR-079.
 - AC3: Voiding a membership payment shows a confirmation that the membership will be voided and its visits become unpaid.
 
 ## F-14 Desk cash expenses
-**US-14.1** As staff, I record a small expense paid from the till with [Trošak] on S-03 (BR-132).
+**US-14.1** As staff, I record an expense with [Trošak] on S-03, on the same form as S-17 [Novi trošak] (BR-132, BR-133, D-98).
 - AC1: After saving, the expense appears in S-12 "Moji troškovi danas" and in the shift summary.
 
 ## F-15 Magacin

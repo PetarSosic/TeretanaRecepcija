@@ -30,15 +30,16 @@
 | P-22 | Search members, view profiles | ✓ | ✓ | ✓ | BR-044 |
 | P-23 | Edit member personal data | ✓ | ✓ | ✓ | BR-045 |
 | P-24 | Anonymize a member | ✓ | ✗ | ✗ | BR-046 |
+| P-24a | Pause a membership (7 days at most in total) and end a pause | ✓ | ✓ | ✓ | BR-056, D-100 |
 | P-25 | Sell or renew a membership at list price (open shift required) | ✓ | ✓ | ✓ | BR-092 |
-| P-26 | Enter the amount and sessions for Personalni (≥ minimum) | ✓ | ✓ | ✓ | BR-059 |
+| P-26 | Enter the amount, sessions and the gym's fixed part for Personalni (amount ≥ minimum) | ✓ | ✓ | ✓ | BR-059, D-99 |
 | P-27 | Change a list-price amount | ✓ | ✗ | ✗ | BR-059 |
 | P-27a | Override the start date of a membership being sold (S-05, S-08) | ✓ | ✓ | ✓ | BR-052, D-97 |
 | P-28 | Sell day passes; replace a lost card | ✓ | ✓ | ✓ | BR-034, BR-100 |
 | P-29 | View today's payments and sales (not back-dated) | ✓ (all dates) | ✓ | ✓ | |
 | P-30 | Correct method or note; void with reason | ✓ (any record) | open shift | open shift | BR-094, BR-095 |
 | P-31 | Correct an amount | ✓ | ✗ | ✗ | BR-094 |
-| P-32 | Enter a desk expense (non-salary category, from till) | ✓ | ✓ | ✓ | BR-132 |
+| P-32 | Enter an expense at the desk on the BR-133 form: any day up to today, any method, from the till or not; non-salary category; open shift | ✓ (salary too, no shift needed outside the till) | ✓ | ✓ | BR-132, D-98 |
 | P-33 | View expenses | all | every non-salary expense, read-only: of today on S-12 (D-96), of Danas, Ova sedmica or Ovaj mjesec on S-17 (D-80) | own, today | BR-134, D-80, D-96 |
 | P-34 | Void an expense | ✓ (any) | own, open shift | own, open shift | BR-135 |
 | **Magacin** | | | | | |
@@ -51,7 +52,7 @@
 | P-50 | Visit statistics page (S-15) | ✓ | ✓ | ✗ | D-40 |
 | P-51 | Finance dashboard, income, expenses, profit, income statement and cash flow (S-16…S-21) | ✓ | Pregled, Troškovi and Smjene only: Prihod and Troškovi without salaries, for Danas, Ova sedmica or Ovaj mjesec; never profit, the statement or the cash flow (D-80, D-92) | ✗ | BR-157, BR-158, D-80, D-92 |
 | P-52 | Trainer statistics, shares, payouts | ✓ | ✗ | ✗ | BR-156 |
-| P-53 | Owner expense form (any category, incl. Plate and payouts) | ✓ | ✗ | ✗ | BR-133 |
+| P-53 | S-17 [Novi trošak]; salary categories and payouts in the expense form | ✓ | ✗ | ✗ | BR-133, D-98 |
 | P-54 | Manage expense categories | ✓ | ✗ | ✗ | BR-131 |
 | P-55 | Back-dated entries | ✓ | ✗ | ✗ | BR-120 |
 | P-56 | Audit log | ✓ | ✗ | ✗ | BR-096 |

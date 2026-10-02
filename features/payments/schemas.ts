@@ -47,17 +47,3 @@ export const voidSchema = z.object({
     .min(3, me.errors.E_REASON_REQUIRED)
     .max(200, me.errors.E_REASON_REQUIRED),
 });
-
-/** BR-132: an active non-salary category, 2–200 characters, €0.01–10,000. */
-export const deskExpenseSchema = z.object({
-  categoryId: z.string().uuid({ message: me.deskExpense.categoryRequired }),
-  description: z
-    .string()
-    .trim()
-    .min(2, me.deskExpense.descriptionInvalid)
-    .max(200, me.deskExpense.descriptionInvalid),
-  amount: money(me.deskExpense.amountInvalid).refine(
-    (value) => Number(value) >= 0.01 && Number(value) <= 10000,
-    { message: me.deskExpense.amountInvalid },
-  ),
-});

@@ -40,7 +40,9 @@ Use these terms **exactly** in the documents, code and UI.
 | Session | — | Termin | One unit of a session limit. Every visit of a limited type uses one. |
 | Session limit | `gym_visit_limit`, `group_session_limit`, `personal_session_limit` | Broj termina | Maximum visits of a type within a membership. `null` = unlimited ("Neograničeno"). |
 | Remaining sessions | computed | Preostalo termina | Limit minus the visits already linked to that membership. |
-| Membership status | computed | Status | `active` Aktivna · `upcoming` Buduća · `used_up` Iskorištena · `expired` Istekla · `voided` Poništena. |
+| Membership status | computed | Status | `active` Aktivna · `paused` Pauzirana (D-100) · `upcoming` Buduća · `used_up` Iskorištena · `expired` Istekla · `voided` Poništena. |
+| Pause | `membership_pauses` | Pauza | Days on which a membership covers nothing and which move its last valid day later; 7 days at most in total per membership (BR-056, D-100). |
+| Gym's fixed part | `membership_finance.personal_gym_fee` | Fiksni dio za teretanu | The part of a Personalni amount that goes to the gym, entered at sale or else the trainer's fee (BR-059, D-99). |
 | Personal minimum price | `personal_min_price` | Minimalna cijena personalnog | Lowest allowed amount for a Personalni sale. Default €80. |
 | Program | `program` | Program | A kind of training trainers can be assigned to (e.g. "Grupni trening"). Kind `group` or `personal`. |
 | Trainer assignment | `trainer_program` | Dodjela trenera | A link saying a trainer runs a program. |

@@ -9,7 +9,12 @@ import { fieldErrorsOf, rpcCode, rpcFailure } from "@/lib/rpc";
 import { createClient } from "@/lib/supabase/server";
 import type { ActionState } from "@/lib/action-state";
 import { personalMinimumText, saleArguments, saleFieldsFrom } from "./sale";
-import { classTimeChangeSchema, sellSchema } from "./schemas";
+import {
+  classTimeChangeSchema,
+  endPauseSchema,
+  pauseSchema,
+  sellSchema,
+} from "./schemas";
 
 /** F-08: sell or renew a membership (BR-050 to BR-060, BR-092). */
 export async function sellMembership(
@@ -36,6 +41,9 @@ export async function sellMembership(
     // D-71: the class time has its own field, so its message goes under it.
     if (code.startsWith("E_CLASS_TIME_"))
       return { fieldErrors: { classTime: getErrorMessage(code) } };
+    // D-99: and the gym's fixed part under its own.
+    if (code === "E_GYM_FEE_INVALID")
+      return { fieldErrors: { gymFee: getErrorMessage(code) } };
     return rpcFailure(error);
   }
 
@@ -70,6 +78,68 @@ export async function changeClassTime(
 
   revalidatePath(`/members/${parsed.data.memberId}`);
   return { success: me.memberships.classTimeSaved };
+}
+
+/**
+ * D-100 (BR-056): S-07 [Pauziraj]. Any role pauses a membership, 7 days at most in
+ * total; no money changes hands, so no shift is needed (BR-092).
+ */
+export async function pauseMembership(
+  _state: ActionState,
+  formData: FormData,
+): Promise<ActionState> {
+  await requireStaff();
+  const parsed = pauseSchema.safeParse({
+    memberId: formData.get("memberId"),
+    membershipId: formData.get("membershipId"),
+    pauseFrom: formData.get("pauseFrom") ?? "",
+    days: formData.get("days") ?? "",
+  });
+  if (!parsed.success)
+    return { fieldErrors: fieldErrorsOf(parsed.error.issues) };
+
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("pause_membership", {
+    p_membership: parsed.data.membershipId,
+    p_from: parsed.data.pauseFrom,
+    p_days: parsed.data.days,
+  });
+  if (error) {
+    const code = rpcCode(error);
+    // Each refusal belongs to the field that caused it.
+    if (code === "E_PAUSE_TOO_LONG")
+      return { fieldErrors: { days: getErrorMessage(code) } };
+    if (code.startsWith("E_PAUSE_"))
+      return { fieldErrors: { pauseFrom: getErrorMessage(code) } };
+    return rpcFailure(error);
+  }
+
+  revalidatePath(`/members/${parsed.data.memberId}`);
+  revalidatePath("/members");
+  return { success: me.memberships.pauseSaved };
+}
+
+/** D-100: S-07 [Prekini pauzu]. The member is back; the days from today go back. */
+export async function endMembershipPause(
+  _state: ActionState,
+  formData: FormData,
+): Promise<ActionState> {
+  await requireStaff();
+  const parsed = endPauseSchema.safeParse({
+    memberId: formData.get("memberId"),
+    pauseId: formData.get("pauseId"),
+  });
+  if (!parsed.success) return { error: me.errors.E_VALIDATION };
+
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("end_membership_pause", {
+    p_pause: parsed.data.pauseId,
+  });
+  if (error) return rpcFailure(error);
+
+  revalidatePath(`/members/${parsed.data.memberId}`);
+  revalidatePath("/members");
+  return { success: me.memberships.pauseEndSaved };
 }
 
 export type MembershipPreview = {

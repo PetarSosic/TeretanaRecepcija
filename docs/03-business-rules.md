@@ -197,7 +197,12 @@ Every rule has an ID. Code comments and tests must reference these IDs, e.g. `//
 
   A G+T membership whose group sessions are used up is still `active` (the gym part is unlimited). The UI shows `Grupni: 0 preostalo`.
 - **BR-055 (remaining sessions):** limit − number of visits of that type linked to the membership. **Every visit counts**, including a second visit on the same day. Check-out never uses a session. Unused sessions expire at `end_date` and are never transferred.
-- **BR-056:** A membership can never be frozen, paused or extended. Only a new sale adds time.
+- **BR-056 (pause, D-100):** a membership may be paused, **7 days at most in total**; nothing else extends it, and only a new sale adds time.
+  - Any staff role pauses it on S-07: from a day that is today or later and not after its last valid day, for 1 day up to what is left of the 7. Pauses of one membership never overlap. A pause cannot begin today when the member already came in today on that membership (`E_PAUSE_VISITED`).
+  - Every paused day moves the last valid day one day later. A non-voided membership of the same member that shares a visit type and starts the day after the old last day (BR-052 step 1) moves by as many days, with its own pauses, and so on down the chain.
+  - On a paused day the membership covers nothing (BR-053) and its status is `paused`, `Pauzirana` (BR-054).
+  - A member who comes in on a paused day ends that pause: the check-in (scan or manual start) gives back the days from today, and the last valid day keeps only the days already paused. [Prekini pauzu] does the same by hand; a pause that has not begun is given back whole.
+  - Errors: `E_PAUSE_INVALID`, `E_PAUSE_TOO_LONG`, `E_PAUSE_OVERLAP`, `E_PAUSE_VISITED`. Pauses are audited (BR-096) and never deleted.
 - **BR-057:** A member may hold any number of memberships at once (e.g. Mjesečna + Personalni). Selling a new membership before the current one ends is allowed; it becomes `upcoming` (BR-052 step 1).
 
   This is also how a mid-term change of plan is handled (D-61). A member who paid for Grupni and wants Personalni two weeks later simply buys Personalni; because the two plans share no visit type they are not comparable, so the new membership starts today (BR-052 step 3) while the old one runs to its own end date and its unused sessions expire (BR-055). Nothing is prorated, refunded or transferred, and the old membership is not voided.
@@ -216,6 +221,7 @@ Every rule has an ID. Code comments and tests must reference these IDs, e.g. `//
   - For plans with a list price, the amount equals the list price; only the owner can change it (at sale, or later via BR-094).
   - For Personalni, any staff role enters the amount. It must be ≥ the personal minimum price (BR-012), otherwise: `Iznos ne može biti manji od <min> €.`
   - The personal session count is entered at sale: whole number 1–50.
+  - **Gym's fixed part (D-99):** any staff role may enter, for Personalni, the part of the amount that goes to the gym, from 0 to the amount. Left empty, the trainer's fee applies (BR-058). It is stored with the membership's financial terms (BR-050) and used by BR-155.
 - **BR-060:** Every membership sale creates **exactly one** payment for the full amount in the same transaction. There are no partial payments and no debts.
 
 ## 7. Visits (check-in and check-out)
@@ -407,14 +413,11 @@ Every rule has an ID. Code comments and tests must reference these IDs, e.g. `//
   - categories are never deleted;
   - `is_system` categories cannot be deactivated;
   - deactivated categories are hidden from new expenses but stay on old ones.
-- **BR-132 (desk expense, any role):**
-  - category: active, not a salary category, and not "Roba za prodaju" (goods come in only through Nova roba, BR-141; D-92);
-  - description: 2–200 characters;
-  - amount: 0.01–10,000.00;
-  - date: gym today;
-  - method: cash, with `paid_from_till = true`;
-  - attached to the open shift.
-- **BR-133 (owner expense form):**
+- **BR-132 (desk expense, any role, D-98):** [Trošak] on S-03 is the BR-133 form, for every role.
+  - category: active, and not "Roba za prodaju" (goods come in only through Nova roba, BR-141; D-92); salary categories, and so payouts, only for the owner and the admin (D-37, D-80);
+  - "Iz kase" is ticked when the dialog opens while a shift is open;
+  - a manager's or receptionist's expense needs an open shift and is attached to it, whatever its date, so they can void it while it is open (BR-135); only what is paid from the till counts in the shift's cash (BR-115).
+- **BR-133 (expense form; S-17 and, since D-98, the desk):**
 
 | Field | Rule |
 |---|---|
@@ -511,6 +514,7 @@ Buying goods and the cost of the goods sold are two different things (D-92). A s
 - **BR-155 (shares per membership payment):**
   - **Grupni and G+T:** trainer share = max(amount − gym fixed amount, 0) × share % / 100, where the share % is the one stored on the membership at sale (BR-050, D-62) — never the plan's current value.
   - **Personalni:**
+    - the trainer fee is the gym's fixed part entered at sale, otherwise the trainer's fee copied at sale (D-99);
     - trainer fee `null` → trainer share and gym share are "nije definisano";
     - otherwise trainer share = amount − trainer fee;
     - if the result is negative → 0, with the warning `Iznos manji od naknade teretani`.

@@ -2,7 +2,6 @@ import { describe, expect, it } from "vitest";
 import {
   correctPaymentSchema,
   dayPassSchema,
-  deskExpenseSchema,
   voidSchema,
 } from "@/features/payments/schemas";
 import { me } from "@/lib/i18n/me";
@@ -62,36 +61,6 @@ describe("voidSchema (BR-095, BR-135)", () => {
     );
     expect(voidSchema.parse({ id, reason: " Pogrešno " }).reason).toBe(
       "Pogrešno",
-    );
-  });
-});
-
-describe("deskExpenseSchema (BR-132)", () => {
-  const base = { categoryId: id, description: "Deterdžent" };
-  it("accepts €0.01 to €10,000.00", () => {
-    expect(deskExpenseSchema.parse({ ...base, amount: "0,01" }).amount).toBe(
-      "0.01",
-    );
-    expect(deskExpenseSchema.parse({ ...base, amount: "10000" }).amount).toBe(
-      "10000.00",
-    );
-  });
-  it("refuses zero and anything above the desk limit", () => {
-    for (const amount of ["0", "0,00", "10000,01"])
-      expect(
-        deskExpenseSchema.safeParse({ ...base, amount }).error?.issues[0]
-          ?.message,
-      ).toBe(me.deskExpense.amountInvalid);
-  });
-  it("needs a category and a description of 2–200 characters", () => {
-    const result = deskExpenseSchema.safeParse({
-      categoryId: "",
-      description: "x",
-      amount: "5",
-    });
-    const fields = (result.error?.issues ?? []).map((issue) => issue.path[0]);
-    expect(fields).toEqual(
-      expect.arrayContaining(["categoryId", "description"]),
     );
   });
 });

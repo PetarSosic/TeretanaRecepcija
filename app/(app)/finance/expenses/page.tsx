@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
+import type { Trainer } from "@/features/finance/components/expense-dialog";
 import { PeriodPicker } from "@/features/finance/components/period-picker";
 import {
   ExpensesScreen,
   type ExpenseRow,
   type StaffOption,
-  type Trainer,
 } from "@/features/finance/components/expenses-screen";
 import { periodFromParams, presetsFor } from "@/features/finance/period";
 import type { Category } from "@/features/settings/components/categories-section";

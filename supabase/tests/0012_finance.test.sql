@@ -427,10 +427,11 @@ select throws_ok(
 select throws_ok(
   $$select fin_expenses((select first from fin_month), (select last from fin_chart_month))$$,
   'E_FORBIDDEN', 'BR-157 (D-80): nor from fin_expenses');
+-- D-98: the expense form is every role's now, but salaries stay the owner's (D-80).
 select throws_ok(
-  $$select record_expense('cccccccc-0000-0000-0000-000000060001', 'pgTAP', 10,
+  $$select record_expense('cccccccc-0000-0000-0000-000000060002', 'pgTAP', 10,
                           current_date, 'cash', false, null, null, null, null)$$,
-  'E_FORBIDDEN', 'BR-133: and a manager records no owner expense');
+  'E_CATEGORY_NOT_ALLOWED', 'BR-133 (D-98): and a manager records no salary');
 select throws_ok(
   $$select backdated_day_passes(1, 'cash', current_date)$$,
   'E_FORBIDDEN', 'BR-120: back-dated entries are the owner''s alone');

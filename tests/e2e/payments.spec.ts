@@ -195,10 +195,13 @@ test("US-12.1 and US-14.1: a day pass and a desk expense from reception", async 
     page.getByText("Prodato: 3 × dnevna karta = 30,00 €"),
   ).toBeVisible();
 
-  // S-11 and BR-132: salary categories are not offered at the desk (D-37).
+  // S-11 (D-98): the BR-133 form, on "Iz kase" while the shift is open; salary
+  // categories are not offered at the desk (D-37).
   await page.getByRole("button", { name: "Trošak" }).click();
   const expense = page.getByRole("dialog");
-  await expect(expense.getByText("Plaćeno iz kase · danas")).toBeVisible();
+  await expect(
+    expense.getByRole("checkbox", { name: /Iz kase/ }),
+  ).toBeChecked();
   await expect(
     expense
       .getByLabel("Kategorija")

@@ -85,6 +85,7 @@ export function MembershipFields({
   );
   const [sessions, setSessions] = useState("");
   const [amount, setAmount] = useState("");
+  const [gymFee, setGymFee] = useState("");
   const [editingAmount, setEditingAmount] = useState(false);
   const [startText, setStartText] = useState("");
   const [editingStart, setEditingStart] = useState(false);
@@ -126,6 +127,7 @@ export function MembershipFields({
     setPreview(null);
     setEditingAmount(false);
     setAmount("");
+    setGymFee("");
     // BR-058: suggest the trainer of the member's latest membership of the same kind,
     // but only if they may still be chosen (BR-023, BR-025).
     const suggested = next
@@ -314,6 +316,31 @@ export function MembershipFields({
           ) : null}
           <FieldError id={`${idPrefix}-amount-error`}>
             {fieldErrors.amount}
+          </FieldError>
+        </div>
+      ) : null}
+
+      {/* 4a. Fiksni dio za teretanu (Personalni only, D-99): empty = the trainer's fee. */}
+      {isPersonal ? (
+        <div className="grid gap-2">
+          <Label htmlFor={`${idPrefix}-gym-fee`}>{me.memberships.gymFee}</Label>
+          <Input
+            id={`${idPrefix}-gym-fee`}
+            name="gymFee"
+            inputMode="decimal"
+            value={gymFee}
+            onChange={(event) => setGymFee(event.target.value)}
+            aria-invalid={Boolean(fieldErrors.gymFee)}
+            aria-describedby={`${idPrefix}-gym-fee-hint ${idPrefix}-gym-fee-error`}
+          />
+          <p
+            id={`${idPrefix}-gym-fee-hint`}
+            className="text-sm text-muted-foreground"
+          >
+            {me.memberships.gymFeeHint}
+          </p>
+          <FieldError id={`${idPrefix}-gym-fee-error`}>
+            {fieldErrors.gymFee}
           </FieldError>
         </div>
       ) : null}

@@ -258,7 +258,21 @@ create table membership_finance (                          -- OWNER ONLY, snapsh
   gym_id            uuid not null references gyms(id),
   gym_fixed_amount  numeric(10,2) not null default 0,
   trainer_share_pct numeric(5,2),
-  personal_gym_fee  numeric(10,2)                            -- null = nije definisano
+  personal_gym_fee  numeric(10,2)  -- entered at sale (D-99), else the trainer's; null = nije definisano
+);
+
+-- D-100 (BR-056): pauses, 7 days at most in total per membership. paused_until is the last
+-- paused day; paused_from - 1 when the pause was ended before it held a day.
+create table membership_pauses (
+  id            uuid primary key default gen_random_uuid(),
+  gym_id        uuid not null references gyms(id),
+  membership_id uuid not null references memberships(id),
+  paused_from   date not null,
+  paused_until  date not null,
+  ended_early   boolean not null default false,
+  created_by    uuid not null references staff(id),
+  created_at    timestamptz not null default now(),
+  check (paused_until >= paused_from - 1)
 );
 
 -- Visits ------------------------------------------------------------------------------------
@@ -511,18 +525,20 @@ All RPCs are `security definer`. Each one:
 | `scan_card(p_code text)` → json `{result, member, open_visit, options, candidates, unpaid_count}` | all | BR-070–073 (check-out happens inside, unless the guard applies), BR-072a |
 | `check_in(p_member uuid, p_type visit_type, p_membership uuid, p_trainer uuid, p_slot uuid, p_manual bool)` → json | all | BR-071–079 |
 | `check_out(p_visit uuid, p_confirmed bool)` → json | all | BR-072, BR-072a |
-| `register_member(p_card_code, p_first, p_last, p_phone, p_email, p_dob, p_plan, p_trainer, p_amount, p_sessions, p_method, p_check_in bool, p_class_time time default null, p_start_override date default null)` → json | all (`p_start_override` too, N-31, D-97) | BR-033, BR-040–043, BR-050–060, BR-058a |
+| `register_member(p_card_code, p_first, p_last, p_phone, p_email, p_dob, p_plan, p_trainer, p_amount, p_sessions, p_method, p_check_in bool, p_class_time time default null, p_start_override date default null)` → json | all (`p_start_override` too, N-31, D-97); `p_gym_fee numeric default null` last (D-99) | BR-033, BR-040–043, BR-050–060, BR-058a |
 | `find_duplicates(p_phone, p_email)` → rows | all | BR-043 |
 | `update_member(p_member, …)` | all | BR-045 |
 | `anonymize_member(p_member)` | owner | BR-046 |
-| `sell_membership(p_member, p_plan, p_trainer, p_amount, p_sessions, p_method, p_start_override date default null, p_class_time time default null)` | all (override too, D-97) | BR-050–060, BR-058a, BR-092 |
+| `sell_membership(p_member, p_plan, p_trainer, p_amount, p_sessions, p_method, p_start_override date default null, p_class_time time default null)` | all (override too, D-97); `p_gym_fee numeric default null` last (D-99) | BR-050–060, BR-058a, BR-092 |
 | `set_membership_class_time(p_membership uuid, p_class_time time)` → membership | all | BR-058a (D-71) |
+| `pause_membership(p_membership uuid, p_from date, p_days int)` → membership_pauses | all | BR-056 (D-100) |
+| `end_membership_pause(p_pause uuid)` → membership_pauses | all | BR-056 (D-100); a check-in (`start_check_in`, `check_in`) ends a running pause the same way and answers `pause_ended` |
 | `sell_day_passes(p_qty, p_method)` | all | BR-100 |
 | `replace_card(p_member, p_new_code, p_method)` | all | BR-034 |
 | `correct_payment(p_payment, p_method, p_note, p_amount default null)` | all (amount: owner) | BR-094 |
 | `void_payment(p_payment, p_reason)` | all per BR-094 | BR-095 |
-| `record_desk_expense(p_category, p_description, p_amount)` | all | BR-132; "Roba za prodaju" raises `E_CATEGORY_NOT_ALLOWED` (D-92) |
-| `record_expense(…BR-133 fields)` | owner | BR-133; "Roba za prodaju" raises `E_CATEGORY_NOT_ALLOWED` (D-92) |
+| `record_desk_expense(p_category, p_description, p_amount)` | all | BR-132 before D-98, unused by the app since; "Roba za prodaju" raises `E_CATEGORY_NOT_ALLOWED` (D-92) |
+| `record_expense(…BR-133 fields)` | all (D-98): a salary category only for the owner and the admin; anyone else needs an open shift, which the expense joins | BR-132, BR-133; "Roba za prodaju", and a salary for anyone but the owner, raise `E_CATEGORY_NOT_ALLOWED` (D-92, D-37) |
 | `upsert_recurring_expense(p_id, p_category, p_description, p_amount, p_method, p_starts_on, p_is_active)` → recurring_expenses | owner | BR-136 (D-93); posts the month that has begun at once |
 | `post_recurring_expenses(p_gym, p_today date default null)` → number posted | other functions only | BR-136 |
 | `job_recurring_expenses()` → number posted, for every gym | pg_cron only | BR-136, BR-162 |
@@ -585,7 +601,7 @@ An `admin` reads every table in the list below on the same terms as an owner, an
 | trainer_finance, plan_finance, membership_finance | ✓ | ✗ | ✗ |
 | recurring_expenses (D-93) | ✓ | ✗ | ✗ |
 | staff_credentials | ✗ (admin only, D-59) | ✗ | ✗ |
-| members, cards, card_batches, memberships, visits | own gym | own gym (card_batches: ✗, D-81) | own gym (card_batches: ✗) |
+| members, cards, card_batches, memberships, membership_pauses, visits | own gym | own gym (card_batches: ✗, D-81) | own gym (card_batches: ✗) |
 | payments | all | `paid_on = gym_today()` and not back-dated | same as manager |
 | stock_movements | all | local date = today | same as manager |
 | products | own gym | own gym | own gym |

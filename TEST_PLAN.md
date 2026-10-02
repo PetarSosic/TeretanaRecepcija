@@ -1662,8 +1662,9 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Koraci:** `/reception` → [Trošak] → Kategorija `Potrošni materijal`, Opis `Sredstvo za čišćenje`,
   Iznos `12,50` → sačuvajte.
 - **Test podaci:** kao gore
-- **Očekivani rezultat:** u dijalogu stoji nepromjenjiva napomena „Plaćeno iz kase · danas“.
-  Nakon čuvanja „Trošak je sačuvan.“ Stavka je na `/payments/today` u sekciji troškova.
+- **Očekivani rezultat:** otvara se dijalog „Novi trošak“ sa poljima kao u Finansijama (D-98), a „Iz kase“
+  je štiklirano dok je smjena otvorena. Nakon čuvanja „Trošak je sačuvan.“ Stavka je na
+  `/payments/today` u sekciji troškova.
 - **Gdje provjeriti:** UI; `/payments/today`
 - [x] Prošlo  [ ] Palo  Napomena: **22.09.2026 — PROŠLO.** E2E payments.spec.ts + DB 0008: dnevne karte i trošak pulta, iznosi i zapisi u bazi.
 
@@ -1674,13 +1675,13 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Test podaci:**
   | Unos | Očekivano |
   |---|---|
-  | bez kategorije | „Izaberite kategoriju.“ |
+  | bez kategorije | „Provjerite unesene podatke.“ |
   | opis `a` (1 znak) | „Unesite opis (2–200 znakova).“ |
   | opis od 201 znaka | ista poruka |
-  | iznos `0` | „Unesite iznos od 0,01 do 10.000,00 €.“ |
+  | iznos `0` | „Unesite iznos između 0,01 i 100.000,00 €.“ (D-98: granica BR-133) |
   | iznos `0,01` | prolazi (donja granica) |
-  | iznos `10000` | prolazi (gornja granica) |
-  | iznos `10000,01` | poruka o iznosu |
+  | iznos `100000` | prolazi (gornja granica) |
+  | iznos `100000,01` | poruka o iznosu |
   | iznos `-5` | poruka o iznosu |
   | iznos `12,345` | poruka o iznosu |
   | iznos `abc` | poruka o iznosu |

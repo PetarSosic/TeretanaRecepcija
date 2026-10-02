@@ -77,6 +77,12 @@ export function useCheckInFlow({
 
   const handle = useCallback(
     (outcome: ScanOutcome): boolean => {
+      // D-100 (BR-056): coming in ended the member's pause; the desk is told.
+      if (
+        (outcome.result === "checked_in" || outcome.result === "choose") &&
+        outcome.pause_ended
+      )
+        toast({ tone: "success", message: me.memberships.pauseEndedByVisit });
       switch (outcome.result) {
         case "checked_in": {
           const result = outcome.check_in;

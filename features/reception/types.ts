@@ -18,7 +18,8 @@ export type CheckInResult = {
   covered: boolean;
   plan_name: string | null;
   end_date: string | null;
-  status: "active" | "upcoming" | "used_up" | "expired" | "voided" | null;
+  status:
+    "active" | "paused" | "upcoming" | "used_up" | "expired" | "voided" | null;
   /** null = Neograničeno */
   remaining: number | null;
   unpaid_count: number;
@@ -64,12 +65,14 @@ export type ScanOutcome =
       member: MemberBrief;
       duration_seconds: number;
     }
-  | { result: "checked_in"; check_in: CheckInResult }
+  // D-100: pause_ended is true when this check-in ended a pause of the member.
+  | { result: "checked_in"; check_in: CheckInResult; pause_ended?: boolean }
   | {
       result: "choose";
       member: MemberBrief;
       manual: boolean;
       options: CheckInOptions;
+      pause_ended?: boolean;
     };
 
 export type InGymRow = {

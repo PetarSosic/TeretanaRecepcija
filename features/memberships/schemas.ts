@@ -21,6 +21,19 @@ const optionalMoney = z.preprocess(
     .nullable(),
 );
 
+/** D-99: the gym's fixed part of a Personalni sale, empty for the trainer's fee. */
+const optionalGymFee = z.preprocess(
+  emptyToNull,
+  z
+    .string()
+    .trim()
+    .refine((value) => /^\d{1,8}([.,]\d{1,2})?$/.test(value), {
+      message: me.memberships.gymFeeInvalid,
+    })
+    .transform((value) => parseMoneyInput(value))
+    .nullable(),
+);
+
 const optionalUuid = z.preprocess(
   emptyToNull,
   z.string().uuid({ message: me.memberships.trainerPlaceholder }).nullable(),
@@ -57,6 +70,7 @@ export const saleFieldsSchema = z
         .nullable(),
     ),
     amount: optionalMoney,
+    gymFee: optionalGymFee.optional().transform((value) => value ?? null),
     method: z.enum(["cash", "card"], {
       message: me.memberships.methodRequired,
     }),
@@ -105,6 +119,17 @@ export const saleFieldsSchema = z
           path: ["sessions"],
           message: me.memberships.sessionsInvalid,
         });
+      // D-99: the gym's fixed part is never more than the amount.
+      if (
+        value.gymFee !== null &&
+        value.amount !== null &&
+        Number(value.gymFee) > Number(value.amount)
+      )
+        context.addIssue({
+          code: "custom",
+          path: ["gymFee"],
+          message: me.memberships.gymFeeInvalid,
+        });
     }
   });
 
@@ -119,4 +144,24 @@ export const classTimeChangeSchema = z.object({
   memberId: z.string().uuid(),
   membershipId: z.string().uuid(),
   classTime: classTimeValue,
+});
+
+/** D-100 (BR-056): S-07 [Pauziraj]; the RPC checks the dates and the 7 days in total. */
+export const pauseSchema = z.object({
+  memberId: z.string().uuid(),
+  membershipId: z.string().uuid(),
+  pauseFrom: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, { message: me.memberships.pauseFromInvalid }),
+  days: z.coerce
+    .number({ message: me.memberships.pauseDaysInvalid.replace("{max}", "7") })
+    .int(me.memberships.pauseDaysInvalid.replace("{max}", "7"))
+    .min(1, me.memberships.pauseDaysInvalid.replace("{max}", "7"))
+    .max(7, me.memberships.pauseDaysInvalid.replace("{max}", "7")),
+});
+
+/** D-100: S-07 [Prekini pauzu]. */
+export const endPauseSchema = z.object({
+  memberId: z.string().uuid(),
+  pauseId: z.string().uuid(),
 });

@@ -17,6 +17,7 @@ export function saleFieldsFrom(formData: FormData) {
     classTime: formData.get("classTime") ?? "",
     sessions: formData.get("sessions") ?? "",
     amount: formData.get("amount") ?? "",
+    gymFee: formData.get("gymFee") ?? "",
     method: formData.get("method") ?? "",
     startOverride: formData.get("startOverride") ?? "",
   };
@@ -34,6 +35,8 @@ export function saleArguments(value: SaleFields) {
         : null,
     p_amount: value.amount,
     p_sessions: value.planKind === "personal" ? value.sessions : null,
+    // D-99: empty means the trainer's fee, which the database looks up itself.
+    p_gym_fee: value.planKind === "personal" ? value.gymFee : null,
     p_method: value.method,
     // BR-052 step 4: a start chosen by staff (any role, D-97); S-05 sends it too (N-31).
     p_start_override: value.startOverride,

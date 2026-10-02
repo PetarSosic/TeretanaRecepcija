@@ -591,17 +591,9 @@ export const me = {
     sold: "Prodato: {qty} × dnevna karta = {amount}",
     unavailable: "Dnevna karta nije podešena. Vlasnik je dodaje u planovima.",
   },
-  // S-11 Trošak (F-14).
+  // S-11 Trošak (F-14). D-98: the dialog is the BR-133 form and its texts (finance).
   deskExpense: {
     title: "Trošak",
-    category: "Kategorija",
-    categoryRequired: "Izaberite kategoriju.",
-    description: "Opis",
-    descriptionInvalid: "Unesite opis (2–200 znakova).",
-    amount: "Iznos (€)",
-    amountInvalid: "Unesite iznos od 0,01 do 10.000,00 €.",
-    fixedNote: "Plaćeno iz kase · danas",
-    saved: "Trošak je sačuvan.",
   },
   // Doc 02: visit types.
   visitTypes: {
@@ -624,6 +616,11 @@ export const me = {
     amountHint: "Minimalno {min}",
     amountInvalid: "Unesite iznos, na primjer 79 ili 79,50.",
     editAmount: "Promijeni iznos",
+    // D-99: the gym's fixed part of a Personalni sale, typed by any role.
+    gymFee: "Fiksni dio za teretanu (€)",
+    gymFeeHint: "Ako ostane prazno, važi naknada trenera iz podešavanja.",
+    gymFeeInvalid:
+      "Fiksni dio za teretanu mora biti između 0 i iznosa članarine.",
     start: "Početak",
     until: "Važi do",
     editStart: "Promijeni početak",
@@ -657,11 +654,30 @@ export const me = {
     },
     status: {
       active: "Aktivna",
+      paused: "Pauzirana",
       upcoming: "Buduća",
       used_up: "Iskorištena",
       expired: "Istekla",
       voided: "Poništena",
     },
+    // D-100 (BR-056): a pause of 7 days at most in total, on S-07.
+    pause: "Pauziraj",
+    pauseTitle: "Pauziraj članarinu",
+    pauseFrom: "Od",
+    pauseDays: "Broj dana",
+    pauseLeft: "Preostalo za pauzu: {days} od 7 dana.",
+    pauseUntilPreview: "Važi do će biti {date}.",
+    pauseDaysInvalid: "Unesite broj dana od 1 do {max}.",
+    pauseFromInvalid: "Izaberite dan od danas do kraja članarine.",
+    pauseSaved: "Članarina je pauzirana.",
+    pauseRange: "Pauza {from}–{until}",
+    pauseEnded: "prekinuta",
+    pauseEnd: "Prekini pauzu",
+    pauseEndTitle: "Prekini pauzu",
+    pauseEndText:
+      "Dani pauze od danas se vraćaju i „Važi do“ se skraćuje za njih.",
+    pauseEndSaved: "Pauza je prekinuta.",
+    pauseEndedByVisit: "Pauza članarine je završena jer je član došao.",
   },
   // S-16 to S-22 (F-17 to F-19, F-23, F-24), owner only.
   finance: {
@@ -941,6 +957,7 @@ export const me = {
     tables: {
       members: "Članovi",
       memberships: "Članarine",
+      membership_pauses: "Pauze članarina",
       payments: "Uplate",
       expenses: "Troškovi",
       recurring_expenses: "Fiksni troškovi",
@@ -981,6 +998,10 @@ export const me = {
       start_date: "Početak",
       end_date: "Važi do",
       start_reason: "Razlog početka",
+      // D-100: membership_pauses.
+      paused_from: "Pauza od",
+      paused_until: "Pauza do",
+      ended_early: "Prekinuta ranije",
       covers_gym: "Pokriva teretanu",
       covers_group: "Pokriva grupne",
       covers_personal: "Pokriva personalne",
@@ -1129,6 +1150,15 @@ export const me = {
     E_CLASS_TIME_INVALID:
       "Izabrani termin nije među aktivnim terminima ovog trenera.",
     E_AMOUNT_BELOW_MIN: "Iznos ne može biti manji od {min} €.",
+    // D-99 and D-100.
+    E_GYM_FEE_INVALID:
+      "Fiksni dio za teretanu mora biti između 0 i iznosa članarine.",
+    E_PAUSE_INVALID:
+      "Pauza mora početi danas ili kasnije, dok članarina još važi.",
+    E_PAUSE_TOO_LONG: "Članarina se može pauzirati najviše 7 dana ukupno.",
+    E_PAUSE_OVERLAP: "Članarina je u tom periodu već pauzirana.",
+    E_PAUSE_VISITED:
+      "Član je danas već došao na ovu članarinu, pa pauza može početi najranije sjutra.",
     E_AMOUNT_LOCKED: "Samo vlasnik može mijenjati iznos.",
     E_RECORD_NOT_EDITABLE:
       "Ova stavka se ne može mijenjati (smjena je zaključena).",

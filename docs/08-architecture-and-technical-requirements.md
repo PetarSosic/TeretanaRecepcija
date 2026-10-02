@@ -142,6 +142,11 @@ RPCs raise `P0001` with the message `E_<CODE>`. `lib/errors.ts` maps each code t
 | E_CLASS_TIME_INVALID | `Izabrani termin nije među aktivnim terminima ovog trenera.` (D-71) |
 | E_AMOUNT_BELOW_MIN | `Iznos ne može biti manji od {min} €.` |
 | E_AMOUNT_LOCKED | `Samo vlasnik može mijenjati iznos.` |
+| E_GYM_FEE_INVALID | `Fiksni dio za teretanu mora biti između 0 i iznosa članarine.` (D-99) |
+| E_PAUSE_INVALID | `Pauza mora početi danas ili kasnije, dok članarina još važi.` (D-100) |
+| E_PAUSE_TOO_LONG | `Članarina se može pauzirati najviše 7 dana ukupno.` (D-100) |
+| E_PAUSE_OVERLAP | `Članarina je u tom periodu već pauzirana.` (D-100) |
+| E_PAUSE_VISITED | `Član je danas već došao na ovu članarinu, pa pauza može početi najranije sjutra.` (D-100) |
 | E_RECORD_NOT_EDITABLE | `Ova stavka se ne može mijenjati (smjena je zaključena).` |
 | E_REASON_REQUIRED | `Unesite razlog (3–200 znakova).` |
 | E_STOCK_INSUFFICIENT | `Nema dovoljno na stanju (stanje: {qty}).` |

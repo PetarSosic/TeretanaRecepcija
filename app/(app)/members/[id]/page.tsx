@@ -9,6 +9,7 @@ import {
 } from "@/features/members/components/member-profile";
 import { loadSaleCatalog } from "@/features/memberships/catalog";
 import { requireStaff } from "@/lib/auth";
+import { gymToday } from "@/lib/gym-date";
 import { me } from "@/lib/i18n/me";
 import { createClient } from "@/lib/supabase/server";
 
@@ -127,6 +128,9 @@ export default async function MemberPage({
       names.set(row.id, row.full_name);
   }
 
+  // D-89: comes with the session, so it costs no call of its own.
+  const today = await gymToday(staff.gym_id);
+
   return (
     <MemberProfile
       member={member}
@@ -150,6 +154,7 @@ export default async function MemberPage({
       visitsPerPage={VISITS_PER_PAGE}
       tab={tab}
       catalog={catalog}
+      today={today}
     />
   );
 }

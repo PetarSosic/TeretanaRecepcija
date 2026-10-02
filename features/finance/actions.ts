@@ -9,13 +9,13 @@ import { fieldErrorsOf, rpcCode, rpcFailure } from "@/lib/rpc";
 import { deliverShiftReport } from "@/lib/shift-report";
 import { createClient } from "@/lib/supabase/server";
 import type { ActionState } from "@/lib/action-state";
+import { submitExpense } from "./record-expense";
 import {
   backdatedCardFeeSchema,
   backdatedDayPassSchema,
   backdatedMembershipSchema,
   backdatedVisitSchema,
   closeAnyShiftSchema,
-  expenseSchema,
   recurringExpenseSchema,
   resendShiftSchema,
   voidExpenseSchema,
@@ -61,39 +61,8 @@ export async function saveExpense(
   formData: FormData,
 ): Promise<ActionState> {
   const staff = await requireOwner();
-  const parsed = expenseSchema.safeParse({
-    categoryId: formData.get("categoryId") ?? "",
-    description: formData.get("description") ?? "",
-    amount: formData.get("amount") ?? "",
-    spentOn: formData.get("spentOn") ?? "",
-    method: formData.get("method") ?? "",
-    fromTill: formData.get("fromTill") === "on",
-    supplier: formData.get("supplier") ?? "",
-    invoice: formData.get("invoice") ?? "",
-    vat: formData.get("vat") ?? "unset",
-    trainerId: formData.get("trainerId") ?? "",
-  });
-  if (!parsed.success)
-    return { fieldErrors: fieldErrorsOf(parsed.error.issues) };
-
-  const tooLate = await futureDate(staff.gym_id, "spentOn", parsed.data.spentOn);
-  if (tooLate) return tooLate;
-
-  const supabase = await createClient();
-  const { error } = await supabase.rpc("record_expense", {
-    p_category: parsed.data.categoryId,
-    p_description: parsed.data.description,
-    p_amount: parsed.data.amount,
-    p_spent_on: parsed.data.spentOn,
-    // AS-17: "Van kase" is stored as no method at all.
-    p_method: parsed.data.method === "none" ? null : parsed.data.method,
-    p_from_till: parsed.data.fromTill,
-    p_supplier: parsed.data.supplier || null,
-    p_invoice: parsed.data.invoice || null,
-    p_vat: parsed.data.vat === "unset" ? null : parsed.data.vat === "yes",
-    p_trainer: parsed.data.trainerId,
-  });
-  if (error) return rpcFailure(error);
+  const failure = await submitExpense(staff.gym_id, formData);
+  if (failure) return failure;
 
   revalidateFinance();
   return { success: me.finance.expenseSaved };

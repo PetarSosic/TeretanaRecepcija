@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { memberFieldsSchema, registerSchema } from "@/features/members/schemas";
-import { saleFieldsSchema } from "@/features/memberships/schemas";
+import { pauseSchema, saleFieldsSchema } from "@/features/memberships/schemas";
 import { parseDateInput, typeDateInput } from "@/lib/format";
 import { me } from "@/lib/i18n/me";
 import { parseCardCode } from "@/lib/scan";
@@ -247,5 +247,66 @@ describe("registerSchema (BR-033)", () => {
     });
     expect(value.cardCode).toBe("1234567890");
     expect(value.phone).toBe("+38267123456");
+  });
+});
+
+describe("saleFieldsSchema: the gym's fixed part of Personalni (D-99)", () => {
+  const personal = {
+    ...sale,
+    planKind: "personal",
+    requiresTrainer: "false",
+    sessions: "10",
+    amount: "100",
+  };
+  it("leaves an empty field to the trainer's fee", () => {
+    expect(saleFieldsSchema.parse(personal).gymFee).toBeNull();
+    expect(
+      saleFieldsSchema.parse({ ...personal, gymFee: "" }).gymFee,
+    ).toBeNull();
+  });
+  it("keeps a typed part as a decimal string, from 0 to the amount", () => {
+    expect(saleFieldsSchema.parse({ ...personal, gymFee: "30,5" }).gymFee).toBe(
+      "30.50",
+    );
+    expect(saleFieldsSchema.parse({ ...personal, gymFee: "0" }).gymFee).toBe(
+      "0.00",
+    );
+    expect(saleFieldsSchema.parse({ ...personal, gymFee: "100" }).gymFee).toBe(
+      "100.00",
+    );
+  });
+  it("refuses more than the amount, or text, under its own field", () => {
+    for (const gymFee of ["100,01", "abc", "-5"]) {
+      const result = saleFieldsSchema.safeParse({ ...personal, gymFee });
+      expect(result.error?.issues[0]?.path[0], gymFee).toBe("gymFee");
+      expect(result.error?.issues[0]?.message, gymFee).toBe(
+        me.memberships.gymFeeInvalid,
+      );
+    }
+  });
+});
+
+describe("pauseSchema (BR-056, D-100)", () => {
+  const pause = {
+    memberId: "11111111-1111-4111-8111-111111111111",
+    membershipId: "22222222-2222-4222-8222-222222222222",
+    pauseFrom: "2026-10-05",
+    days: "3",
+  };
+  it("takes a day and 1 to 7 days", () => {
+    expect(pauseSchema.parse(pause).days).toBe(3);
+    expect(pauseSchema.parse({ ...pause, days: "7" }).days).toBe(7);
+  });
+  it("refuses 0, 8 or a part of a day", () => {
+    for (const days of ["0", "8", "1.5", ""])
+      expect(pauseSchema.safeParse({ ...pause, days }).success, days).toBe(
+        false,
+      );
+  });
+  it("needs a date", () => {
+    expect(
+      pauseSchema.safeParse({ ...pause, pauseFrom: "" }).error?.issues[0]
+        ?.message,
+    ).toBe(me.memberships.pauseFromInvalid);
   });
 });

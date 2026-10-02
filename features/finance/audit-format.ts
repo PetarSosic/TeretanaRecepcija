@@ -192,6 +192,9 @@ export function auditSubject(
       return `#${text("member_number")} ${text("first_name")} ${text("last_name")}`.trim();
     case "memberships":
       return joined(ref("plan_id"), member());
+    case "membership_pauses":
+      // D-100: the days the pause holds.
+      return `${ref("paused_from")} – ${ref("paused_until")}`;
     case "payments":
       if (data.kind === "day_pass")
         return `${me.audit.values.dayPass} × ${text("quantity")}`;

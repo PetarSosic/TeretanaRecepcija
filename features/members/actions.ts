@@ -138,6 +138,9 @@ export async function registerMember(
     // D-71: so is the fixed class time.
     if (code.startsWith("E_CLASS_TIME_"))
       return { fieldErrors: { classTime: getErrorMessage(code) } };
+    // D-99: and the gym's fixed part under its own.
+    if (code === "E_GYM_FEE_INVALID")
+      return { fieldErrors: { gymFee: getErrorMessage(code) } };
     return rpcFailure(error);
   }
 

@@ -22,6 +22,13 @@ import type {
   ClassTimeDefaults,
   TrainerDefaults,
 } from "@/features/memberships/components/membership-fields";
+import {
+  EndPauseDialog,
+  PAUSE_DAYS_MAX,
+  PauseDialog,
+  pauseRangeText,
+  type MembershipPause,
+} from "@/features/memberships/components/pause-dialog";
 import { SellDialog } from "@/features/memberships/components/sell-dialog";
 import { beginCheckIn, checkOut } from "@/features/reception/actions";
 import { useCheckInFlow } from "@/features/reception/components/check-in-flow";
@@ -62,6 +69,9 @@ export type ProfileMembership = {
   personal_session_limit: number | null;
   personal_used: number;
   is_backdated: boolean;
+  /** D-100: the days its pauses hold, at most 7, and the pauses themselves. */
+  paused_days: number;
+  pauses: MembershipPause[];
 };
 
 export type ProfilePayment = {
@@ -175,6 +185,27 @@ function classTimeChangeable(membership: ProfileMembership): boolean {
   );
 }
 
+/** D-100 (BR-056): a pause can start while the membership still has days and pause left. */
+function pausable(membership: ProfileMembership, today: string): boolean {
+  return (
+    membership.status !== "voided" &&
+    membership.end_date >= today &&
+    membership.paused_days < PAUSE_DAYS_MAX
+  );
+}
+
+/** D-100: the pause [Prekini pauzu] acts on, the one running now or the next to come. */
+function openPause(
+  membership: ProfileMembership,
+  today: string,
+): MembershipPause | null {
+  return (
+    membership.pauses.find(
+      (pause) => membership.status !== "voided" && pause.paused_until >= today,
+    ) ?? null
+  );
+}
+
 /** S-07 (US-07.2): the member, their card, and the three history tabs. */
 export function MemberProfile({
   member,
@@ -189,6 +220,7 @@ export function MemberProfile({
   visitsPerPage,
   tab,
   catalog,
+  today,
 }: {
   member: Member;
   cardCode: string | null;
@@ -203,6 +235,8 @@ export function MemberProfile({
   visitsPerPage: number;
   tab: ProfileTab;
   catalog: SaleCatalog;
+  /** BR-001: gym_today, the first day a pause may start (D-100). */
+  today: string;
 }) {
   const [selling, setSelling] = useState<{ planId?: string } | null>(null);
   const [dialog, setDialog] = useState<
@@ -210,6 +244,11 @@ export function MemberProfile({
   >(null);
   const [changingClassTime, setChangingClassTime] =
     useState<ProfileMembership | null>(null);
+  const [pausing, setPausing] = useState<ProfileMembership | null>(null);
+  const [endingPause, setEndingPause] = useState<{
+    membership: ProfileMembership;
+    pause: MembershipPause;
+  } | null>(null);
   const readOnly = member.is_anonymized;
   const router = useRouter();
   const toast = useToast();
@@ -412,7 +451,21 @@ export function MemberProfile({
                     </Td>
                     <Td>{membership.trainer_name ?? "—"}</Td>
                     <Td>{formatDate(membership.start_date)}</Td>
-                    <Td>{formatDate(membership.end_date)}</Td>
+                    <Td>
+                      {formatDate(membership.end_date)}
+                      {/* D-100: each pause under the day it moved. */}
+                      {membership.pauses.map((pause) => (
+                        <span
+                          key={pause.id}
+                          className="block text-xs text-muted-foreground"
+                        >
+                          {pauseRangeText(pause)}
+                          {pause.ended_early
+                            ? ` · ${me.memberships.pauseEnded}`
+                            : ""}
+                        </span>
+                      ))}
+                    </Td>
                     <Td>{me.memberships.status[membership.status]}</Td>
                     <Td>{remainingText(membership)}</Td>
                     <Td className="text-right">
@@ -429,6 +482,34 @@ export function MemberProfile({
                             {me.memberships.changeClassTime}
                           </Button>
                         ) : null}
+                        {/* D-100: [Pauziraj] and [Prekini pauzu], no money involved. */}
+                        {pausable(membership, today) && !readOnly ? (
+                          <Button
+                            type="button"
+                            size="sm"
+                            variant="outline"
+                            aria-label={`${me.memberships.pause} ${membership.plan_name}`}
+                            onClick={() => setPausing(membership)}
+                          >
+                            {me.memberships.pause}
+                          </Button>
+                        ) : null}
+                        {(() => {
+                          const pause = openPause(membership, today);
+                          return pause && !readOnly ? (
+                            <Button
+                              type="button"
+                              size="sm"
+                              variant="outline"
+                              aria-label={`${me.memberships.pauseEnd} ${membership.plan_name}`}
+                              onClick={() =>
+                                setEndingPause({ membership, pause })
+                              }
+                            >
+                              {me.memberships.pauseEnd}
+                            </Button>
+                          ) : null;
+                        })()}
                         {/* US-08.2: [Produži] on every membership that is not voided. */}
                         {membership.status !== "voided" && !readOnly ? (
                           <MoneyButton
@@ -638,6 +719,20 @@ export function MemberProfile({
             : null
         }
         classTimes={catalog.classTimes}
+      />
+      <PauseDialog
+        open={pausing !== null}
+        onOpenChange={(open) => !open && setPausing(null)}
+        memberId={member.id}
+        membership={pausing}
+        today={today}
+      />
+      <EndPauseDialog
+        open={endingPause !== null}
+        onOpenChange={(open) => !open && setEndingPause(null)}
+        memberId={member.id}
+        planName={endingPause?.membership.plan_name ?? ""}
+        pause={endingPause?.pause ?? null}
       />
       <EditMemberDialog
         open={dialog === "edit"}

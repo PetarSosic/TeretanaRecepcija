@@ -1,18 +1,14 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { submitExpense } from "@/features/finance/record-expense";
 import { requireStaff } from "@/lib/auth";
 import { formatMoney } from "@/lib/format";
 import { me } from "@/lib/i18n/me";
 import { fieldErrorsOf, rpcFailure } from "@/lib/rpc";
 import { createClient } from "@/lib/supabase/server";
 import type { ActionState } from "@/lib/action-state";
-import {
-  correctPaymentSchema,
-  dayPassSchema,
-  deskExpenseSchema,
-  voidSchema,
-} from "./schemas";
+import { correctPaymentSchema, dayPassSchema, voidSchema } from "./schemas";
 
 const TODAY_PATH = "/payments/today";
 
@@ -114,30 +110,20 @@ export async function voidPayment(
   return { success: me.payments.voidedDone };
 }
 
-/** S-11 and BR-132: a small expense paid from the till. */
+/**
+ * S-11 [Trošak] (D-98): the desk sends the BR-133 form; record_expense keeps salaries
+ * the owner's and attaches a manager's or receptionist's expense to the open shift.
+ */
 export async function recordDeskExpense(
   _state: ActionState,
   formData: FormData,
 ): Promise<ActionState> {
-  await requireStaff();
-  const parsed = deskExpenseSchema.safeParse({
-    categoryId: formData.get("categoryId") ?? "",
-    description: formData.get("description") ?? "",
-    amount: formData.get("amount") ?? "",
-  });
-  if (!parsed.success)
-    return { fieldErrors: fieldErrorsOf(parsed.error.issues) };
-
-  const supabase = await createClient();
-  const { error } = await supabase.rpc("record_desk_expense", {
-    p_category: parsed.data.categoryId,
-    p_description: parsed.data.description,
-    p_amount: parsed.data.amount,
-  });
-  if (error) return rpcFailure(error);
+  const staff = await requireStaff();
+  const failure = await submitExpense(staff.gym_id, formData);
+  if (failure) return failure;
 
   revalidateMoney();
-  return { success: me.deskExpense.saved };
+  return { success: me.finance.expenseSaved };
 }
 
 /** S-12 [Poništi] on an expense (BR-135). */

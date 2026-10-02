@@ -161,6 +161,8 @@ export async function deleteTestGym(gymId: string): Promise<void> {
     ["visits", "gym_id"],
     ["payments", "gym_id"],
     ["membership_finance", "gym_id"],
+    // D-100: pauses point at memberships.
+    ["membership_pauses", "gym_id"],
     ["memberships", "gym_id"],
     // M-05: shifts reference staff, so they go before it.
     ["shifts", "gym_id"],

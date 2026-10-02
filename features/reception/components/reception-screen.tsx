@@ -20,11 +20,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RegisterDialog } from "@/features/members/components/register-dialog";
 import type { SaleCatalog } from "@/features/memberships/catalog";
+import type { Trainer } from "@/features/finance/components/expense-dialog";
 import {
   DayPassDialog,
   DeskExpenseDialog,
-  type ExpenseCategory,
 } from "@/features/payments/components/desk-dialogs";
+import type { Category } from "@/features/settings/components/categories-section";
 import { formatDuration, formatTime } from "@/lib/format";
 import { getErrorMessage } from "@/lib/errors";
 import { me } from "@/lib/i18n/me";
@@ -58,14 +59,14 @@ export function ReceptionScreen({
   initialPanel,
   catalog,
   dayPassPrice,
-  expenseCategories,
+  expenseForm,
 }: {
   initialPanel: ReceptionPanel;
   catalog: SaleCatalog;
   /** BR-100: the current day-pass price, for S-10's live total. */
   dayPassPrice: string | null;
-  /** BR-132: active, non-salary categories for S-11. */
-  expenseCategories: ExpenseCategory[];
+  /** S-11 (D-98): the categories, trainers and today the BR-133 form offers. */
+  expenseForm: { categories: Category[]; trainers: Trainer[]; today: string };
 }) {
   const [panel, setPanel] = useState(initialPanel);
   const [status, setStatus] = useState<string | null>(null);
@@ -275,7 +276,7 @@ export function ReceptionScreen({
       <DeskExpenseDialog
         open={deskDialog === "expense"}
         onOpenChange={(open) => !open && setDeskDialog(null)}
-        categories={expenseCategories}
+        {...expenseForm}
       />
 
       <RegisterDialog

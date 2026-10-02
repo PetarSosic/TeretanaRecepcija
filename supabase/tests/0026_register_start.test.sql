@@ -44,12 +44,13 @@ select is(
   (select count(*)::int from pg_proc
    where proname = 'register_member' and pronamespace = 'public'::regnamespace),
   1, 'N-31: the old register_member is gone, only the one with the start date is left');
+-- D-99 (migration 0049) added the gym's fixed part as the last parameter.
 select ok(
   has_function_privilege('authenticated',
-    'register_member(text, text, text, text, text, date, uuid, uuid, numeric, integer, payment_method, boolean, time, date)',
+    'register_member(text, text, text, text, text, date, uuid, uuid, numeric, integer, payment_method, boolean, time, date, numeric)',
     'execute')
   and not has_function_privilege('anon',
-    'register_member(text, text, text, text, text, date, uuid, uuid, numeric, integer, payment_method, boolean, time, date)',
+    'register_member(text, text, text, text, text, date, uuid, uuid, numeric, integer, payment_method, boolean, time, date, numeric)',
     'execute'),
   'N-31: signed-in staff may call it, anonymous callers may not');
 

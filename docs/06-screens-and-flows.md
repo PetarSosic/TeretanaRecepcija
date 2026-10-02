@@ -75,6 +75,7 @@ An `admin` sees everything an owner sees (D-58).
 - A hidden input is focused whenever no other input or dialog has focus.
 - Characters followed by Enter are processed by BR-070.
 - While a green or result dialog is open, digit keys followed by Enter still go to the scan handler (the dialog closes and the new scan is processed).
+- When a scan or a manual start ends a member's pause (D-100), the toast `Pauza članarine je završena jer je član došao.` appears.
 - While a form dialog (S-05, S-08, S-10, S-11) is open, scans go only to that dialog's card field, if it has one; otherwise they are ignored.
 - When the search box has focus, typed text goes to the search.
 
@@ -128,7 +129,7 @@ An `admin` sees everything an owner sees (D-58).
 **Buttons:** [Nova članarina] [Izgubljena kartica] [Ručna prijava] or [Ručna odjava] (depending on whether a visit is open) [Uredi podatke]. The owner also sees [Anonimiziraj].
 
 **Tabs:**
-- `Članarine`: plan, trainer, Od, Važi do, status, and remaining sessions per limited type. [Produži] on each non-voided membership. [Promijeni termin] beside it on each group membership (covers group, has a trainer) that is neither voided nor expired (D-71, BR-058a): a dialog `Promijeni termin` showing the plan, the trainer and `Trenutni termin: <termin>` (or `nije upisan`), the `Fiksni termin` select with that trainer's active times, and [Sačuvaj] [Otkaži]. On success the toast `Termin sačuvan.` Nothing is charged.
+- `Članarine`: plan, trainer, Od, Važi do, status, and remaining sessions per limited type. [Produži] on each non-voided membership. [Promijeni termin] beside it on each group membership (covers group, has a trainer) that is neither voided nor expired (D-71, BR-058a): a dialog `Promijeni termin` showing the plan, the trainer and `Trenutni termin: <termin>` (or `nije upisan`), the `Fiksni termin` select with that trainer's active times, and [Sačuvaj] [Otkaži]. On success the toast `Termin sačuvan.` Nothing is charged. [Pauziraj] (D-100, BR-056) on each membership that is not voided, not past its last day, and has pause left: a dialog `Pauziraj članarinu` with the plan, `Važi do` and `Preostalo za pauzu: <n> od 7 dana.`, the fields `Od` (today or later) and `Broj dana`, the live text `Važi do će biti <datum>.`, and [Sačuvaj] [Otkaži]; on success `Članarina je pauzirana.` Each pause is listed under `Važi do` as `Pauza <od>–<do>` (`· prekinuta` when it was ended early). [Prekini pauzu] on a membership with a pause running or to come asks `Dani pauze od danas se vraćaju i „Važi do“ se skraćuje za njih.`; on success `Pauza je prekinuta.`
 - `Uplate`: owners see everything. Others see today's non-back-dated payments. Columns: date, kind, plan, amount, method, entered by, and status (Poništeno).
 - `Dolasci`: as in US-07.2.
 
@@ -145,6 +146,7 @@ An `admin` sees everything an owner sees (D-58).
 4. `Iznos (€)`:
    - read-only for list-price plans (the owner sees an edit pencil);
    - required for Personalni, with the hint `Minimalno <min> €`.
+4a. `Fiksni dio za teretanu (€)` (D-99): Personalni only, optional, every role, with the hint `Ako ostane prazno, važi naknada trenera iz podešavanja.` 0 up to the amount.
 5. `Početak`: read-only, with the BR-052 reason text underneath, and an edit pencil [Promijeni početak] for every role (D-97). `Važi do`: read-only and calculated.
 6. `Način plaćanja`: two large buttons, Gotovina and Platna kartica.
 7. A summary line: `<plan> · <Početak>–<Važi do> · <iznos> · <način>`.
@@ -165,7 +167,8 @@ An `admin` sees everything an owner sees (D-58).
 - **Buttons:** [Naplati] and [Otkaži].
 
 ## S-11 Desk expense dialog
-- **Fields:** `Kategorija` (active, non-salary, not "Roba za prodaju", D-92), `Opis`, `Iznos (€)`, and the fixed note `Plaćeno iz kase · danas`.
+- **D-98:** the dialog of S-17 [Novi trošak] (BR-133), titled `Novi trošak` with `Troškovi` underneath, for every role.
+- **Fields:** `Kategorija` (active, not "Roba za prodaju", D-92; salary categories only for the owner and the admin, D-37), `Trener` (salary category only), `Opis`, `Iznos (€)`, `Datum`, `Način` (Gotovina, Platna kartica, Van kase), `PDV uračunat`, `Dobavljač`, `Račun` and `Iz kase` with its hint. `Iz kase` is ticked when the dialog opens while a shift is open.
 - **Buttons:** [Sačuvaj] and [Otkaži].
 
 ## S-12 Today's payments — `/payments/today`
