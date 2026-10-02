@@ -21,7 +21,7 @@ const optionalMoney = z.preprocess(
     .nullable(),
 );
 
-/** D-99: the gym's fixed part of a Personalni sale, empty for the trainer's fee. */
+/** D-101: the gym's fixed part, the one figure of a Personalni sale and its amount. */
 const optionalGymFee = z.preprocess(
   emptyToNull,
   z
@@ -105,26 +105,16 @@ export const saleFieldsSchema = z
         path: ["classTime"],
         message: me.errors.E_CLASS_TIME_REQUIRED,
       });
-    // BR-059: Personalni has no list price, so its amount and sessions are entered.
+    // BR-059: Personalni has no list price, so its sessions are entered, and D-101: the
+    // gym's fixed part, which is also the amount paid.
     if (value.planKind === "personal") {
-      if (value.amount === null)
-        context.addIssue({
-          code: "custom",
-          path: ["amount"],
-          message: me.memberships.amountInvalid,
-        });
       if (value.sessions === null)
         context.addIssue({
           code: "custom",
           path: ["sessions"],
           message: me.memberships.sessionsInvalid,
         });
-      // D-99: the gym's fixed part is never more than the amount.
-      if (
-        value.gymFee !== null &&
-        value.amount !== null &&
-        Number(value.gymFee) > Number(value.amount)
-      )
+      if (value.gymFee === null)
         context.addIssue({
           code: "custom",
           path: ["gymFee"],

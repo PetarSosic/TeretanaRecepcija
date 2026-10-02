@@ -150,8 +150,9 @@ export function MembershipFields({
     setClassTime(id ? suggestedClassTime(id) : "");
   }
 
+  // D-101: what a Personalni member pays is the gym's fixed part.
   const amountValue = isPersonal
-    ? moneyOrNull(amount)
+    ? moneyOrNull(gymFee)
     : editingAmount
       ? moneyOrNull(amount)
       : (plan?.price ?? null);
@@ -264,11 +265,11 @@ export function MembershipFields({
         </div>
       ) : null}
 
-      {/* 4. Iznos: entered for Personalni, list price otherwise (BR-059) */}
-      {plan ? (
+      {/* 4. Iznos: the list price (BR-059); Personalni has none of its own (D-101) */}
+      {plan && !isPersonal ? (
         <div className="grid gap-2">
           <Label htmlFor={`${idPrefix}-amount`}>{me.memberships.amount}</Label>
-          {isPersonal || editingAmount ? (
+          {editingAmount ? (
             <Input
               id={`${idPrefix}-amount`}
               name="amount"
@@ -276,7 +277,7 @@ export function MembershipFields({
               value={amount}
               onChange={(event) => setAmount(event.target.value)}
               aria-invalid={Boolean(fieldErrors.amount)}
-              aria-describedby={`${idPrefix}-amount-hint ${idPrefix}-amount-error`}
+              aria-describedby={`${idPrefix}-amount-error`}
             />
           ) : (
             <div className="flex items-center gap-2">
@@ -303,24 +304,14 @@ export function MembershipFields({
               ) : null}
             </div>
           )}
-          {isPersonal ? (
-            <p
-              id={`${idPrefix}-amount-hint`}
-              className="text-sm text-muted-foreground"
-            >
-              {me.memberships.amountHint.replace(
-                "{min}",
-                formatMoney(catalog.personalMin),
-              )}
-            </p>
-          ) : null}
           <FieldError id={`${idPrefix}-amount-error`}>
             {fieldErrors.amount}
           </FieldError>
         </div>
       ) : null}
 
-      {/* 4a. Fiksni dio za teretanu (Personalni only, D-99): empty = the trainer's fee. */}
+      {/* 4a. Fiksni dio za teretanu (Personalni only, D-99): required, and it is what the
+          member pays, at least the personal minimum (D-101, BR-012). */}
       {isPersonal ? (
         <div className="grid gap-2">
           <Label htmlFor={`${idPrefix}-gym-fee`}>{me.memberships.gymFee}</Label>
@@ -337,7 +328,10 @@ export function MembershipFields({
             id={`${idPrefix}-gym-fee-hint`}
             className="text-sm text-muted-foreground"
           >
-            {me.memberships.gymFeeHint}
+            {me.memberships.amountHint.replace(
+              "{min}",
+              formatMoney(catalog.personalMin),
+            )}
           </p>
           <FieldError id={`${idPrefix}-gym-fee-error`}>
             {fieldErrors.gymFee}

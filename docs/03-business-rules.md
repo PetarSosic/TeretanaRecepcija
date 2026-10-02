@@ -37,7 +37,7 @@ Every rule has an ID. Code comments and tests must reference these IDs, e.g. `//
 - **BR-011:** "3x nedeljno" in the Grupni name is a label only. There is **no weekly limit**, only the 12-session limit.
 - **BR-012:** Other seeded settings:
   - card replacement fee **€5**;
-  - personal minimum price **€80**;
+  - personal minimum price **€80** (since D-101 the lowest gym's fixed part of a Personalni sale; the owner wants **€40** for KP Fitness, set on S-27 like any setting);
   - expiry reminder **3 days**;
   - automatic close time **23:00**;
   - double-scan guard **120 s**;
@@ -208,7 +208,7 @@ Every rule has an ID. Code comments and tests must reference these IDs, e.g. `//
   This is also how a mid-term change of plan is handled (D-61). A member who paid for Grupni and wants Personalni two weeks later simply buys Personalni; because the two plans share no visit type they are not comparable, so the new membership starts today (BR-052 step 3) while the old one runs to its own end date and its unused sessions expire (BR-055). Nothing is prorated, refunded or transferred, and the old membership is not voided.
 - **BR-058 (trainer):**
   - Grupni, G+T and Personalni require a trainer who meets BR-023.
-  - The trainer's current fee is copied onto a Personalni membership at sale.
+  - ~~The trainer's current fee is copied onto a Personalni membership at sale.~~ Since D-101 a Personalni sale carries the gym's fixed part typed at sale instead (BR-059); the trainer's fee from S-24 is no longer copied.
   - The trainer suggested by default is the trainer of the member's latest membership of the same plan kind.
 - **BR-058a (fixed class time, D-71):**
   - A plan that covers group training and requires a trainer (seed: Grupni, G+T) also requires the member's **fixed class time** (`Fiksni termin`), chosen after the trainer, in S-05, S-08 and S-22.
@@ -219,9 +219,9 @@ Every rule has an ID. Code comments and tests must reference these IDs, e.g. `//
   - Memberships sold before D-71 have no fixed class time until one is set this way. What the stored time is used for beyond S-07 is not decided yet.
 - **BR-059 (amount):**
   - For plans with a list price, the amount equals the list price; only the owner can change it (at sale, or later via BR-094).
-  - For Personalni, any staff role enters the amount. It must be ≥ the personal minimum price (BR-012), otherwise: `Iznos ne može biti manji od <min> €.`
+  - **Personalni (D-101):** there is no separate amount. Any staff role enters the **gym's fixed part** (`Fiksni dio za teretanu (€)`), which is required and **is the amount**: the member pays it at the desk (BR-060) and all of it goes to the gym. It must be ≥ the personal minimum price (BR-012), otherwise: `Fiksni dio za teretanu ne može biti manji od <min> €.` It is stored with the membership's financial terms (BR-050) and used by BR-155.
   - The personal session count is entered at sale: whole number 1–50.
-  - **Gym's fixed part (D-99):** any staff role may enter, for Personalni, the part of the amount that goes to the gym, from 0 to the amount. Left empty, the trainer's fee applies (BR-058). It is stored with the membership's financial terms (BR-050) and used by BR-155.
+  - ~~Gym's fixed part (D-99): from 0 to a separately typed amount; left empty, the trainer's fee applies.~~ Superseded by D-101 on 02.10.2026.
 - **BR-060:** Every membership sale creates **exactly one** payment for the full amount in the same transaction. There are no partial payments and no debts.
 
 ## 7. Visits (check-in and check-out)
@@ -514,7 +514,7 @@ Buying goods and the cost of the goods sold are two different things (D-92). A s
 - **BR-155 (shares per membership payment):**
   - **Grupni and G+T:** trainer share = max(amount − gym fixed amount, 0) × share % / 100, where the share % is the one stored on the membership at sale (BR-050, D-62) — never the plan's current value.
   - **Personalni:**
-    - the trainer fee is the gym's fixed part entered at sale, otherwise the trainer's fee copied at sale (D-99);
+    - the trainer fee is the gym's fixed part stored at sale (D-99). Since D-101 it equals the amount, so a new sale gives the trainer 0 and the gym the whole amount; a sale from before D-101 keeps the fixed part or trainer's fee it was sold with;
     - trainer fee `null` → trainer share and gym share are "nije definisano";
     - otherwise trainer share = amount − trainer fee;
     - if the result is negative → 0, with the warning `Iznos manji od naknade teretani`.

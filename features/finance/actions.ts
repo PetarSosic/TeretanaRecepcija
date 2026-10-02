@@ -9,6 +9,7 @@ import { fieldErrorsOf, rpcCode, rpcFailure } from "@/lib/rpc";
 import { deliverShiftReport } from "@/lib/shift-report";
 import { createClient } from "@/lib/supabase/server";
 import type { ActionState } from "@/lib/action-state";
+import { personalMinimumText } from "@/features/memberships/sale";
 import { submitExpense } from "./record-expense";
 import {
   backdatedCardFeeSchema,
@@ -213,6 +214,13 @@ export async function saveBackdatedMembership(
     const code = rpcCode(error);
     if (code.startsWith("E_CLASS_TIME_"))
       return { fieldErrors: { classTime: getErrorMessage(code) } };
+    // D-101: so does the Personalni minimum, under the fixed part S-22 shows.
+    if (code === "E_AMOUNT_BELOW_MIN")
+      return {
+        fieldErrors: {
+          amount: getErrorMessage(code, { min: await personalMinimumText() }),
+        },
+      };
     return rpcFailure(error);
   }
 

@@ -286,6 +286,8 @@ async function sell(
     /** D-71: the Fiksni termin a Grupni or G+T sale needs. */
     classTime?: string;
     amount?: string;
+    /** D-101: Personalni's fixed part for the gym, which is also its amount. */
+    gymFee?: string;
     sessions?: string;
     method: "Gotovina" | "Platna kartica";
   },
@@ -305,6 +307,11 @@ async function sell(
     await dialog.getByLabel("Broj termina").fill(options.sessions);
   if (options.amount)
     await dialog.getByRole("textbox", { name: "Iznos (€)" }).fill(options.amount);
+  // D-101: Personalni's one figure is the gym's fixed part.
+  if (options.gymFee)
+    await dialog
+      .getByRole("textbox", { name: "Fiksni dio za teretanu (€)" })
+      .fill(options.gymFee);
   await dialog.getByText(options.method, { exact: true }).click();
   await dialog.getByRole("button", { name: "Naplati i sačuvaj" }).click();
   await expect(page.getByText("Članarina sačuvana.").first()).toBeVisible();
@@ -354,7 +361,7 @@ test("the desk's day: four sales and a voided day pass (data for the owner's scr
   await sell(page, member["Personalni"], plan.personalni, {
     trainer: trainer.julija,
     sessions: "8",
-    amount: "100",
+    gymFee: "100",
     method: "Gotovina",
   });
   await page.goto("/reception");
@@ -614,11 +621,15 @@ test("FIN-11: trainers — columns, undefined fee, detail, payout and an empty m
   console.log(
     `[note] FIN-11 rows: ${(await tamara.innerText()).replace(/\s+/g, " ")} || ${(await julija.innerText()).replace(/\s+/g, " ")}`,
   );
-  await expect(julija).toContainText("nije definisano");
+  // D-101: the gym's fixed part is the whole Personalni amount, so even Julija, whose own
+  // fee is not defined, has a defined split: nothing for her, €100 for the gym. Undefined
+  // shares stay for sales from before D-101 (finance.spec.ts).
+  await expect(julija).not.toContainText("nije definisano");
+  await expect(julija).toContainText("100,00 €");
   await page.getByRole("link", { name: "E2E Julija" }).click();
   const julijaDetail = section(page, "Uplate trenera — E2E Julija");
   await expect(julijaDetail).toContainText("E2E Personalni Finansije");
-  await expect(julijaDetail).toContainText("nije definisano");
+  await expect(julijaDetail).not.toContainText("nije definisano");
   await page.getByRole("link", { name: "E2E Tamara" }).click();
   await expect(section(page, "Uplate trenera — E2E Tamara")).toContainText(
     "E2E Kombinovani Finansije",

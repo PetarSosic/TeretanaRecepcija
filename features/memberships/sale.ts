@@ -33,9 +33,9 @@ export function saleArguments(value: SaleFields) {
       value.requiresTrainer && value.coversGroup
         ? (value.classTime ?? null)
         : null,
-    p_amount: value.amount,
+    // D-101: Personalni has no amount of its own; its fixed part for the gym is it.
+    p_amount: value.planKind === "personal" ? null : value.amount,
     p_sessions: value.planKind === "personal" ? value.sessions : null,
-    // D-99: empty means the trainer's fee, which the database looks up itself.
     p_gym_fee: value.planKind === "personal" ? value.gymFee : null,
     p_method: value.method,
     // BR-052 step 4: a start chosen by staff (any role, D-97); S-05 sends it too (N-31).

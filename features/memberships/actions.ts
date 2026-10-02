@@ -36,12 +36,16 @@ export async function sellMembership(
   });
   if (error) {
     const code = rpcCode(error);
-    if (code === "E_AMOUNT_BELOW_MIN")
-      return rpcFailure(error, { min: await personalMinimumText() });
     // D-71: the class time has its own field, so its message goes under it.
     if (code.startsWith("E_CLASS_TIME_"))
       return { fieldErrors: { classTime: getErrorMessage(code) } };
-    // D-99: and the gym's fixed part under its own.
+    // D-101: and the gym's fixed part, the Personalni amount, under its own.
+    if (code === "E_AMOUNT_BELOW_MIN")
+      return {
+        fieldErrors: {
+          gymFee: getErrorMessage(code, { min: await personalMinimumText() }),
+        },
+      };
     if (code === "E_GYM_FEE_INVALID")
       return { fieldErrors: { gymFee: getErrorMessage(code) } };
     return rpcFailure(error);

@@ -1452,23 +1452,24 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Gdje provjeriti:** UI; `/payments/today`
 - [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-rest.spec.ts`: recepcioner u prodaji Mjesečne nema [Promijeni iznos] ni polje iznosa; vlasnik mijenja iznos na 70 → uplata 70,00 € u bazi i na `/payments/today`. Raniji dokaz (22.09.): DB 0006/0007: datumi BR-052, prestari dolasci, vlasnikova prava, E14 kraj mjeseca, limiti/statusi, smjena i finansijski snapshot. Ovo potvrđuje baznu logiku, ne sve korake/poruke UI slučaja.
 
-### [MSHIP-07] Personalni: iznos i broj termina su obavezni
+### [MSHIP-07] Personalni: fiksni dio za teretanu i broj termina su obavezni
 - **Prioritet:** Kritično
 - **Uloga / preduslovi:** otvorena smjena
-- **Koraci:** dijalog prodaje → `Personalni` → ostavite iznos i termine prazne → [Naplati i sačuvaj].
+- **Koraci:** dijalog prodaje → `Personalni` → ostavite fiksni dio i termine prazne → [Naplati i sačuvaj].
 - **Test podaci:** —
-- **Očekivani rezultat:** „Unesite iznos, na primjer 79 ili 79,50.“ uz iznos i „Unesite broj termina
-  od 1 do 50.“ uz termine. Uz polje iznosa stoji podsjetnik „Minimalno 80,00 €“.
+- **Očekivani rezultat (D-101, 02.10.2026):** polja „Iznos (€)“ nema. „Unesite fiksni dio za
+  teretanu, na primjer 40 ili 40,50.“ uz „Fiksni dio za teretanu (€)“ i „Unesite broj termina
+  od 1 do 50.“ uz termine. Uz fiksni dio stoji podsjetnik „Minimalno <min> €“ iz podešavanja.
 - **Gdje provjeriti:** UI
 - [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-forms.spec.ts`: Personalni sa trenerom, prazni iznos i termini → „Unesite iznos, na primjer 79 ili 79,50.“ uz iznos i „Unesite broj termina od 1 do 50.“ uz termine; podsjetnik „Minimalno 80,00 €“ vidljiv; nije sačuvana članarina. Raniji dokaz (22.09.): Unit members.test.ts i DB 0006: obavezni iznos/termini/trener/način plaćanja i format iznosa. Cijela tabela graničnih vrijednosti nije ponovljena kroz UI.
 
 ### [MSHIP-08] Personalni: minimalna cijena (E13)
 - **Prioritet:** Kritično
 - **Uloga / preduslovi:** minimalna cijena personalnog je 80 € (S-27)
-- **Koraci:** prodajte `Personalni` sa iznosom `79,99`, trenerom Tamarom i 8 termina.
+- **Koraci:** prodajte `Personalni` sa fiksnim dijelom za teretanu `79,99`, trenerom Tamarom i 8 termina.
 - **Test podaci:** `79,99`
-- **Očekivani rezultat:** „Iznos ne može biti manji od 80.00 €.“ (tačna vrijednost iz podešavanja).
-  Sa `80` prolazi.
+- **Očekivani rezultat (D-101):** „Fiksni dio za teretanu ne može biti manji od 80,00 €.“ (tačna
+  vrijednost iz podešavanja; za KP Fitness vlasnik traži 40 €). Sa `80` prolazi, a uplata je 80,00 €.
 - **Gdje provjeriti:** UI
 - [x] Prošlo  [ ] Palo  Napomena: **22.09.2026 — PROŠLO.** E2E members.spec.ts + DB 0006: prodaja Personalni, odbijanje ispod minimuma i produženje mjesečne od dana nakon isteka; sintetički datumi/podaci.
 
@@ -1482,9 +1483,11 @@ Legenda: svaki test ima polje za rezultat. Popunjavajte ga dok radite.
 - **Gdje provjeriti:** UI
 - [x] Prošlo  [ ] Palo  Napomena: **23.09.2026 — PROŠLO.** `test-plan-high-c.spec.ts`: `0`, `51`, `2.5`, `-3`, `abc` termina → „Unesite broj termina od 1 do 50.“ bez čuvanja; `1` i `50` se čuvaju. Raniji dokaz (22.09.): Unit members.test.ts i DB 0006: obavezni iznos/termini/trener/način plaćanja i format iznosa. Cijela tabela graničnih vrijednosti nije ponovljena kroz UI.
 
-### [MSHIP-10] Iznos — format i granice
+### [MSHIP-10] Fiksni dio za teretanu (iznos Personalnog) — format i granice
 - **Prioritet:** Visoko
-- **Uloga / preduslovi:** prodaja personalne članarine (polje iznosa je slobodno)
+- **Uloga / preduslovi:** prodaja personalne članarine; od D-101 se u „Fiksni dio za teretanu (€)“
+  upisuje iznos, a poruke su „Unesite fiksni dio za teretanu, na primjer 40 ili 40,50.“ i „Fiksni
+  dio za teretanu ne može biti manji od <min> €.“
 - **Koraci:** probajte `100`, `100,50`, `100.50`, `100,555`, `-100`, `0`, `abc`, prazno,
   `999999999`.
 - **Test podaci:** kao gore
@@ -4281,6 +4284,28 @@ Migracija 0047 mijenja samo tu provjeru u `membership_sale`.
 | pgTAP sa migracijom 0047 u transakciji koja se poništava (produkcija) | **30/30 fajlova**; novo `0029_staff_start_override` (14 provjera); `0006` bez stare provjere „samo vlasnik“ (83), `0026` sa recepcionerovim početkom (13). Bez 0047 padaju tačno `0026` i `0029` (`E_FORBIDDEN`) |
 | Migracija 0047 na produkciji | primijenjena 01.10.2026 **prije** push-a; provjereno: jedna `membership_sale`, tijelo identično fajlu 0047, prava ista kao prije (`authenticated` i `anon` bez prava), podaci nedirnuti. Poslije toga `npm run test:db` (produkcija, poništava se): **30/30** |
 | E2E (`test-plan-high-c` MSHIP-05) | ažuriran, **nije pušten**: na produkciji su sada pravi korisnici, pa E2E samo na dev bazi |
+
+### 9.23 Dopuna — Personalni bez posebnog iznosa (D-101), 02.10.2026
+
+**D-101 (zahtjev vlasnika 02.10.2026):** pri prodaji Personalnog (S-05 „Novi član“, S-08 i
+naknadni unos S-22) nema više polja „Iznos (€)“. Ostaje „Fiksni dio za teretanu (€)“: obavezan
+je, to je iznos koji član plaća na recepciji (jedna uplata, BR-060) i sav ide teretani, pa je
+dio trenera 0. Minimalna cijena personalnog (BR-012) sada važi za fiksni dio; vlasnik traži
+40 €, što se mijenja u Podešavanja → Teretana. Naknada trenera sa S-24 se više ne prepisuje na
+prodaju. Stare članarine ostaju kakve su. Migracija 0051 mijenja `membership_sale` i
+`backdated_membership`, potpisi ostaju; obrazac iz stare kartice koji pošalje i iznos i drugačiji
+fiksni dio se odbija (`E_GYM_FEE_INVALID`), ništa se ne čuva pogrešno.
+
+Izmijenjeni slučajevi: MSHIP-07, MSHIP-08 i MSHIP-10 (nova polja i poruke). FIN-11: Personalni
+prodat poslije D-101 kod trenera bez naknade više nije „nije definisano“, nego 0 € treneru i
+cio iznos teretani; „nije definisano“ ostaje za stare prodaje (`finance.spec.ts`).
+
+| Provjera 02.10.2026 | Rezultat |
+|---|---|
+| `npm run lint`, `npm run typecheck`, unit (`tests/unit`), `npm run build` | PROŠLO (220 unit) |
+| pgTAP sa migracijom 0051 u transakciji koja se poništava (produkcija) | **33/33 fajla**; `0031_personal_gym_fee` prepisan za D-101 (15 provjera: obavezno, minimum 40 €, stari obrazac odbijen, S-05, S-22, dio trenera 0); `0006` (83) prodaje Personalni preko fiksnog dijela |
+| Migracija 0051 na produkciji | **nije primijenjena**: čeka odobrenje, jer mora ići zajedno sa deploy-em |
+| E2E (`members`, `pause-gym-fee`, `test-plan-forms` MSHIP-07, `test-plan-high-c` MSHIP-09/10, `test-plan-rest` MSHIP-11, `test-plan-high-f` FIN-11) | ažurirani, **nisu pušteni**: lokalni server zove RPC na produkciji, pa trebaju migraciju 0051 |
 
 *Kraj plana. Novi rezultati upisani su uz slučajeve; neoznačeni kvadratići nisu automatski prolaz.*
 

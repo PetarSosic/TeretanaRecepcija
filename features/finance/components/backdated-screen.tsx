@@ -334,7 +334,12 @@ function MembershipForm({
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="grid gap-1.5">
-          <Label htmlFor="amount">{me.finance.amount} (€)</Label>
+          {/* D-101: Personalni's one figure is the gym's fixed part, as on S-08. */}
+          <Label htmlFor="amount">
+            {plan?.kind === "personal"
+              ? me.memberships.gymFee
+              : `${me.finance.amount} (€)`}
+          </Label>
           <Input
             id="amount"
             name="amount"

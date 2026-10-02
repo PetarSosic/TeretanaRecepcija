@@ -115,7 +115,7 @@ All features are **MVP**. Acceptance criteria (AC) are written so each one can b
 - AC1: The plan list shows active plans, excluding the day pass.
 - AC2: The start date, reason text and last valid day are calculated by BR-052 and BR-051 and shown before saving.
 - AC3: A trainer is required when BR-058 applies, and the list follows BR-023.
-- AC4: The amount is read-only for list-price plans (editable for the owner). For Personalni it is required and ≥ the minimum (BR-059), and the session count (1–50) is required.
+- AC4: The amount is read-only for list-price plans (editable for the owner). Personalni has no amount field: the gym's fixed part is its amount, required and ≥ the minimum (BR-059, D-101), and the session count (1–50) is required.
 - AC5: The payment method is required. Save runs in one transaction (BR-060) and links unpaid visits per BR-052.
 - AC6: With no open shift, Save is disabled (BR-092), except in the owner's back-dated mode.
 

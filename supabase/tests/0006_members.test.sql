@@ -352,8 +352,9 @@ select is(
 -- BR-059 and BR-058: amounts and trainers --------------------------------------------------
 select throws_ok(
   $$select sell_membership('66666666-0000-0000-0000-000000020004',
-      '66666666-0000-0000-0000-00000000f003', '66666666-0000-0000-0000-00000000d001', 75, 10, 'cash')$$,
-  'P0001', 'E_AMOUNT_BELOW_MIN', 'E13: Personalni for €75 is rejected, the minimum is €80');
+      '66666666-0000-0000-0000-00000000f003', '66666666-0000-0000-0000-00000000d001', null, 10, 'cash',
+      p_gym_fee => 75)$$,
+  'P0001', 'E_AMOUNT_BELOW_MIN', 'E13 (D-101): Personalni with a fixed part of €75 is rejected, the minimum is €80');
 select throws_ok(
   $$select sell_membership('66666666-0000-0000-0000-000000020004',
       '66666666-0000-0000-0000-00000000f003', null, 120, 10, 'cash')$$,
@@ -374,15 +375,17 @@ select throws_ok(
 
 select lives_ok(
   $$select sell_membership('66666666-0000-0000-0000-000000020004',
-      '66666666-0000-0000-0000-00000000f003', '66666666-0000-0000-0000-00000000d001', 120, 10, 'card')$$,
-  'E13: Personalni for €120 with Tamara is sold');
+      '66666666-0000-0000-0000-00000000f003', '66666666-0000-0000-0000-00000000d001', null, 10, 'card',
+      p_gym_fee => 120)$$,
+  'E13 (D-101): Personalni with Tamara and a fixed part of €120 is sold');
 reset role;
 select is(
-  (select mf.personal_gym_fee from membership_finance mf
+  (select mf.personal_gym_fee || '|' || p.amount from membership_finance mf
    join memberships ms on ms.id = mf.membership_id
+   join payments p on p.membership_id = ms.id
    where ms.member_id = '66666666-0000-0000-0000-000000020004'
      and ms.plan_id = '66666666-0000-0000-0000-00000000f003'),
-  80.00::numeric, 'BR-058: the trainer fee is copied onto the membership');
+  '120.00|120.00', 'D-101: the fixed part is the payment, not Tamara''s €80 fee');
 select is(
   (select personal_session_limit from memberships
    where member_id = '66666666-0000-0000-0000-000000020004'

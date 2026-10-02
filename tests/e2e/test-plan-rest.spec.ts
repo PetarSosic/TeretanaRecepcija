@@ -583,7 +583,10 @@ test("MSHIP-11: Grupni, G+T and Personalni need a trainer; Mjesečna does not as
     // once a trainer is proposed, as it is for a member who had one before).
     await expect(dialog.getByLabel("Trener")).toHaveValue("");
     if (planId === plan.personalni) {
-      await dialog.getByRole("textbox", { name: "Iznos (€)" }).fill("90");
+      // D-101: Personalni's one figure is the gym's fixed part.
+      await dialog
+        .getByRole("textbox", { name: "Fiksni dio za teretanu (€)" })
+        .fill("90");
       await dialog.getByLabel("Broj termina").fill("8");
     }
     await dialog.getByText("Gotovina", { exact: true }).click();

@@ -32,7 +32,7 @@
 | P-24 | Anonymize a member | ✓ | ✗ | ✗ | BR-046 |
 | P-24a | Pause a membership (7 days at most in total) and end a pause | ✓ | ✓ | ✓ | BR-056, D-100 |
 | P-25 | Sell or renew a membership at list price (open shift required) | ✓ | ✓ | ✓ | BR-092 |
-| P-26 | Enter the amount, sessions and the gym's fixed part for Personalni (amount ≥ minimum) | ✓ | ✓ | ✓ | BR-059, D-99 |
+| P-26 | Enter the sessions and the gym's fixed part for Personalni, which is its amount (≥ minimum) | ✓ | ✓ | ✓ | BR-059, D-99, D-101 |
 | P-27 | Change a list-price amount | ✓ | ✗ | ✗ | BR-059 |
 | P-27a | Override the start date of a membership being sold (S-05, S-08) | ✓ | ✓ | ✓ | BR-052, D-97 |
 | P-28 | Sell day passes; replace a lost card | ✓ | ✓ | ✓ | BR-034, BR-100 |

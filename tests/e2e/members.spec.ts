@@ -349,15 +349,17 @@ test("US-08.1 and E13: Personalni below the minimum is refused, then sold", asyn
   await dialog.getByLabel("Vrsta članarine").selectOption(personalniId);
   await dialog.getByLabel("Trener").selectOption(trainerId);
   await dialog.getByLabel("Broj termina").fill("10");
+  // D-101: Personalni has no amount of its own; the gym's fixed part is what is paid.
+  await expect(dialog.getByLabel("Iznos (€)")).toHaveCount(0);
   await expect(dialog.getByText("Minimalno 80,00 €")).toBeVisible();
-  await dialog.getByLabel("Iznos (€)").fill("75");
+  await dialog.getByLabel("Fiksni dio za teretanu (€)").fill("75");
   await dialog.getByText("Platna kartica", { exact: true }).click();
   await dialog.getByRole("button", { name: "Naplati i sačuvaj" }).click();
   await expect(
-    dialog.getByText("Iznos ne može biti manji od 80,00 €."),
+    dialog.getByText("Fiksni dio za teretanu ne može biti manji od 80,00 €."),
   ).toBeVisible();
 
-  await dialog.getByLabel("Iznos (€)").fill("120");
+  await dialog.getByLabel("Fiksni dio za teretanu (€)").fill("120");
   await dialog.getByRole("button", { name: "Naplati i sačuvaj" }).click();
   await expect(page.getByText("Članarina sačuvana.")).toBeVisible();
   await expect(page.getByRole("dialog")).toBeHidden();

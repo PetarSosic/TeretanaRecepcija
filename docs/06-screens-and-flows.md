@@ -143,10 +143,8 @@ An `admin` sees everything an owner sees (D-58).
 2. `Trener`: shown if required, filtered by BR-023.
 2a. `Fiksni termin` (D-71, BR-058a): for plans that cover group training and require a trainer, shown once a trainer is chosen. A select (`Izaberite termin`) of only that trainer's active class times, e.g. `Uto, čet, sub · 08:00`. If the trainer has none, the select is replaced by `Trener nema nijedan aktivan termin u rasporedu, pa se članarina ne može prodati. Vlasnik ili menadžer dodaje ili aktivira časove u Podešavanja → Treneri i raspored.` and the sale cannot be saved.
 3. `Broj termina`: Personalni only, 1–50.
-4. `Iznos (€)`:
-   - read-only for list-price plans (the owner sees an edit pencil);
-   - required for Personalni, with the hint `Minimalno <min> €`.
-4a. `Fiksni dio za teretanu (€)` (D-99): Personalni only, optional, every role, with the hint `Ako ostane prazno, važi naknada trenera iz podešavanja.` 0 up to the amount.
+4. `Iznos (€)`: read-only for list-price plans (the owner sees an edit pencil). Not shown for Personalni (D-101).
+4a. `Fiksni dio za teretanu (€)` (D-99, D-101): Personalni only, required, every role, with the hint `Minimalno <min> €`. It is the amount the member pays, and all of it goes to the gym.
 5. `Početak`: read-only, with the BR-052 reason text underneath, and an edit pencil [Promijeni početak] for every role (D-97). `Važi do`: read-only and calculated.
 6. `Način plaćanja`: two large buttons, Gotovina and Platna kartica.
 7. A summary line: `<plan> · <Početak>–<Važi do> · <iznos> · <način>`.
@@ -261,7 +259,7 @@ An `admin` sees everything an owner sees (D-58).
 
 **Tab rules:**
 - Dolazak: requires a member, check-in and check-out times, the type, and the trainer/slot when needed.
-- Članarina: works like S-08 (the `Fiksni termin` of D-71 included), with an editable start date and payment date.
+- Članarina: works like S-08 (the `Fiksni termin` of D-71 included), with an editable start date and payment date. For Personalni the amount field is labelled `Fiksni dio za teretanu (€)` and is the gym's fixed part, as on S-08 (D-101).
 
 **Banner:** `Naknadni unos – ne ulazi u smjenu.`
 

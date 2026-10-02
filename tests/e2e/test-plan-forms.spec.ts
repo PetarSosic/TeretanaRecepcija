@@ -727,7 +727,7 @@ test("SET-02: username rules on S-23", async ({ page }) => {
   note(`SET-02 "${upper}" → ${result}; stored ${JSON.stringify(data)}`);
 });
 
-test("MSHIP-07: a personal package needs an amount and sessions", async ({
+test("MSHIP-07: a personal package needs the gym's fixed part and sessions (D-101)", async ({
   page,
 }) => {
   await signIn(page, receptionist);
@@ -737,11 +737,12 @@ test("MSHIP-07: a personal package needs an amount and sessions", async ({
   await dialog.getByLabel("Vrsta članarine").selectOption(plan.personalni);
   await dialog.getByLabel("Trener").selectOption(trainerId);
   await expect(dialog.getByText("Minimalno 80,00 €")).toBeVisible();
+  await expect(dialog.getByLabel("Iznos (€)")).toHaveCount(0);
   await dialog.getByText("Gotovina", { exact: true }).click();
   await dialog.getByRole("button", { name: "Naplati i sačuvaj" }).click();
   await expect
-    .poll(() => fieldError(dialog, "Iznos (€)"))
-    .toBe("Unesite iznos, na primjer 79 ili 79,50.");
+    .poll(() => fieldError(dialog, "Fiksni dio za teretanu (€)"))
+    .toBe("Unesite fiksni dio za teretanu, na primjer 40 ili 40,50.");
   await expect
     .poll(() => fieldError(dialog, "Broj termina"))
     .toBe("Unesite broj termina od 1 do 50.");

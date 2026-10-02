@@ -42,8 +42,8 @@ Use these terms **exactly** in the documents, code and UI.
 | Remaining sessions | computed | Preostalo termina | Limit minus the visits already linked to that membership. |
 | Membership status | computed | Status | `active` Aktivna · `paused` Pauzirana (D-100) · `upcoming` Buduća · `used_up` Iskorištena · `expired` Istekla · `voided` Poništena. |
 | Pause | `membership_pauses` | Pauza | Days on which a membership covers nothing and which move its last valid day later; 7 days at most in total per membership (BR-056, D-100). |
-| Gym's fixed part | `membership_finance.personal_gym_fee` | Fiksni dio za teretanu | The part of a Personalni amount that goes to the gym, entered at sale or else the trainer's fee (BR-059, D-99). |
-| Personal minimum price | `personal_min_price` | Minimalna cijena personalnog | Lowest allowed amount for a Personalni sale. Default €80. |
+| Gym's fixed part | `membership_finance.personal_gym_fee` | Fiksni dio za teretanu | The one figure of a Personalni sale, required: what the member pays at the desk, all of which goes to the gym (BR-059, D-99, D-101). Sales from before D-101 may hold a smaller part or the trainer's fee. |
+| Personal minimum price | `personal_min_price` | Minimalna cijena personalnog | Lowest allowed amount for a Personalni sale, which since D-101 is its gym's fixed part. Default €80. |
 | Program | `program` | Program | A kind of training trainers can be assigned to (e.g. "Grupni trening"). Kind `group` or `personal`. |
 | Trainer assignment | `trainer_program` | Dodjela trenera | A link saying a trainer runs a program. |
 | Class slot | `class_slot` | Čas (u rasporedu) | A weekly scheduled group class: program + trainer + weekday + start time. |

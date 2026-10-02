@@ -377,18 +377,21 @@ test("MSHIP-12: the payment method is required", async ({ page }) => {
   expect(await membershipCount(member.buyer)).toBe(0);
 });
 
-test("MSHIP-09 and MSHIP-10: personal sessions and amount bounds", async ({
+test("MSHIP-09 and MSHIP-10: personal sessions and fixed-part bounds (D-101)", async ({
   page,
 }) => {
   test.setTimeout(180_000);
   await signIn(page, staff.ana);
   const SESSIONS = "Unesite broj termina od 1 do 50.";
-  const AMOUNT = "Unesite iznos, na primjer 79 ili 79,50.";
+  const AMOUNT = "Unesite fiksni dio za teretanu, na primjer 40 ili 40,50.";
   async function attempt(sessions: string, amount: string) {
     const sale = await openSale(page, plan.personalni);
     await sale.getByLabel("Trener").selectOption(julija);
     await sale.getByLabel("Broj termina").fill(sessions);
-    await sale.getByRole("textbox", { name: "Iznos (€)" }).fill(amount);
+    // D-101: Personalni's one figure is the gym's fixed part.
+    await sale
+      .getByRole("textbox", { name: "Fiksni dio za teretanu (€)" })
+      .fill(amount);
     await sale.getByText("Gotovina", { exact: true }).click();
     const before = await membershipCount(member.buyer);
     await sale.getByRole("button", { name: "Naplati i sačuvaj" }).click();
@@ -429,7 +432,9 @@ test("MSHIP-09 and MSHIP-10: personal sessions and amount bounds", async ({
   const zero = await attempt("8", "0");
   note(`MSHIP-10 "0" → ${zero.shown}`);
   expect(zero.saved).toBe(false);
-  expect(zero.shown).toContain("Iznos ne može biti manji od 80,00 €.");
+  expect(zero.shown).toContain(
+    "Fiksni dio za teretanu ne može biti manji od 80,00 €.",
+  );
   const huge = await attempt("8", "999999999");
   note(`MSHIP-10 "999999999" → ${huge.shown}`);
   expect(huge.saved).toBe(false);

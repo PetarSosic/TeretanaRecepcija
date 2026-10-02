@@ -8,7 +8,7 @@ import {
   type TestStaff,
 } from "./fixtures";
 
-// D-99: S-05 Novi član takes the gym's fixed part of a Personalni sale. D-100 (BR-056):
+// D-101: S-05 Novi član takes only the gym's fixed part of a Personalni sale. D-100 (BR-056):
 // S-07 pauses a membership, [Prekini pauzu] ends it, and a scan on a paused day ends
 // it too. Everything lives in this test's own gym, which afterAll removes.
 test.describe.configure({ mode: "serial" });
@@ -166,13 +166,14 @@ async function gymToday(): Promise<string> {
   return data as string;
 }
 
-/** S-05 with Personalni: 10 sessions, €100, and the fixed part given (D-99). */
+/** S-05 with Personalni: 10 sessions and the gym's fixed part, €100 unless given (D-101). */
 async function register(
   page: Page,
   card: string,
   name: string,
   phone: string,
   checkIn: boolean,
+  gymFee: string | null = "100",
 ) {
   await page.goto("/members");
   await page.getByRole("button", { name: "Novi član" }).click();
@@ -193,13 +194,14 @@ async function register(
   await dialog.getByLabel("Vrsta članarine").selectOption(personalniId);
   await dialog.getByLabel("Trener").selectOption(trainerId);
   await dialog.getByLabel("Broj termina").fill("10");
-  await dialog.getByLabel("Iznos (€)").fill("100");
+  if (gymFee !== null)
+    await dialog.getByLabel("Fiksni dio za teretanu (€)").fill(gymFee);
   if (!checkIn) await dialog.getByLabel("Prijavi odmah").uncheck();
   await dialog.getByText("Gotovina", { exact: true }).click();
   return dialog;
 }
 
-test("D-99: Novi član with Personalni takes the gym's fixed part", async ({
+test("D-101: Novi član with Personalni takes only the gym's fixed part", async ({
   page,
 }) => {
   await signIn(page, receptionist);
@@ -209,33 +211,45 @@ test("D-99: Novi član with Personalni takes the gym's fixed part", async ({
     "E2E Ana",
     "067 310 001",
     false,
+    null,
   );
+  await expect(dialog.getByLabel("Iznos (€)")).toHaveCount(0);
   await expect(dialog.getByLabel("Fiksni dio za teretanu (€)")).toHaveValue("");
-  await expect(
-    dialog.getByText("Ako ostane prazno, važi naknada trenera iz podešavanja."),
-  ).toBeVisible();
+  await expect(dialog.getByText("Minimalno 80,00 €")).toBeVisible();
 
-  // More than the amount is refused under the field, and nothing is saved.
-  await dialog.getByLabel("Fiksni dio za teretanu (€)").fill("150");
+  // Empty and below the minimum are refused under the field, and nothing is saved.
   await dialog.getByRole("button", { name: "Sačuvaj" }).click();
   await expect(
     dialog.getByText(
-      "Fiksni dio za teretanu mora biti između 0 i iznosa članarine.",
+      "Unesite fiksni dio za teretanu, na primjer 40 ili 40,50.",
     ),
   ).toBeVisible();
+  await dialog.getByLabel("Fiksni dio za teretanu (€)").fill("75");
+  await dialog.getByRole("button", { name: "Sačuvaj" }).click();
+  await expect(
+    dialog.getByText("Fiksni dio za teretanu ne može biti manji od 80,00 €."),
+  ).toBeVisible();
 
-  await dialog.getByLabel("Fiksni dio za teretanu (€)").fill("30");
+  await dialog.getByLabel("Fiksni dio za teretanu (€)").fill("90");
   await dialog.getByRole("button", { name: "Sačuvaj" }).click();
   await expect(dialog.getByText(/Član #1 je kreiran\./)).toBeVisible({
     timeout: 15_000,
   });
 
-  const { data } = await adminClient()
+  // The fixed part is both what the gym keeps and the one payment (BR-060, BR-155).
+  const admin = adminClient();
+  const { data } = await admin
     .from("membership_finance")
     .select("personal_gym_fee::text")
     .eq("gym_id", gymId)
     .single<{ personal_gym_fee: string }>();
-  expect(data?.personal_gym_fee).toBe("30.00");
+  expect(data?.personal_gym_fee).toBe("90.00");
+  const { data: payment } = await admin
+    .from("payments")
+    .select("amount::text")
+    .eq("gym_id", gymId)
+    .single<{ amount: string }>();
+  expect(payment?.amount).toBe("90.00");
 });
 
 test("D-100: S-07 pauses a membership and [Prekini pauzu] gives the days back", async ({

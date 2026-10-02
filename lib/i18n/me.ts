@@ -616,11 +616,9 @@ export const me = {
     amountHint: "Minimalno {min}",
     amountInvalid: "Unesite iznos, na primjer 79 ili 79,50.",
     editAmount: "Promijeni iznos",
-    // D-99: the gym's fixed part of a Personalni sale, typed by any role.
+    // D-99 and D-101: the gym's fixed part, the one figure of a Personalni sale.
     gymFee: "Fiksni dio za teretanu (€)",
-    gymFeeHint: "Ako ostane prazno, važi naknada trenera iz podešavanja.",
-    gymFeeInvalid:
-      "Fiksni dio za teretanu mora biti između 0 i iznosa članarine.",
+    gymFeeInvalid: "Unesite fiksni dio za teretanu, na primjer 40 ili 40,50.",
     start: "Početak",
     until: "Važi do",
     editStart: "Promijeni početak",
@@ -1149,10 +1147,11 @@ export const me = {
     E_CLASS_TIME_REQUIRED: "Izaberite fiksni termin.",
     E_CLASS_TIME_INVALID:
       "Izabrani termin nije među aktivnim terminima ovog trenera.",
-    E_AMOUNT_BELOW_MIN: "Iznos ne može biti manji od {min} €.",
-    // D-99 and D-100.
+    // D-101: only a Personalni sale has a minimum, and its fixed part is its amount.
+    E_AMOUNT_BELOW_MIN: "Fiksni dio za teretanu ne može biti manji od {min} €.",
+    // D-99, D-101 and D-100.
     E_GYM_FEE_INVALID:
-      "Fiksni dio za teretanu mora biti između 0 i iznosa članarine.",
+      "Fiksni dio za teretanu nije ispravan. Osvježite stranicu i unesite ga ponovo.",
     E_PAUSE_INVALID:
       "Pauza mora početi danas ili kasnije, dok članarina još važi.",
     E_PAUSE_TOO_LONG: "Članarina se može pauzirati najviše 7 dana ukupno.",

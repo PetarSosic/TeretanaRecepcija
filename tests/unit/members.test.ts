@@ -155,7 +155,7 @@ describe("saleFieldsSchema (S-08)", () => {
       "79.50",
     );
   });
-  it("asks Personalni for its amount, sessions and trainer (BR-058, BR-059)", () => {
+  it("asks Personalni for its fixed part, sessions and trainer (BR-058, BR-059, D-101)", () => {
     const result = saleFieldsSchema.safeParse({
       ...sale,
       planKind: "personal",
@@ -164,14 +164,15 @@ describe("saleFieldsSchema (S-08)", () => {
     expect(result.success).toBe(false);
     const fields = (result.error?.issues ?? []).map((issue) => issue.path[0]);
     expect(fields).toEqual(
-      expect.arrayContaining(["amount", "sessions", "trainerId"]),
+      expect.arrayContaining(["gymFee", "sessions", "trainerId"]),
     );
+    expect(fields).not.toContain("amount");
   });
   it("limits the session count to 1–50", () => {
     const base = {
       ...sale,
       planKind: "personal",
-      amount: "120",
+      gymFee: "120",
       requiresTrainer: "false",
     };
     expect(saleFieldsSchema.safeParse({ ...base, sessions: "0" }).success).toBe(
@@ -219,7 +220,7 @@ describe("saleFieldsSchema (S-08)", () => {
         requiresTrainer: "true",
         coversGroup: "false",
         trainerId: "22222222-2222-4222-8222-222222222222",
-        amount: "120",
+        gymFee: "120",
         sessions: "10",
       }).success,
     ).toBe(true);
@@ -250,33 +251,32 @@ describe("registerSchema (BR-033)", () => {
   });
 });
 
-describe("saleFieldsSchema: the gym's fixed part of Personalni (D-99)", () => {
+describe("saleFieldsSchema: the gym's fixed part is the Personalni amount (D-99, D-101)", () => {
   const personal = {
     ...sale,
     planKind: "personal",
     requiresTrainer: "false",
     sessions: "10",
-    amount: "100",
   };
-  it("leaves an empty field to the trainer's fee", () => {
-    expect(saleFieldsSchema.parse(personal).gymFee).toBeNull();
-    expect(
-      saleFieldsSchema.parse({ ...personal, gymFee: "" }).gymFee,
-    ).toBeNull();
+  it("requires it, under its own field", () => {
+    for (const gymFee of [undefined, ""]) {
+      const result = saleFieldsSchema.safeParse({ ...personal, gymFee });
+      expect(result.error?.issues[0]?.path[0], String(gymFee)).toBe("gymFee");
+      expect(result.error?.issues[0]?.message, String(gymFee)).toBe(
+        me.memberships.gymFeeInvalid,
+      );
+    }
   });
-  it("keeps a typed part as a decimal string, from 0 to the amount", () => {
-    expect(saleFieldsSchema.parse({ ...personal, gymFee: "30,5" }).gymFee).toBe(
-      "30.50",
-    );
-    expect(saleFieldsSchema.parse({ ...personal, gymFee: "0" }).gymFee).toBe(
-      "0.00",
-    );
-    expect(saleFieldsSchema.parse({ ...personal, gymFee: "100" }).gymFee).toBe(
-      "100.00",
+  it("keeps a typed part as a decimal string, with no amount beside it", () => {
+    const value = saleFieldsSchema.parse({ ...personal, gymFee: "40,5" });
+    expect(value.gymFee).toBe("40.50");
+    expect(value.amount).toBeNull();
+    expect(saleFieldsSchema.parse({ ...personal, gymFee: "150" }).gymFee).toBe(
+      "150.00",
     );
   });
-  it("refuses more than the amount, or text, under its own field", () => {
-    for (const gymFee of ["100,01", "abc", "-5"]) {
+  it("refuses text or a negative figure", () => {
+    for (const gymFee of ["abc", "-5"]) {
       const result = saleFieldsSchema.safeParse({ ...personal, gymFee });
       expect(result.error?.issues[0]?.path[0], gymFee).toBe("gymFee");
       expect(result.error?.issues[0]?.message, gymFee).toBe(

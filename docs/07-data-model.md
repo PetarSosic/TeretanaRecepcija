@@ -258,7 +258,7 @@ create table membership_finance (                          -- OWNER ONLY, snapsh
   gym_id            uuid not null references gyms(id),
   gym_fixed_amount  numeric(10,2) not null default 0,
   trainer_share_pct numeric(5,2),
-  personal_gym_fee  numeric(10,2)  -- entered at sale (D-99), else the trainer's; null = nije definisano
+  personal_gym_fee  numeric(10,2)  -- the Personalni amount since D-101 (before: typed part, D-99, or the trainer's); null = nije definisano
 );
 
 -- D-100 (BR-056): pauses, 7 days at most in total per membership. paused_until is the last
@@ -525,11 +525,11 @@ All RPCs are `security definer`. Each one:
 | `scan_card(p_code text)` → json `{result, member, open_visit, options, candidates, unpaid_count}` | all | BR-070–073 (check-out happens inside, unless the guard applies), BR-072a |
 | `check_in(p_member uuid, p_type visit_type, p_membership uuid, p_trainer uuid, p_slot uuid, p_manual bool)` → json | all | BR-071–079 |
 | `check_out(p_visit uuid, p_confirmed bool)` → json | all | BR-072, BR-072a |
-| `register_member(p_card_code, p_first, p_last, p_phone, p_email, p_dob, p_plan, p_trainer, p_amount, p_sessions, p_method, p_check_in bool, p_class_time time default null, p_start_override date default null)` → json | all (`p_start_override` too, N-31, D-97); `p_gym_fee numeric default null` last (D-99) | BR-033, BR-040–043, BR-050–060, BR-058a |
+| `register_member(p_card_code, p_first, p_last, p_phone, p_email, p_dob, p_plan, p_trainer, p_amount, p_sessions, p_method, p_check_in bool, p_class_time time default null, p_start_override date default null)` → json | all (`p_start_override` too, N-31, D-97); `p_gym_fee numeric default null` last (D-99): for Personalni the required fixed part and the amount, with `p_amount` null or equal (D-101) | BR-033, BR-040–043, BR-050–060, BR-058a |
 | `find_duplicates(p_phone, p_email)` → rows | all | BR-043 |
 | `update_member(p_member, …)` | all | BR-045 |
 | `anonymize_member(p_member)` | owner | BR-046 |
-| `sell_membership(p_member, p_plan, p_trainer, p_amount, p_sessions, p_method, p_start_override date default null, p_class_time time default null)` | all (override too, D-97); `p_gym_fee numeric default null` last (D-99) | BR-050–060, BR-058a, BR-092 |
+| `sell_membership(p_member, p_plan, p_trainer, p_amount, p_sessions, p_method, p_start_override date default null, p_class_time time default null)` | all (override too, D-97); `p_gym_fee numeric default null` last (D-99): for Personalni the required fixed part and the amount, with `p_amount` null or equal (D-101) | BR-050–060, BR-058a, BR-092 |
 | `set_membership_class_time(p_membership uuid, p_class_time time)` → membership | all | BR-058a (D-71) |
 | `pause_membership(p_membership uuid, p_from date, p_days int)` → membership_pauses | all | BR-056 (D-100) |
 | `end_membership_pause(p_pause uuid)` → membership_pauses | all | BR-056 (D-100); a check-in (`start_check_in`, `check_in`) ends a running pause the same way and answers `pause_ended` |
@@ -546,7 +546,7 @@ All RPCs are `security definer`. Each one:
 | `stock_in(p_product, p_qty, p_unit_cost, p_from_till bool, p_method default null, p_spent_on date default null, p_description default null, p_supplier default null, p_invoice default null, p_vat bool default null)` | all (owner/admin for an earlier `p_spent_on`, D-95) | BR-141 |
 | `stock_sale(p_product, p_qty, p_method)` | all | BR-142 |
 | `correct_sale(p_movement, p_method)`, `void_stock_movement(p_movement, p_reason)` | per BR-094 and BR-095 | |
-| `backdated_visit(…)`, `backdated_membership(…, p_class_time time default null)`, `backdated_day_passes(…)`, `backdated_card_fee(…)` | owner | BR-120, BR-058a |
+| `backdated_visit(…)`, `backdated_membership(…, p_class_time time default null)` (for Personalni `p_amount` is the gym's fixed part, D-101), `backdated_day_passes(…)`, `backdated_card_fee(…)` | owner | BR-120, BR-058a |
 | `generate_card_batch(p_qty)` → batch | owner (D-81) | BR-030, BR-036 |
 | `upsert_trainer`, `upsert_program`, `set_trainer_program`, `upsert_class_slot` | owner, manager | BR-023–026 |
 | `set_trainer_fee(p_trainer, p_fee, p_group_share_pct)`, `upsert_plan` (incl. finance), `upsert_expense_category`, `update_gym_settings` | owner | BR-004, BR-131, BR-140, D-62 |
